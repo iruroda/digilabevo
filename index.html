@@ -120,6 +120,7 @@ tr+tr td{border-top:1px solid var(--border)}
 tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .treebox{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:auto;height:calc(100vh - 250px);min-height:300px}
 .treebox svg{display:block}
+.treebox{cursor:grab}.treebox.grabbing{cursor:grabbing;user-select:none}.treebox .tn{cursor:pointer}
 .tr-e{fill:none;stroke:#c4c4c4;stroke-width:1;opacity:.6}
 .tr-e.on{stroke:var(--accent);stroke-width:2;opacity:1}.tr-e.up{stroke:var(--sub);stroke-width:2;opacity:1}
 .treebox svg.focus .tr-e:not(.on):not(.up){opacity:.08}
@@ -541,6 +542,10 @@ if(fbAuth){fbAuth.onAuthStateChanged(user=>{
   else{CUR_USER=null;CUR_NAME=null;ROUTES=loadLocal();updateAuthUI()}})}
 // ---------- 스크롤바 (스크롤할 때만 표시) ----------
 function hookScroll(t,el){let h;t.addEventListener('scroll',()=>{el.classList.add('scrolling');clearTimeout(h);h=setTimeout(()=>el.classList.remove('scrolling'),650)},{passive:true})}
+(()=>{const b=$('#treebox');let d=null;
+b.addEventListener('mousedown',e=>{if(e.button||e.target.closest('.tn'))return;d={x:e.clientX,y:e.clientY,l:b.scrollLeft,t:b.scrollTop};b.classList.add('grabbing');e.preventDefault()});
+window.addEventListener('mousemove',e=>{if(!d)return;b.scrollLeft=d.l-(e.clientX-d.x);b.scrollTop=d.t-(e.clientY-d.y)});
+window.addEventListener('mouseup',()=>{d=null;b.classList.remove('grabbing')})})();
 hookScroll(window,document.documentElement);['#mpanel','#mbody','#treebox'].forEach(s=>hookScroll($(s),$(s)));
 // ---------- 시작 ----------
 ROUTES=loadLocal();drawSel();drawModes();drawFilters();updateAuthUI();view('route');
