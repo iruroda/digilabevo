@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>디지랩 EVO</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#4a8fe0">
+<style>
+:root{--bg:#e8f0fb;--card:#ffffff;--txt:#1a1a1a;--sub-rgb:104,126,160;--sub:#687ea0;--accent:#4a8fe0;--accent-rgb:74,143,224;--border:rgba(var(--sub-rgb),.35);--yellow:#ffc401;--warm:#1a1a1a;--warm-bg:rgba(255,196,1,.32);--ov:rgba(30,45,75,.45)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+img{-webkit-user-drag:none;user-drag:none;-webkit-touch-callout:none}
+html{overflow-y:scroll;overflow-x:hidden;scrollbar-gutter:stable}
+@media (hover:hover) and (pointer:fine){
+.sb{scrollbar-gutter:stable}
+html::-webkit-scrollbar,.sb::-webkit-scrollbar{width:12px;height:12px}
+html::-webkit-scrollbar-track,.sb::-webkit-scrollbar-track{background:transparent}
+html::-webkit-scrollbar-thumb,.sb::-webkit-scrollbar-thumb{background:transparent;border:3px solid transparent;border-radius:10px;background-clip:padding-box;transition:background .25s}
+html.scrolling::-webkit-scrollbar-thumb,.sb.scrolling::-webkit-scrollbar-thumb{background:rgba(30,45,75,.28);border:3px solid transparent;background-clip:padding-box}
+html.scrolling::-webkit-scrollbar-thumb:hover,.sb.scrolling::-webkit-scrollbar-thumb:hover{background:rgba(30,45,75,.42);border:3px solid transparent;background-clip:padding-box}
+html,.sb{scrollbar-width:thin;scrollbar-color:rgba(30,45,75,0) transparent}
+html.scrolling,.sb.scrolling{scrollbar-color:rgba(30,45,75,.28) transparent}
+}
+html,body{margin:0;padding:0;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
+input,textarea{-webkit-user-select:text;user-select:text;font-family:inherit}
+button{font-family:inherit}
+body.lock{overflow:hidden}
+.wrap{max-width:520px;margin:0 auto;min-height:100vh}
+header{position:sticky;top:0;z-index:15;background:linear-gradient(180deg,#ffffff,var(--bg) 55%);padding:12px 12px 8px}
+.title{display:flex;align-items:center;gap:9px;margin:0 0 9px;padding-right:43px;min-height:34px}
+.title svg.logo{width:24px;height:24px;flex:0 0 auto;cursor:pointer}
+.title h1{font-size:16px;font-weight:800;margin:0;letter-spacing:-.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.viewtoggle{display:flex;gap:5px;flex:0 0 auto}
+.viewtoggle button{border-radius:8px;padding:6px 9px;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--bg);color:var(--txt);cursor:pointer;white-space:nowrap}
+.viewtoggle button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+body[data-view=route] .searchwrap{display:none}
+body[data-view=route] header{padding-bottom:4px}
+#menubtnWrap{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:33;display:flex;justify-content:flex-end;pointer-events:none}
+#menubtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:0;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;pointer-events:auto;flex-shrink:0}
+#menubtn span{display:block;width:19px;height:3px;border-radius:2px;background:var(--accent);transform-origin:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s ease}
+#menubtn.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
+#menubtn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+#menubtn.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+.searchwrap{position:relative;margin:0}
+.search{width:100%;padding:9px 38px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--txt);font-size:14px;outline:none;height:34px}
+.search:focus{border-color:var(--accent)}
+.search::placeholder{color:rgba(var(--sub-rgb),.7)}
+.qicon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;pointer-events:none}
+.qicon circle,.qicon path{stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;fill:none}
+.qclear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;padding:0;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.qclear svg{width:15px;height:15px}.qclear svg path{stroke:var(--accent);stroke-width:2.2;stroke-linecap:round}
+.chips{display:flex;flex-wrap:wrap;gap:7px;padding:11px 0 2px}
+.chip{flex:0 0 auto;display:flex;align-items:center;gap:5px;padding:0 11px;height:28px;border-radius:999px;background:var(--bg);color:var(--txt);font-size:11.5px;font-weight:600;border:2.5px solid transparent;cursor:pointer;white-space:nowrap}
+.chip.active{border-color:var(--accent)}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chip .x{font-size:13px;line-height:1;color:var(--sub);margin-left:1px}
+.chip.on .x{color:#fff}
+.chip.tag{background:#fff;border:1px solid var(--border);padding:0 9px}
+.chip.ban{background:var(--warm-bg);color:var(--warm);border-color:transparent}
+.content{padding:6px 12px 44px}
+.rcard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:8px}
+.lab{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
+.lab small{font-weight:600;font-size:11px}
+.field+.field{margin-top:14px}
+.pick{position:relative}
+.pick input{width:100%;padding:0 12px;height:34px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;outline:none;color:var(--txt)}
+.pick input:focus{border-color:var(--accent)}
+.pick input::placeholder{color:rgba(var(--sub-rgb),.7)}
+.drop{position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:260px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(30,45,75,.2);z-index:20;display:none}
+.drop.open{display:block}
+.drop div{padding:7px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600}
+.drop div.hl{background:var(--bg)}
+.drop small{color:var(--sub);margin-left:auto;font-weight:600;font-size:11px}
+.drop img{width:26px;height:26px;object-fit:contain}
+.rrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:10px 12px}
+.rrow.sm{margin-top:8px;padding:7px 10px;background:var(--bg);border-color:transparent;gap:10px}
+.rrow img{width:44px;height:44px;object-fit:contain;flex:0 0 auto}
+.rrow.sm img{width:34px;height:34px}
+.rrow .nm{font-size:13.5px;font-weight:800;word-break:keep-all}
+.rrow .mt{font-size:11.5px;color:var(--sub);font-weight:600}
+.rrow .xb{margin-left:auto;border:none;background:none;color:var(--sub);font-size:18px;line-height:1;cursor:pointer;padding:4px}
+.hintx{font-size:11.5px;color:var(--sub);margin-top:8px;line-height:1.5}
+.btn{display:flex;align-items:center;justify-content:center;height:36px;padding:0 10px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--txt);font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;flex:1}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btnrow{display:flex;gap:8px}
+.tagp{display:inline-flex;align-items:center;gap:3px;background:var(--bg);border-radius:7px;padding:2px 7px;font-size:11.5px;font-weight:600;color:var(--txt)}
+.tagp.evo{background:var(--accent);color:#fff;font-weight:700}
+.tagp.dev{background:#fff;border:1px solid var(--border);color:var(--sub)}
+.tagp.hard{background:var(--yellow);color:#1a1a1a;font-weight:700}
+.tagp.got{background:rgba(var(--accent-rgb),.14);color:#2c6cb8;font-weight:700}
+.sum{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.sum b{font-size:17px;font-weight:800}.sum span{font-size:12.5px;color:var(--sub);font-weight:600}
+.facts{display:flex;flex-wrap:wrap;gap:5px}
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:12px;align-items:center;cursor:pointer}
+.step img{width:44px;height:44px;object-fit:contain;flex:0 0 auto;background:var(--bg);border-radius:12px}
+.step .nm{font-size:13.5px;font-weight:800}.step .mt{font-size:11.5px;color:var(--sub);font-weight:600}
+.link{display:flex;gap:12px;min-height:30px}
+.link .ln{width:44px;display:flex;justify-content:center}.link .ln i{display:block;width:2px;background:var(--border)}
+.link .tx{padding:6px 0;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.empty{text-align:center;color:var(--sub);padding:50px 20px;font-size:13px;line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.grid .empty{grid-column:1/-1}
+.card{position:relative;height:114px;background:var(--card);border-radius:8px;padding:5px 3px 4px;overflow:hidden;border:1px solid var(--border);cursor:pointer}
+.card .no{position:absolute;top:4px;left:4px;font-size:8.5px;color:var(--sub);font-weight:700;z-index:2}
+.card .stg{position:absolute;top:4px;right:4px;font-size:8.5px;color:var(--accent);font-weight:700}
+.card img{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:74%;height:54px;object-fit:contain}
+.card .nm{position:absolute;left:0;right:0;bottom:4px;font-size:10px;font-weight:700;line-height:1.15;text-align:center;word-break:keep-all;padding:0 4px}
+.count{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px}
+.rlist{display:flex;flex-direction:column;gap:6px}
+.rlist .rrow{padding:8px 12px;cursor:pointer}
+table{border-collapse:collapse;width:100%}
+th,td{padding:5px 6px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--sub);font-weight:700;font-size:11px}
+tr+tr td{border-top:1px solid var(--border)}
+.mv td:nth-child(2){text-align:left}
+.md{color:var(--sub);font-size:11px;line-height:1.4;margin-top:2px;font-weight:500}
+tr.hit td{background:rgba(var(--accent-rgb),.12)}
+.treebox{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:auto;height:calc(100vh - 250px);min-height:300px}
+.treebox svg{display:block}
+.tr-e{fill:none;stroke:#b4c2d9;stroke-width:1;opacity:.6}
+.tr-e.on{stroke:var(--accent);stroke-width:2;opacity:1}.tr-e.up{stroke:var(--sub);stroke-width:2;opacity:1}
+.treebox svg.focus .tr-e:not(.on):not(.up){opacity:.08}
+.tn circle{fill:#8da1c2;cursor:pointer}.tn.end circle{fill:var(--accent)}
+.tn text{font-size:11px;fill:var(--txt);font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:3px;pointer-events:none}
+.treebox svg.focus .tn:not(.on){opacity:.18}
+.tn.sel circle{stroke:var(--txt);stroke-width:2.5}.tn.hit circle{stroke:var(--yellow);stroke-width:4}
+.tcol{font-size:11px;fill:var(--sub);font-weight:700}
+.sitefooter{font-size:7.5px;color:var(--accent);text-align:left;line-height:1.5;padding:12px;user-select:none}
+#menuOverlay,#modalOv{position:fixed;inset:0;background:var(--ov);opacity:0;pointer-events:none;transition:opacity .18s ease}
+#menuOverlay{z-index:30}#menuOverlay.open{opacity:1;pointer-events:auto}
+#mpanelWrap{position:fixed;inset:0;max-width:520px;margin:0 auto;z-index:31;display:flex;justify-content:flex-end;pointer-events:none}
+#mpanel{position:relative;width:min(320px,88vw);height:100%;background:#fff;padding:0 16px 16px;overflow-y:auto;display:flex;flex-direction:column;overscroll-behavior:contain;box-shadow:-6px 0 24px rgba(30,45,75,.18);opacity:0;transform:scale(.96);transform-origin:top right;pointer-events:none;transition:opacity .15s ease,transform .15s ease}
+#mpanel.open{opacity:1;transform:scale(1);pointer-events:auto}
+.mtitle{display:flex;align-items:center;gap:8px;position:sticky;top:0;padding:16px 0 8px;background:#fff;z-index:1;line-height:1}
+.mtitle svg.logo{width:22px;height:22px}.mtitle span{font-size:15px;font-weight:800}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;color:var(--sub);background:none;border:none;cursor:pointer;padding:0}
+.info-btn svg{width:14px;height:14px;display:block;pointer-events:none}
+.mgrouptitle{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:800;margin:8px 0 0}
+.mgrouptitle.mgap{margin-top:24px}
+.mgrouptitle::after{content:'';flex:1;height:1px;background:var(--border)}
+.msec h3{font-size:12px;color:var(--sub);margin:12px 0 8px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.msec h3 .car{font-size:10px;transition:transform .2s}
+.msec.collapsed h3{margin-bottom:0}.msec.collapsed .car{transform:rotate(-90deg)}.msec.collapsed .chips{display:none}
+#mpanel .chips{padding:0}
+.mgreet{font-size:12.5px;font-weight:600;color:var(--sub);margin-top:auto;padding-top:36px}
+.mfooter{padding-top:8px;display:flex;gap:8px}
+.modal{position:fixed;inset:0;background:var(--ov);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.modal.open{display:flex}
+.modal .box{position:relative;background:#fff;border-radius:16px;padding:18px 24px 20px;max-width:320px;width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(30,45,75,.2)}
+.modal.wide .box{max-width:440px}
+.modal h2{font-size:17px;font-weight:800;color:var(--accent);margin:0 0 14px;padding-right:20px}
+.mclose{position:absolute;top:10px;right:10px;width:28px;height:28px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.mclose span{position:absolute;width:14px;height:2px;border-radius:1px;background:var(--sub)}
+.mclose span:nth-child(1){transform:rotate(45deg)}.mclose span:nth-child(2){transform:rotate(-45deg)}
+#mbody{font-size:15px;line-height:1.6;overflow-y:auto;margin:0 -8px;padding:0 8px;overscroll-behavior:contain}
+#mbody.dense{font-size:13px;line-height:1.5}
+#mbody .ibrow{display:flex;margin-top:8px}#mbody .ibrow:first-child{margin-top:0}#mbody .idash{flex-shrink:0;width:13px}
+.sec{margin-top:16px}.sec:first-child{margin-top:0}
+.sec h3{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:800;margin:0 0 8px}
+.sec h3::after{content:'';flex:1;height:1px;background:var(--border)}
+.drow{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:10px;padding:6px 8px;margin-top:6px;cursor:pointer}
+.drow img{width:32px;height:32px;object-fit:contain}.drow .nm{font-size:12.5px;font-weight:700}.drow .mt{font-size:11px;color:var(--sub);font-weight:600}
+.drow .rq{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.phd{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.phd img{width:68px;height:68px;object-fit:contain;background:var(--bg);border-radius:16px}
+.phd .n{font-size:15px;font-weight:800}.phd .e{font-size:11.5px;color:var(--sub);font-weight:600}
+.inp{width:100%;height:36px;border-radius:12px;border:1px solid var(--border);padding:0 12px;font-size:14px;outline:none}
+.inp:focus{border-color:var(--accent)}
+.nrow{display:flex;align-items:center;gap:6px;margin:5px 0;font-size:12.5px;font-weight:600}
+.nrow input{width:60px;height:30px;border-radius:8px;border:1px solid var(--border);padding:0 6px;font-size:13px;outline:none}
+.nrow input:focus{border-color:var(--accent)}
+input[type=range]{accent-color:var(--accent)}
+.sv{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border)}
+.sv:first-child{border-top:none}
+.sv .tt{flex:1;min-width:0}.sv .tt b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sv .tt span{font-size:11px;color:var(--sub);font-weight:600}
+.sv button{height:28px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:11.5px;font-weight:700;cursor:pointer;color:var(--txt)}
+</style>
+</head>
+<body data-view="route">
+<div class="wrap">
+<header>
+  <div class="title"><svg class="logo" id="hlogo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27.5" fill="none" stroke="#ffc401" stroke-width="9"/><circle cx="32" cy="32" r="10.8" fill="none" stroke="#ffc401" stroke-width="7"/></svg><h1 id="htitle">디지랩 EVO</h1>
+    <div class="viewtoggle"><button id="vt-route" type="button">경로</button><button id="vt-dex" type="button">도감</button><button id="vt-skill" type="button">기술</button><button id="vt-tree" type="button">트리</button></div></div>
+  <div class="searchwrap">
+    <span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="q" class="search" type="text" placeholder="" autocomplete="off" aria-label="검색">
+    <button id="qclear" class="qclear" type="button" aria-label="검색어 지우기"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button>
+  </div>
+</header>
+<div class="content">
+ <section id="v-route">
+  <div class="rcard">
+   <div class="field"><div class="lab">출발 디지몬</div><div id="pk-start"></div></div>
+   <div class="field"><div class="lab">도착 디지몬 <small>비우면 기술만 모으고 끝</small></div><div id="pk-end"></div></div>
+  </div>
+  <div class="rcard">
+   <div class="field"><div class="lab">꼭 배우고 싶은 기술 <small id="wc"></small></div><div id="pk-skill"></div><div class="chips" id="skills" style="padding:8px 0 0"></div></div>
+   <div class="field"><div class="lab">거치고 싶지 않은 디지몬</div><div id="pk-ban"></div><div class="chips" id="bans" style="padding:8px 0 0"></div></div>
+  </div>
+  <div class="rcard">
+   <div class="lab">경로 기준</div><div class="chips" id="modes" style="padding:0"></div>
+   <div class="hintx" id="modehint"></div>
+  </div>
+  <div class="btnrow" style="margin-bottom:12px"><button class="btn pri" id="go" type="button">경로 찾기</button></div>
+  <div id="result"></div>
+ </section>
+ <section id="v-dex" hidden><div class="count" id="cnt"></div><div class="grid" id="cards"></div></section>
+ <section id="v-skill" hidden><div id="skview"></div></section>
+ <section id="v-tree" hidden>
+  <div class="rcard" style="padding:10px 12px"><div id="pk-root"></div><div class="chips" style="padding:8px 0 0"><button class="chip" id="tlab" type="button">이름 표시</button><button class="chip" id="tend" type="button">끝 디지몬만 이름 표시</button></div><div class="hintx" id="tinfo"></div></div>
+  <div class="treebox sb" id="treebox"></div>
+ </section>
+</div>
+<div class="sitefooter">본 사이트는 팬이 만든 비공식 사이트로, 반다이남코, Toei Animation 등 디지몬 관련 권리자와는 어떠한 관계도 없습니다. 디지몬은 각 권리자의 상표이며, 모든 게임 콘텐츠와 이미지는 각 권리자에게 귀속됩니다.</div>
+</div>
+<div id="menubtnWrap"><button id="menubtn" type="button" aria-label="메뉴"><span></span><span></span><span></span></button></div>
+<div id="menuOverlay"></div>
+<div id="mpanelWrap"><div id="mpanel" class="sb">
+  <div class="mtitle"><svg class="logo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27.5" fill="none" stroke="#ffc401" stroke-width="9"/><circle cx="32" cy="32" r="10.8" fill="none" stroke="#ffc401" stroke-width="7"/></svg><span>디지랩 EVO</span><span class="info-btn" id="infoBtn" role="button" tabindex="0" aria-label="설명 보기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.2v.1"/></svg></span></div>
+  <div class="mgrouptitle">경로</div>
+  <div class="msec" data-key="rt"><h3>설정<span class="car">▾</span></h3><div class="chips"><button class="chip" id="mTune" type="button">난이도 가중치</button><button class="chip" id="mSaved" type="button">저장한 경로</button></div></div>
+  <div class="mgrouptitle mgap">도감</div>
+  <div class="msec" data-key="stage"><h3>세대<span class="car">▾</span></h3><div class="chips" id="chips-stage"></div></div>
+  <div class="msec" data-key="type"><h3>타입<span class="car">▾</span></h3><div class="chips" id="chips-type"></div></div>
+  <div class="msec" data-key="attr"><h3>속성<span class="car">▾</span></h3><div class="chips" id="chips-attr"></div></div>
+  <div id="mgreet" class="mgreet"></div>
+  <div class="mfooter"><button class="btn" id="savedBtn" type="button">저장한 경로</button><button class="btn" id="loginBtn" type="button">로그인</button></div>
+</div></div>
+<div class="modal" id="modal"><div class="box"><button class="mclose" type="button" id="mx" aria-label="닫기"><span></span><span></span></button><h2 id="mh"></h2><div id="mbody" class="sb"></div></div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="data.js"></script>
+<script>
+const D=window.DIGI, M=window.MOVES;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TYPE={free:'프리',virus:'바이러스',vaccine:'백신',data:'데이터'};
+const ATTR={neutral:'무',fire:'불',water:'물',plant:'풀',electric:'전기',earth:'땅',wind:'바람',dark:'어둠',light:'빛'};
+const EL=['무','불','물','풀','전기','땅','바람','빛','어둠'];
+const ELC=['#8a93a3','#e5533d','#2f7fe0','#34a853','#d9a800','#a0713a','#4cb8b0','#c9a400','#7d4fc4'];
+const DT={0:'보조',1:'물리',2:'마법',8:'회복'};
+const TG={1:'자신',2:'아군 1',3:'아군 전체',4:'적 1',5:'적 전체'};
+const CL={LVL:'Lv',HP:'HP',SP:'SP',ATK:'공격',DEF:'방어',INT:'지력',SPD:'속도',ABI:'ABI',CAM:'CAM',Other:'추가 조건'};
+const STAT=[['HP','HP'],['SP','SP'],['ATK','공격'],['DEF','방어'],['INT','지력'],['SPD','속도']];
+const img=i=>`icons/${D[i].no}.png`;
+// 한글 초성
+const CHO='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+const cho=s=>[...s].map(c=>{const n=c.charCodeAt(0)-44032;return n>=0&&n<11172?CHO[Math.floor(n/588)]:c}).join('');
+const match=(name,q)=>{q=q.trim().toLowerCase();if(!q)return true;return name.toLowerCase().includes(q)||(/^[ㄱ-ㅎ]+$/.test(q)&&cho(name).includes(q))};
+
+// 기술 -> 습득 디지몬
+const holders={};D.forEach((m,i)=>m.moves.forEach(([id])=>{(holders[id]=holders[id]||[]).push(i)}));
+const skillIds=Object.keys(holders).sort((a,b)=>M[a].n.localeCompare(M[b].n,'ko'));
+
+
+// ---------- 경로 탐색: (디지몬, 모은 기술 비트마스크) 상태 다익스트라 ----------
+const MODES={
+ steps:{evo:1,dev:1,easy:0,hint:'진화·퇴화 단계 수가 가장 적은 경로'},
+ lessdev:{evo:1,dev:6,easy:0,hint:'퇴화 1회를 진화 6회만큼 비싸게 보고 계산'},
+ prefdev:{evo:1,dev:0.35,easy:0,hint:'퇴화를 진화의 1/3 비용으로 보고 계산'},
+ easy:{evo:1,dev:1,easy:1,hint:'레벨 구간별로 스탯 조건을 못 채우는 진화에 가중치를 더해 계산 (메뉴의 ‘난이도 가중치’에서 조정)'},
+ evoonly:{evo:1,dev:Infinity,easy:0,hint:'퇴화 없이 진화 방향으로만 이동 (갈 수 없으면 실패)'}
+};
+const SK=['HP','SP','ATK','DEF','INT','SPD'];
+// 난이도 가중치: 구간(레벨)마다 '그 레벨이 되어도 못 채우는 스탯' 1개당 비용
+const TUNE_DEF={lv:[70,80,90,99],w:[0.5,0.75,1,1.5],imp:8,spec:2};
+let TUNE=JSON.parse(JSON.stringify(TUNE_DEF));
+try{const t=JSON.parse(localStorage.getItem('tune')||'null');if(t&&t.lv&&t.w&&t.lv.length===4&&t.w.length===4)TUNE=t}catch(e){}
+function statAt(i,k,L){const [b,g]=D[i].bs[k];let v=Math.floor((b+g*(L-1))/100);return k==='HP'?v*10:v}
+const _need={};
+function needLevel(i,k,req){const key=i*1000+SK.indexOf(k)*100000000+req*1;if(key in _need)return _need[key];
+  let r=100;for(let L=1;L<=99;L++){if(statAt(i,k,L)>=req){r=L;break}}return _need[key]=r}
+const _hc={};let _hv=0;
+function hardness(from,to){ // 진화 from→to : 스탯별 필요 레벨(100=Lv.99로도 불가)
+  const c=D[to].cond;const need={};let extra=0,hard=[];
+  SK.forEach(k=>{if(c[k]){const nl=needLevel(from,k,c[k]);need[k]=nl;
+    if(nl>TUNE.lv[0])hard.push(k);
+    TUNE.lv.forEach((t,j)=>{if(nl>t)extra+=TUNE.w[j]});
+    if(nl>99)extra+=TUNE.imp}});
+  if(c.Other)extra+=TUNE.spec;
+  return {hard,need,extra,spec:!!c.Other};
+}
+function edgeCost(mo,from,to,isEvo){
+  if(!isEvo)return mo.dev;
+  if(!mo.easy)return mo.evo;
+  const key=from*1000+to;if(_hc.v!==_hv){for(const k in _hc)delete _hc[k];_hc.v=_hv}
+  if(!(key in _hc))_hc[key]=hardness(from,to).extra;
+  return mo.evo+_hc[key];
+}
+function heapPush(h,x){h.push(x);let i=h.length-1;while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p}}
+function heapPop(h){const t=h[0],l=h.pop();if(h.length){h[0]=l;let i=0;for(;;){let a=2*i+1,b=a+1,m=i;if(a<h.length&&h[a][0]<h[m][0])m=a;if(b<h.length&&h[b][0]<h[m][0])m=b;if(m===i)break;[h[m],h[i]]=[h[i],h[m]];i=m}}return t}
+function findRoute(start,end,skills,bans,modeKey){
+  const mo=MODES[modeKey],K=skills.length,FULL=(1<<K)-1,N=D.length,W=1<<K;
+  const iso=i=>!D[i].next.length&&!D[i].prev.length;
+  if(iso(start)||(end!=null&&iso(end)))return {err:'NX 디지몬은 진화·퇴화 관계가 없어서 경로를 만들 수 없어요.'};
+  const cover=D.map(m=>{let b=0;skills.forEach((id,k)=>{if(m.moves.some(x=>x[0]===id))b|=1<<k});return b});
+  const ban=new Set(bans);
+  if(ban.has(start)||(end!=null&&ban.has(end)))return {err:'출발/도착 디지몬이 제외 목록에 있어요.'};
+  const dist=new Float64Array(N*W).fill(Infinity),prev=new Int32Array(N*W).fill(-1),heap=[];
+  const s0=start*W+cover[start];dist[s0]=0;heapPush(heap,[0,s0]);
+  while(heap.length){
+    const [d0,cur]=heapPop(heap);if(d0>dist[cur])continue;
+    const node=(cur/W)|0,mask=cur%W;
+    if(mask===FULL&&(end==null||node===end)){const path=[];for(let c=cur;c!==-1;c=prev[c])path.push((c/W)|0);return {path:path.reverse(),cost:d0}}
+    const moves=[];D[node].next.forEach(t=>moves.push([t,true]));if(mo.dev!==Infinity)D[node].prev.forEach(t=>moves.push([t,false]));
+    for(const [nb,isEvo] of moves){if(ban.has(nb))continue;
+      const ns=nb*W+(mask|cover[nb]);const nd=d0+edgeCost(mo,node,nb,isEvo)+0.001;
+      if(nd<dist[ns]){dist[ns]=nd;prev[ns]=cur;heapPush(heap,[nd,ns])}}
+  }
+  return {err:'이 조건으로는 갈 수 있는 경로가 없어요. 제외 목록을 줄이거나 ‘진화만’ 대신 다른 기준을 써보세요.'};
+}
+
+const MN={steps:'최소 단계',lessdev:'퇴화 최소',prefdev:'퇴화 우선',easy:'쉬운 진화 우선',evoonly:'진화만'};Object.keys(MN).forEach(k=>MODES[k].name=MN[k]);
+
+const tp=(cls,t,tip)=>`<span class="tagp ${cls||''}"${tip?` title="${esc(tip)}"`:''}>${t}</span>`;
+let SCROLLER=[];
+// ---------- 모달 ----------
+const modal=$('#modal');
+function openModal(title,html,opt={}){$('#mh').textContent=title;const b=$('#mbody');b.innerHTML=html;b.className='sb'+(opt.dense?' dense':'');modal.classList.toggle('wide',!!opt.wide);modal.classList.add('open');document.body.classList.add('lock');b.scrollTop=0;return b}
+function closeModal(){modal.classList.remove('open');document.body.classList.remove('lock')}
+$('#mx').onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeMenu()}});
+// ---------- 메뉴 ----------
+function closeMenu(){$('#menubtn').classList.remove('open');$('#mpanel').classList.remove('open');$('#menuOverlay').classList.remove('open')}
+$('#menubtn').onclick=()=>{const o=!$('#mpanel').classList.contains('open');$('#menubtn').classList.toggle('open',o);$('#mpanel').classList.toggle('open',o);$('#menuOverlay').classList.toggle('open',o)};
+$('#menuOverlay').onclick=closeMenu;
+document.querySelectorAll('.msec h3').forEach(h=>h.onclick=()=>h.parentNode.classList.toggle('collapsed'));
+$('#infoBtn').onclick=()=>{closeMenu();openModal('디지랩 EVO',['디지몬 스토리 사이버 슬루스 / 해커즈 메모리의 진화 경로 탐색 도우미입니다.','출발·도착 디지몬 사이에 배우고 싶은 기술을 경유지로 넣으면, 그 기술을 모두 거치는 진화·퇴화 경로를 찾아줍니다.','진화에 필요한 스탯 조건을 레벨 구간별로 따져서, 쉬운 진화를 우선하는 경로도 만들 수 있습니다.','로그인하면 검색한 경로를 저장할 수 있습니다.'].map(t=>`<div class="ibrow"><span class="idash">-</span><span>${t}</span></div>`).join(''))};
+// ---------- 보기 전환 ----------
+const VIEWS=['route','dex','skill','tree'];let CUR='route';const QS={dex:'',skill:'',tree:''};
+const PH={dex:'디지몬 이름 검색 (초성 가능)',skill:'기술 이름 검색 (초성 가능)',tree:'트리에서 이름 찾기'};
+function view(v){CUR=v;document.body.dataset.view=v;VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
+  const q=$('#q');q.placeholder=PH[v]||'';q.value=QS[v]||'';window.scrollTo(0,0);
+  if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree()}
+VIEWS.forEach(k=>$('#vt-'+k).onclick=()=>view(k));
+$('#hlogo').onclick=$('#htitle').onclick=()=>view('route');
+$('#q').addEventListener('input',()=>{QS[CUR]=$('#q').value;if(CUR==='dex')drawDex();else if(CUR==='skill')drawSkillView();else if(CUR==='tree')treeSearch()});
+$('#qclear').onclick=()=>{$('#q').value='';QS[CUR]='';$('#q').dispatchEvent(new Event('input'))};
+// ---------- 선택기 ----------
+function picker(root,items,onPick,ph){
+  root.innerHTML=`<div class="pick"><input placeholder="${ph}" autocomplete="off"><div class="drop"></div></div>`;
+  const inp=root.querySelector('input'),drop=root.querySelector('.drop');let list=[],hl=0;
+  const render=()=>{const q=inp.value;list=items.filter(it=>match(it.label,q)).slice(0,60);hl=0;
+    drop.innerHTML=list.map((it,k)=>`<div data-k="${k}" class="${k==hl?'hl':''}">${it.icon?`<img src="${it.icon}">`:''}${esc(it.label)}<small>${esc(it.sub||'')}</small></div>`).join('')||'<div style="color:var(--sub)">결과 없음</div>';drop.classList.add('open')};
+  const pick=k=>{if(!list[k])return;onPick(list[k].value);inp.value='';drop.classList.remove('open');inp.blur()};
+  inp.addEventListener('focus',render);inp.addEventListener('input',render);
+  inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){hl=Math.max(0,Math.min(list.length-1,hl+(e.key==='ArrowDown'?1:-1)));[...drop.children].forEach((c,k)=>c.classList.toggle('hl',k==hl));drop.children[hl]?.scrollIntoView({block:'nearest'});e.preventDefault()}else if(e.key==='Enter'){pick(hl);e.preventDefault()}else if(e.key==='Escape')drop.classList.remove('open')});
+  drop.addEventListener('mousedown',e=>{const t=e.target.closest('[data-k]');if(t){e.preventDefault();pick(+t.dataset.k)}});
+  inp.addEventListener('blur',()=>setTimeout(()=>drop.classList.remove('open'),100));
+}
+const monItems=D.map((m,i)=>({label:m.ko,sub:`No.${m.no} · ${m.stage}`,icon:img(i),value:i}));
+const skillItems=skillIds.map(id=>({label:M[id].n,sub:`${EL[M[id].el??0]} · ${holders[id].length}마리`,value:id}));
+// ---------- 경로 입력 상태 ----------
+let S={start:null,end:null,skills:[],bans:[],mode:'steps'};
+function drawSel(){
+  for(const [k,box] of [['start','#pk-start'],['end','#pk-end']]){
+    const host=$(box);host.querySelector('.rrow')?.remove();
+    if(S[k]!=null){const m=D[S[k]];host.insertAdjacentHTML('beforeend',`<div class="rrow sm"><img src="${img(S[k])}"><div><div class="nm">${esc(m.ko)}</div><div class="mt">${m.stage} · ${TYPE[m.type]||''} · ${ATTR[m.attr]||''}</div></div><button class="xb" data-k="${k}" aria-label="지우기">×</button></div>`);
+      host.querySelector('.xb').onclick=()=>{S[k]=null;drawSel()}}}
+  $('#skills').innerHTML=S.skills.map((id,k)=>`<span class="chip tag">${esc(M[id].n)}<span class="x" data-k="${k}">×</span></span>`).join('');
+  $('#skills').querySelectorAll('.x').forEach(b=>b.onclick=()=>{S.skills.splice(+b.dataset.k,1);drawSel()});
+  $('#wc').textContent=`${S.skills.length}/8`;
+  $('#bans').innerHTML=S.bans.map((i,k)=>`<span class="chip ban">${esc(D[i].ko)}<span class="x" data-k="${k}" style="color:inherit">×</span></span>`).join('');
+  $('#bans').querySelectorAll('.x').forEach(b=>b.onclick=()=>{S.bans.splice(+b.dataset.k,1);drawSel()});
+}
+picker($('#pk-start'),monItems,v=>{S.start=v;drawSel()},'디지몬 이름 검색');
+picker($('#pk-end'),monItems,v=>{S.end=v;drawSel()},'디지몬 이름 검색');
+picker($('#pk-skill'),skillItems,v=>{if(S.skills.length<8&&!S.skills.includes(v)){S.skills.push(v);drawSel()}},'기술 이름 검색');
+picker($('#pk-ban'),monItems,v=>{if(!S.bans.includes(v)){S.bans.push(v);drawSel()}},'제외할 디지몬 검색');
+function drawModes(){$('#modes').innerHTML=Object.entries(MODES).map(([k,m])=>`<button class="chip${S.mode===k?' active':''}" data-k="${k}" type="button">${m.name}</button>`).join('');
+  $('#modes').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S.mode=b.dataset.k;drawModes()});$('#modehint').textContent=MODES[S.mode].hint}
+// ---------- 결과 ----------
+function condPills(to,from){const c=D[to].cond;const h=from!=null?hardness(from,to):{hard:[],need:{}};
+  const ks=Object.keys(CL).filter(k=>c[k]);
+  return ks.map(k=>{const nl=h.need[k];const hd=h.hard.includes(k);
+    const lv=nl!=null&&nl>=50?(nl>99?' · Lv.99↑':' · Lv.'+nl):'';
+    return tp(hd?'hard':'',`${CL[k]}${k==='Other'?'':' '+c[k]}${lv}`,hd?`${D[from].ko}는 ${nl>99?'Lv.99로도 부족':'Lv.'+nl+'에서 도달'}`:'')}).join('')||tp('','조건 없음')}
+let LAST=null;
+function runRoute(){
+  const r=$('#result');
+  if(S.start==null){r.innerHTML='<div class="empty">출발 디지몬을 먼저 골라주세요.</div>';return}
+  if(S.end==null&&!S.skills.length){r.innerHTML='<div class="empty">도착 디지몬이나 배우고 싶은 기술 중 하나는 골라주세요.</div>';return}
+  const res=findRoute(S.start,S.end,S.skills,S.bans,S.mode);LAST=null;
+  if(res.err){r.innerHTML=`<div class="empty">${res.err}</div>`;return}
+  const p=res.path;const seen=new Set();let nE=0,nD=0,nH=0,body='';
+  p.forEach((i,k)=>{const m=D[i];
+    const got=S.skills.filter(id=>!seen.has(id)&&m.moves.some(x=>x[0]===id));got.forEach(id=>seen.add(id));
+    if(k>0){const from=p[k-1];const evo=D[from].next.includes(i);
+      if(evo){nE++;if(hardness(from,i).hard.length)nH++}else nD++;
+      body+=`<div class="link"><div class="ln"><i></i></div><div class="tx">${tp(evo?'evo':'dev',evo?'진화':'퇴화')}${evo?condPills(i,from):tp('dev','조건 없음')}</div></div>`}
+    body+=`<div class="step" data-i="${i}"><img src="${img(i)}"><div><div class="nm">${esc(m.ko)}</div><div class="mt">${m.stage} · ${TYPE[m.type]||''} · ${ATTR[m.attr]||''}</div>${got.length?`<div class="facts" style="margin-top:4px">${got.map(id=>tp('got',`${esc(M[id].n)} · Lv.${m.moves.find(x=>x[0]===id)[1]}`)).join('')}</div>`:''}</div></div>`});
+  let html=`<div class="rcard"><div class="sum"><b>${p.length-1}단계</b><span>${esc(D[p[0]].ko)} → ${esc(D[p[p.length-1]].ko)}</span></div>
+   <div class="facts" style="margin-bottom:12px">${tp('evo','진화 '+nE)}${tp('dev','퇴화 '+nD)}${nH?tp('hard','빡센 진화 '+nH,`첫 구간(Lv.${TUNE.lv[0]})까지 올려도 못 채우는 스탯이 있는 진화`):''}</div><div class="steps">${body}</div>`;
+  if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 기술: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
+  html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 경로 저장</button></div></div>`;
+  r.innerHTML=html;LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,len:p.length-1};
+  r.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
+  $('#saveRoute').onclick=askSaveRoute;
+}
+$('#go').onclick=runRoute;
+// ---------- 난이도 가중치 ----------
+function openTune(){
+  const b=openModal('난이도 가중치',`<div style="font-size:12.5px;color:var(--sub);font-weight:600;margin-bottom:8px">‘쉬운 진화 우선’ 기준에서, 진화 한 번마다 출발 디지몬이 해당 레벨이 되어도 못 채우는 스탯 1개당 더하는 비용입니다. (진화 1회 = 1)</div><div id="tn"></div><div class="btnrow" style="margin-top:12px"><button class="btn" id="tdef" type="button">기본값으로</button><button class="btn pri" id="tok" type="button">확인</button></div>`,{dense:true});
+  const draw=()=>{$('#tn').innerHTML=TUNE.lv.map((l,j)=>`<div class="nrow">Lv.<input type="number" min="2" max="99" value="${l}" data-lv="${j}"> 못 채우면 스탯당 +<input type="number" step="0.25" min="0" value="${TUNE.w[j]}" data-w="${j}"></div>`).join('')+
+    `<div class="nrow">Lv.99로도 불가능하면 스탯당 추가 +<input type="number" step="0.5" min="0" value="${TUNE.imp}" data-imp></div><div class="nrow">추가 조건(아이템 등) 있으면 +<input type="number" step="0.5" min="0" value="${TUNE.spec}" data-spec></div>`;
+    const save=()=>{_hv++;try{localStorage.setItem('tune',JSON.stringify(TUNE))}catch(e){}};const t=$('#tn');
+    t.querySelectorAll('[data-lv]').forEach(e=>e.onchange=()=>{TUNE.lv[+e.dataset.lv]=Math.max(2,Math.min(99,+e.value||70));save()});
+    t.querySelectorAll('[data-w]').forEach(e=>e.onchange=()=>{TUNE.w[+e.dataset.w]=Math.max(0,+e.value||0);save()});
+    t.querySelector('[data-imp]').onchange=e=>{TUNE.imp=Math.max(0,+e.target.value||0);save()};
+    t.querySelector('[data-spec]').onchange=e=>{TUNE.spec=Math.max(0,+e.target.value||0);save()}};
+  draw();$('#tdef').onclick=()=>{TUNE=JSON.parse(JSON.stringify(TUNE_DEF));_hv++;try{localStorage.setItem('tune',JSON.stringify(TUNE))}catch(e){}draw()};$('#tok').onclick=closeModal;
+}
+$('#mTune').onclick=()=>{closeMenu();openTune()};
+// ---------- 도감 ----------
+const F={stage:null,type:null,attr:null};
+const stages=[...new Set(D.map(m=>m.stage))];
+function chipset(id,pairs,key){const host=$(id);host.innerHTML=pairs.map(([v,l])=>`<button class="chip${F[key]===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
+  host.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{F[key]=F[key]===b.dataset.v?null:b.dataset.v;chipset(id,pairs,key);if(CUR!=='dex')view('dex');else drawDex()})}
+function drawFilters(){chipset('#chips-stage',stages.map(s=>[s,s]),'stage');chipset('#chips-type',Object.entries(TYPE),'type');chipset('#chips-attr',Object.entries(ATTR),'attr')}
+function drawDex(){const q=QS.dex;
+  const list=D.map((m,i)=>i).filter(i=>{const m=D[i];return match(m.ko,q)&&(!F.stage||m.stage===F.stage)&&(!F.type||m.type===F.type)&&(!F.attr||m.attr===F.attr)});
+  $('#cnt').textContent=`${list.length}마리`;
+  $('#cards').innerHTML=list.map(i=>`<div class="card" data-i="${i}"><span class="no">${D[i].no}</span><span class="stg">${D[i].stage}</span><img loading="lazy" src="${img(i)}"><div class="nm">${esc(D[i].ko)}</div></div>`).join('')||'<div class="empty">조건에 맞는 디지몬이 없어요.</div>';
+  $('#cards').querySelectorAll('.card').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i))}
+// ---------- 상세 팝업 ----------
+function openDetail(i){
+  const m=D[i];const want=new Set(S.skills);
+  const stat=STAT.map(([k,l])=>`<tr><td>${l}</td>${m.lv[k].map(v=>`<td>${v}</td>`).join('')}<td class="cv" data-k="${k}">${statAt(i,k,75)}</td></tr>`).join('');
+  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td>Lv.${lv}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${sig?' '+tp('','고유'):''}${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td style="color:${ELC[x.el??0]};font-weight:700">${EL[x.el??0]}</td><td>${DT[x.dt]||''}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${x.sp??'-'}</td></tr>`};
+  const evo=(arr,dir)=>arr.map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div><div class="nm">${esc(D[j].ko)}</div><div class="mt">${D[j].stage}</div></div><div class="rq">${dir==='next'?condPills(j,i):tp('dev','퇴화')}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
+  const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">야생 출현 정보 없음</div>';
+  const b=openModal(m.ko,`<div class="phd"><img src="${img(i)}"><div><div class="n">No.${m.no}</div><div class="e">${esc(m.en)}</div><div class="facts" style="margin-top:6px">${tp('',m.stage)}${tp('',TYPE[m.type]||'')}${tp('',(ATTR[m.attr]||'')+'속성')}</div></div></div>
+  <div class="btnrow"><button class="btn" id="as" type="button">여기서 출발</button><button class="btn" id="ae" type="button">여기로 도착</button></div>
+  <div class="sec"><h3>능력치</h3><table><tr><th></th><th>Lv.1</th><th>Lv.50</th><th>Lv.99</th><th>Lv.<span id="lvn">75</span></th></tr>${stat}</table><div style="display:flex;gap:8px;align-items:center;margin-top:8px;color:var(--sub);font-size:11.5px;font-weight:700">레벨 <input type="range" id="lvs" min="1" max="99" value="75" style="flex:1"></div></div>
+  <div class="sec"><h3>서포트 스킬</h3><b style="font-size:13px">${esc(m.sup[0])}</b><div style="color:var(--sub);font-size:12px">${esc(m.sup[1])}</div><div class="facts" style="margin-top:6px">${tp('','메모리 '+m.mem)}${tp('','장비 슬롯 '+m.slots)}</div></div>
+  <div class="sec"><h3>도감 설명</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.desc)}</div></div>
+  <div class="sec"><h3>배우는 기술</h3><table class="mv"><tr><th>습득</th><th style="text-align:left">기술</th><th>속성</th><th>분류</th><th>위력</th><th>SP</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
+  <div class="sec"><h3>진화 · 퇴화</h3><div class="mt" style="font-size:11px;color:var(--sub);font-weight:700">이전 단계</div>${evo(m.prev,'prev')}<div style="font-size:11px;color:var(--sub);font-weight:700;margin-top:10px">다음 단계 (필요 조건)</div>${evo(m.next,'next')}</div>
+  <div class="sec"><h3>출현 장소</h3>${enc}</div>`,{dense:true,wide:true});
+  $('#lvs').oninput=e=>{const L=+e.target.value;$('#lvn').textContent=L;b.querySelectorAll('.cv').forEach(td=>td.textContent=statAt(i,td.dataset.k,L))};
+  $('#as').onclick=()=>{S.start=i;drawSel();closeModal();view('route')};
+  $('#ae').onclick=()=>{S.end=i;drawSel();closeModal();view('route')};
+  b.querySelectorAll('.mvl').forEach(a=>a.onclick=()=>{closeModal();view('skill');showSkill(a.dataset.id)});
+  b.querySelectorAll('.drow').forEach(e=>e.onclick=()=>openDetail(+e.dataset.j));
+}
+// ---------- 기술 ----------
+let SKSEL=null;
+function drawSkillView(){const host=$('#skview');
+  if(SKSEL!=null){showSkill(SKSEL,true);return}
+  const q=QS.skill;const list=skillIds.filter(id=>match(M[id].n,q)).slice(0,80);
+  host.innerHTML=`<div class="count">${q?list.length+'개':'기술 이름을 검색해보세요 (일부만 표시)'}</div><div class="rlist">${list.map(id=>`<div class="rrow" data-id="${id}"><div style="flex:1"><div class="nm">${esc(M[id].n)}</div><div class="mt">${EL[M[id].el??0]} · ${DT[M[id].dt]||'보조'}</div></div>${tp('',holders[id].length+'마리')}</div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
+  host.querySelectorAll('[data-id]').forEach(e=>e.onclick=()=>showSkill(e.dataset.id))}
+function showSkill(id,keep){SKSEL=id;if(CUR!=='skill'&&!keep){view('skill');return}
+  const x=M[id];const hs=holders[id].map(i=>[i,D[i].moves.find(m=>m[0]===id)[1]]).sort((a,b)=>a[1]-b[1]||D[a[0]].no-D[b[0]].no);
+  $('#skview').innerHTML=`<div class="rcard"><div class="lab"><span>${esc(x.n)}</span></div>
+   <div class="facts"><span class="tagp" style="color:${ELC[x.el??0]};font-weight:700">${EL[x.el??0]}속성</span>${tp('',DT[x.dt]||'보조')}${tp('','위력 '+(x.p||'-')+(x.n2>1?'×'+(x.n1===x.n2?x.n2:x.n1+'~'+x.n2):''))}${tp('','SP '+(x.sp??'-'))}${tp('',TG[x.tg]||'')}${x.aa?tp('','필중'):x.acc?tp('','명중 '+x.acc+'%'):''}</div>
+   ${x.d?`<div class="hintx">${esc(x.d)}</div>`:''}
+   <div class="btnrow" style="margin-top:10px"><button class="btn" id="skBack" type="button">목록으로</button><button class="btn pri" id="addsk" type="button">이 기술로 경로 찾기</button></div></div>
+   <div class="count">${hs.length}마리가 배워요 (습득 레벨 순)</div><div class="rlist">${hs.map(([i,lv])=>`<div class="rrow" data-i="${i}"><img src="${img(i)}" style="width:34px;height:34px"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${tp('','Lv.'+lv)}</div>`).join('')}</div>`;
+  $('#skview').querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
+  $('#skBack').onclick=()=>{SKSEL=null;drawSkillView()};
+  $('#addsk').onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
+// ---------- 진화 트리 ----------
+const TST=[];D.forEach(m=>{if(!TST.includes(m.stage))TST.push(m.stage)});
+const ORD=['유년기 I','유년기 II','성장기','성숙기','완전체','궁극체','초궁극체'];TST.sort((a,b)=>{const x=ORD.indexOf(a),y=ORD.indexOf(b);return(x<0?99:x)-(y<0?99:y)});
+ELC.fill('var(--txt)');
+let TROOT=D.findIndex(m=>m.ko==='쿠라몬'),TG_=null,TLAB=true,TEND=false;
+const NS='http://www.w3.org/2000/svg',mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
+picker($('#pk-root'),monItems.filter((_,i)=>D[i].next.length||D[i].prev.length),v=>{TROOT=v;buildTree()},'시작 디지몬 고르기 (현재: 쿠라몬)');
+$('#tlab').onclick=()=>{TLAB=!TLAB;treeLabels()};$('#tend').onclick=()=>{TEND=!TEND;treeLabels()};
+function buildTree(){
+  const r=TROOT;$('#pk-root input').placeholder=`시작 디지몬 고르기 (현재: ${D[r].ko})`;
+  const seen=new Set([r]),q=[r];while(q.length){const x=q.pop();D[x].next.forEach(t=>{if(!seen.has(t)){seen.add(t);q.push(t)}})}
+  const nDown=seen.size-1;const up=new Set([r]);q.push(r);while(q.length){const x=q.pop();D[x].prev.forEach(t=>{if(!up.has(t)){up.add(t);q.push(t)}})}
+  up.forEach(i=>seen.add(i));const nUp=up.size-1;const nodes=[...seen];
+  const cols=TST.map((s,c)=>nodes.filter(i=>D[i].stage===s)).filter(a=>a.length);const colIdx=new Map();cols.forEach((a,c)=>a.forEach(i=>colIdx.set(i,c)));
+  const dfs=new Map();let k=0;(function f(x){if(dfs.has(x))return;dfs.set(x,k++);D[x].next.forEach(f)})(r);(function g(x){if(dfs.has(x)&&x!==r)return;if(!dfs.has(x))dfs.set(x,k++);D[x].prev.forEach(g)})(r);
+  cols.forEach(a=>a.sort((x,y)=>dfs.get(x)-dfs.get(y)));const pos=new Map();cols.forEach(a=>a.forEach((i,j)=>pos.set(i,j)));
+  const nb=i=>[...D[i].next,...D[i].prev].filter(t=>seen.has(t));
+  for(let it=0;it<24;it++){const seq=it%2?[...cols.keys()].reverse():[...cols.keys()];
+    seq.forEach(c=>{const a=cols[c];const bc=new Map(a.map(i=>{const ns=nb(i).filter(t=>colIdx.get(t)!==c&&(it%2?colIdx.get(t)>c:colIdx.get(t)<c));return[i,ns.length?ns.reduce((s,t)=>s+pos.get(t)/Math.max(1,cols[colIdx.get(t)].length)*a.length,0)/ns.length:pos.get(i)]}));a.sort((x,y)=>bc.get(x)-bc.get(y));a.forEach((i,j)=>pos.set(i,j))})}
+  const box=$('#treebox');box.innerHTML='';const svg=mk('svg',{},box);
+  const STEP=17,CW=190,PADX=60,PADY=40;const maxN=Math.max(...cols.map(a=>a.length));const H=maxN*STEP+PADY*2,W=PADX*2+cols.length*CW;svg.setAttribute('width',W);svg.setAttribute('height',H);
+  const X=i=>PADX+colIdx.get(i)*CW,Y=i=>{const a=cols[colIdx.get(i)];return H/2+(pos.get(i)-(a.length-1)/2)*STEP};
+  cols.forEach((a,c)=>{mk('text',{x:PADX+c*CW,y:22,class:'tcol','text-anchor':'middle'},svg).textContent=D[a[0]].stage+' ('+a.length+')'});
+  const eg=mk('g',{},svg),ng=mk('g',{},svg),E=[];
+  nodes.forEach(i=>D[i].next.forEach(t=>{if(!seen.has(t))return;const x1=X(i),y1=Y(i),x2=X(t),y2=Y(t),mx=(x1+x2)/2;E.push([i,t,mk('path',{d:`M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:'tr-e'},eg)])}));
+  const N=new Map();let sel=null;
+  const walk=(i,dir,set)=>{set.add(i);D[i][dir].forEach(t=>{if(seen.has(t)&&!set.has(t))walk(t,dir,set)})};
+  const info=()=>{const ends=nodes.filter(i=>!D[i].next.length).length;$('#tinfo').textContent=`${nodes.length}마리 (진화로 ${nDown} · 퇴화로 ${nUp}) · 끝 디지몬 ${ends}마리(파란 점) · 점에 올리면 강조, 클릭하면 고정`};
+  const focus=i=>{const u=new Set(),d=new Set();walk(i,'prev',u);walk(i,'next',d);svg.classList.add('focus');
+    E.forEach(([a,b,p])=>{p.classList.toggle('up',u.has(a)&&u.has(b));p.classList.toggle('on',d.has(a)&&d.has(b))});N.forEach((n,j)=>n.classList.toggle('on',u.has(j)||d.has(j)));
+    $('#tinfo').textContent=`${D[i].ko}: 진화로 ${d.size-1}마리 · 끝 디지몬 ${[...d].filter(j=>!D[j].next.length).length}마리 · 조상 ${u.size-1}마리`};
+  const unfocus=()=>{svg.classList.remove('focus');E.forEach(([a,b,p])=>p.classList.remove('on','up'));N.forEach(n=>n.classList.remove('on'));info()};
+  nodes.forEach(i=>{const end=!D[i].next.length;const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);mk('circle',{r:end?5.5:4.2},g);mk('text',{x:9,y:4},g).textContent=D[i].ko;N.set(i,g);
+    g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
+    g.onclick=()=>{if(sel===i){sel=null;unfocus()}else{sel=i;N.forEach((n,j)=>n.classList.toggle('sel',j===r||j===i));focus(i)}};});
+  TG_={N,nodes};info();treeLabels();treeSearch();
+  const rt=N.get(r).getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);box.scrollTo({left:Math.max(0,+rt[1]-40),top:Math.max(0,+rt[2]-box.clientHeight/2)})}
+function treeLabels(){$('#tlab').classList.toggle('on',TLAB);$('#tend').classList.toggle('on',TEND);if(!TG_)return;TG_.N.forEach((n,i)=>{n.querySelector('text').style.display=TLAB&&(!TEND||!D[i].next.length)?'':'none'})}
+function treeSearch(){if(!TG_)return;const v=QS.tree.trim();TG_.N.forEach((n,i)=>n.classList.toggle('hit',!!v&&D[i].ko.includes(v)));
+  if(v){const f=[...TG_.N].find(([i])=>D[i].ko.includes(v));if(f){const t=f[1].getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);$('#treebox').scrollTo({left:+t[1]-120,top:+t[2]-150,behavior:'smooth'})}}}
+// ---------- 저장한 경로 + 로그인 ----------
+let CUR_USER=null,CUR_NAME=null,ROUTES=[];
+const rkey=()=>'digilab_routes_'+(CUR_USER||'guest');
+const loadLocal=()=>{try{return JSON.parse(localStorage.getItem(rkey())||'[]')}catch(e){return[]}};
+const saveLocal=()=>{try{localStorage.setItem(rkey(),JSON.stringify(ROUTES))}catch(e){}};
+let fbAuth=null,db=null;
+try{if(window.firebase&&window.FIREBASE_CONFIG&&window.FIREBASE_CONFIG.apiKey){firebase.initializeApp(window.FIREBASE_CONFIG);fbAuth=firebase.auth();db=firebase.firestore()}}catch(e){console.error('Firebase 초기화 실패',e)}
+const mergeRoutes=(a,b)=>{const m=new Map();[...a,...b].forEach(r=>m.set(r.id,r));return [...m.values()].sort((x,y)=>y.t-x.t).slice(0,50)};
+function saveRemote(){if(db&&fbAuth&&fbAuth.currentUser)db.collection('digilabRoutes').doc(fbAuth.currentUser.uid).set({routes:ROUTES,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>console.error('저장 실패(Firestore 규칙 확인 필요)',e))}
+function persist(){saveLocal();saveRemote()}
+function routeSummary(r){return `${r.start!=null?D[r.start].ko:'?'} → ${r.end!=null?D[r.end].ko:'기술만'}${r.skills.length?' · 기술 '+r.skills.length:''}`}
+function askSaveRoute(){
+  if(!LAST)return;const def=routeSummary(LAST);
+  const b=openModal('경로 저장',`<div style="font-size:12.5px;color:var(--sub);font-weight:600;margin-bottom:8px">${CUR_USER?'계정에 저장됩니다.':'로그인하지 않아서 이 브라우저에만 저장됩니다. 로그인하면 합쳐져요.'}</div><input class="inp" id="rname" maxlength="40" value="${esc(def)}"><div class="btnrow" style="margin-top:12px"><button class="btn pri" id="rok" type="button">저장</button></div>`,{dense:true});
+  const inp=$('#rname');inp.focus();inp.select();
+  const go=()=>{ROUTES=mergeRoutes([{id:Date.now().toString(36),name:inp.value.trim()||def,t:Date.now(),...LAST}],ROUTES);persist();closeModal()};
+  $('#rok').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()}}
+function openSaved(){
+  closeMenu();
+  const draw=()=>{const b=$('#mbody');b.innerHTML=ROUTES.length?ROUTES.map(r=>`<div class="sv" data-id="${r.id}"><div class="tt"><b>${esc(r.name)}</b><span>${esc(routeSummary(r))} · ${MODES[r.mode]?MODES[r.mode].name:''}</span></div><button data-a="load" type="button">불러오기</button><button data-a="del" type="button">삭제</button></div>`).join(''):'<div class="empty" style="padding:30px 0">저장한 경로가 없어요.<br>경로를 찾은 뒤 ‘이 경로 저장’을 눌러보세요.</div>';
+    b.querySelectorAll('.sv').forEach(row=>{const id=row.dataset.id;
+      row.querySelector('[data-a=load]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);S={start:r.start,end:r.end,skills:[...r.skills],bans:[...r.bans],mode:MODES[r.mode]?r.mode:'steps'};drawSel();drawModes();closeModal();view('route');runRoute()};
+      row.querySelector('[data-a=del]').onclick=()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();draw()}})};
+  openModal('저장한 경로','',{dense:true});draw()}
+$('#mSaved').onclick=$('#savedBtn').onclick=openSaved;
+function updateAuthUI(){$('#loginBtn').textContent=CUR_USER?'로그아웃':'로그인';$('#mgreet').textContent=CUR_USER?CUR_NAME+'님, 안녕하세요.':'로그인하면 검색한 경로를 저장해 둘 수 있습니다.'}
+$('#loginBtn').onclick=()=>{
+  if(CUR_USER){fbAuth&&fbAuth.signOut();return}
+  if(!fbAuth){closeMenu();openModal('로그인 준비 중','<div class="ibrow"><span class="idash">-</span><span>Firebase 웹앱 설정이 아직 연결되지 않았습니다.</span></div><div class="ibrow"><span class="idash">-</span><span><b>firebase-config.js</b>에 설정값을 넣으면 구글 로그인이 켜집니다.</span></div><div class="ibrow"><span class="idash">-</span><span>그 전에도 경로 저장은 이 브라우저에 됩니다.</span></div>');return}
+  fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(()=>closeMenu()).catch(err=>{if(err&&err.code==='auth/popup-closed-by-user')return;console.error('구글 로그인 실패(Firebase 콘솔에서 Google 로그인 방식 활성화 확인)',err)})};
+if(fbAuth){fbAuth.onAuthStateChanged(user=>{
+  if(user){const guest=loadLocal();CUR_USER=user.uid;CUR_NAME=user.displayName||user.email||'사용자';
+    db.collection('digilabRoutes').doc(user.uid).get().then(doc=>{const remote=doc.exists?(doc.data().routes||[]):[];ROUTES=mergeRoutes(remote,mergeRoutes(guest,loadLocal()));persist();updateAuthUI()}).catch(e=>{console.error('불러오기 실패(Firestore 규칙 확인 필요)',e);ROUTES=mergeRoutes(guest,loadLocal());updateAuthUI()})}
+  else{CUR_USER=null;CUR_NAME=null;ROUTES=loadLocal();updateAuthUI()}})}
+// ---------- 스크롤바 (스크롤할 때만 표시) ----------
+function hookScroll(t,el){let h;t.addEventListener('scroll',()=>{el.classList.add('scrolling');clearTimeout(h);h=setTimeout(()=>el.classList.remove('scrolling'),650)},{passive:true})}
+hookScroll(window,document.documentElement);['#mpanel','#mbody','#treebox'].forEach(s=>hookScroll($(s),$(s)));
+// ---------- 시작 ----------
+ROUTES=loadLocal();drawSel();drawModes();drawFilters();updateAuthUI();view('route');
+
+</script>
+</body>
+</html>

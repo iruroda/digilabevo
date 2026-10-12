@@ -1,0 +1,14 @@
+{
+  "name": "디지랩 EVO",
+  "short_name": "디지랩 EVO",
+  "description": "디지몬 스토리 사이버 슬루스 진화 경로 탐색 도우미",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#e8f0fb",
+  "theme_color": "#4a8fe0",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "favicon.svg", "sizes": "any", "type": "image/svg+xml"}
+  ]
+}
