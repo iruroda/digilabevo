@@ -25,7 +25,7 @@ html.scrolling,.sb.scrolling{scrollbar-color:rgba(0,0,0,.28) transparent}
 html,body{margin:0;padding:0;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
 input,textarea{-webkit-user-select:text;user-select:text;font-family:inherit}
 button{font-family:inherit}
-body.lock{overflow:hidden}
+html.lock{overflow:hidden}
 .wrap{max-width:520px;margin:0 auto;min-height:100vh}
 header{position:sticky;top:0;z-index:15;background:linear-gradient(180deg,#ffffff,var(--bg) 55%);padding:12px 12px 8px}
 .title{display:flex;align-items:center;gap:9px;margin:0 0 9px;padding-right:43px;min-height:34px}
@@ -196,7 +196,16 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .drow .rq{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 .phd{display:flex;gap:12px;align-items:center;margin-bottom:12px}
 .phd img{width:68px;height:68px;object-fit:contain;background:var(--bg);border-radius:16px}
-.phd .n{font-size:15px;font-weight:800}.phd .e{font-size:11.5px;color:var(--sub);font-weight:600}
+.pg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px 8px}.pc{font-size:12.5px;font-weight:800;white-space:nowrap}.pc b{color:var(--accent);margin-right:6px}.pc span{color:var(--txt)}
+.stgt{font-size:12px;font-weight:700;color:var(--sub);margin-left:4px}.modal h2 .ta{margin-right:6px;vertical-align:-5px}
+.mv td:not(:nth-child(2)),.mv th{white-space:nowrap}
+.lvbox{display:flex;gap:14px;align-items:center}.lvl{display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto}
+.tri{width:44px;height:22px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}.tri svg{width:100%;height:100%;fill:currentColor}
+.lvi{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--accent);font-size:15px}
+.lvi input{width:50px;text-align:center;font-size:18px;font-weight:800;border:1px solid var(--border);border-radius:8px;height:36px;color:var(--txt);background:#fff;outline:none;-moz-appearance:textfield;user-select:text}
+.lvi input:focus{border-color:var(--accent)}.lvi input::-webkit-inner-spin-button,.lvi input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.sg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sc{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:8px;padding:7px 10px;font-size:12px;font-weight:800}.sc b{color:var(--accent)}.sc span{color:var(--txt);font-variant-numeric:tabular-nums}
 .inp{width:100%;height:36px;border-radius:12px;border:1px solid var(--border);padding:0 12px;font-size:14px;outline:none}
 .inp:focus{border-color:var(--accent)}
 .nrow{display:flex;align-items:center;gap:6px;margin:5px 0;font-size:12.5px;font-weight:600}
@@ -406,8 +415,8 @@ const tp=(cls,t,tip)=>`<span class="tagp ${cls||''}"${tip?` title="${esc(tip)}"`
 let SCROLLER=[];
 // ---------- 모달 ----------
 const modal=$('#modal');
-function openModal(title,html,opt={}){$('#mh').textContent=title;const b=$('#mbody');b.innerHTML=html;b.className='sb'+(opt.dense?' dense':'');modal.classList.toggle('wide',!!opt.wide);modal.style.setProperty('--hh',document.querySelector('header').offsetHeight+'px');modal.classList.add('open');document.body.classList.add('lock');b.scrollTop=0;return b}
-function closeModal(){modal.classList.remove('open');document.body.classList.remove('lock')}
+function openModal(title,html,opt={}){if(opt.titleHtml)$('#mh').innerHTML=title;else $('#mh').textContent=title;const b=$('#mbody');b.innerHTML=html;b.className='sb'+(opt.dense?' dense':'');modal.classList.toggle('wide',!!opt.wide);modal.style.setProperty('--hh',document.querySelector('header').offsetHeight+'px');modal.classList.add('open');document.documentElement.classList.add('lock');b.scrollTop=0;return b}
+function closeModal(){modal.classList.remove('open');document.documentElement.classList.remove('lock')}
 $('#mx').onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeMenu()}});
 // ---------- 메뉴 ----------
@@ -509,19 +518,28 @@ function drawDex(){const q=QS.dex;
 // ---------- 상세 팝업 ----------
 function openDetail(i){
   const m=D[i];const want=new Set(S.skills);
-  const stat=STAT.map(([k,l])=>`<tr><td>${l}</td>${m.lv[k].map(v=>`<td>${v}</td>`).join('')}<td class="cv" data-k="${k}">${statAt(i,k,75)}</td></tr>`).join('');
   const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td>Lv.${lv}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${sig?' '+tp('','고유'):''}${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td style="color:${ELC[x.el??0]};font-weight:700;white-space:nowrap">${skI(x,14)}${EL[x.el??0]}</td><td>${DT[x.dt]||''}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${x.sp??'-'}</td></tr>`};
-  const evo=(arr,dir)=>arr.map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div><div class="nm">${esc(D[j].ko)}</div><div class="mt">${D[j].stage}</div></div><div class="rq">${dir==='next'?condPills(j,i):tp('dev','퇴화')}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
+  const evo=(arr,dir)=>arr.map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div><div class="nm">${esc(D[j].ko)}</div><div class="mt">${D[j].stage}</div></div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">야생 출현 정보 없음</div>';
-  const b=openModal(m.ko,`<div class="phd"><img src="${img(i)}"><div><div class="n">No.${m.no}</div><div class="e">${esc(m.en)}</div><div class="facts" style="margin-top:6px">${tp('',m.stage)}${tp('',taI(m,14)+(TYPE[m.type]||''))}${tp('',(ATTR[m.attr]||'')+'속성')}</div></div></div>
+  const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['INT','INT'],['DEF','DEF'],['SPD','SPD']];
+  const cells=LS.map(([k,l])=>`<div class="sc"><b>${l}</b><span class="cv" data-k="${k}">${statAt(i,k,1)}</span></div>`).join('');
+  const title=`${taI(m,22)}No.${String(m.no).padStart(3,'0')} ${esc(m.ko)} <span class="stgt">${m.stage}</span>`;
+  const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
   <div class="btnrow"><button class="btn" id="as" type="button">${ICS}여기서 출발</button><button class="btn" id="ae" type="button">${ICE}여기로 도착</button></div>
-  <div class="sec"><h3>능력치</h3><table><tr><th></th><th>Lv.1</th><th>Lv.50</th><th>Lv.99</th><th>Lv.<span id="lvn">75</span></th></tr>${stat}</table><div style="display:flex;gap:8px;align-items:center;margin-top:8px;color:var(--sub);font-size:11.5px;font-weight:700">레벨 <input type="range" id="lvs" min="1" max="99" value="75" style="flex:1"></div></div>
-  <div class="sec"><h3>서포트 스킬</h3><b style="font-size:13px">${esc(m.sup[0])}</b><div style="color:var(--sub);font-size:12px">${esc(m.sup[1])}</div><div class="facts" style="margin-top:6px">${tp('','메모리 '+m.mem)}${tp('','장비 슬롯 '+m.slots)}</div></div>
-  <div class="sec"><h3>도감 설명</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.desc)}</div></div>
-  <div class="sec"><h3>배우는 스킬</h3><table class="mv"><tr><th>습득</th><th style="text-align:left">스킬</th><th>속성</th><th>분류</th><th>위력</th><th>SP</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
-  <div class="sec"><h3>진화 · 퇴화</h3><div class="mt" style="font-size:11px;color:var(--sub);font-weight:700">이전 단계</div>${evo(m.prev,'prev')}<div style="font-size:11px;color:var(--sub);font-weight:700;margin-top:10px">다음 단계 (필요 조건)</div>${evo(m.next,'next')}</div>
-  <div class="sec"><h3>출현 장소</h3>${enc}</div>`,{dense:true,wide:true});
-  $('#lvs').oninput=e=>{const L=+e.target.value;$('#lvn').textContent=L;b.querySelectorAll('.cv').forEach(td=>td.textContent=statAt(i,td.dataset.k,L))};
+  <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
+  <div class="sec"><h3>배운 스킬</h3><table class="mv"><tr><th>습득</th><th style="text-align:left">스킬</th><th>속성</th><th>분류</th><th>위력</th><th>SP</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
+  <div class="sec"><h3>서포트 스킬</h3><b style="font-size:13px">${esc(m.sup[0])}</b><div style="color:var(--sub);font-size:12px">${esc(m.sup[1])}</div></div>
+  <div class="sec"><h3>퇴화</h3>${evo(m.prev,'prev')}</div>
+  <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>
+  <div class="sec"><h3>프로필</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.desc)}</div></div>
+  <div class="sec"><h3>출현 장소</h3>${enc}</div>`,{dense:true,wide:true,titleHtml:true});
+  const lvn=$('#lvn');const setLv=L=>{b.querySelectorAll('.cv').forEach(td=>td.textContent=statAt(i,td.dataset.k,L))};
+  const norm=v=>Math.max(1,Math.min(99,Math.round(+v)||1));
+  lvn.oninput=()=>{if(lvn.value!==''&&!isNaN(+lvn.value))setLv(norm(lvn.value))};
+  lvn.onblur=()=>{lvn.value=norm(lvn.value);setLv(+lvn.value)};
+  lvn.onkeydown=e=>{if(e.key==='Enter')lvn.blur()};
+  $('#lvu').onclick=()=>{lvn.value=norm((+lvn.value||1)+1);setLv(+lvn.value)};
+  $('#lvd').onclick=()=>{lvn.value=norm((+lvn.value||1)-1);setLv(+lvn.value)};
   $('#as').onclick=()=>{S.start=i;drawSel();closeModal();view('route')};
   $('#ae').onclick=()=>{S.end=i;drawSel();closeModal();view('route')};
   b.querySelectorAll('.mvl').forEach(a=>a.onclick=()=>{closeModal();view('skill');showSkill(a.dataset.id)});
