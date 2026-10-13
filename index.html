@@ -470,7 +470,7 @@ function picker(root,items,onPick,ph){
   drop.addEventListener('mousedown',e=>{const t=e.target.closest('[data-k]');if(t){e.preventDefault();pick(+t.dataset.k)}});
   inp.addEventListener('blur',()=>setTimeout(()=>drop.classList.remove('open'),100));
 }
-const monItems=D.map((m,i)=>({label:m.ko,sub:`No.${m.no} · ${m.stage}`,icon:img(i),value:i}));
+const monItems=D.map((m,i)=>({label:m.ko,sub:`No.${String(m.no).padStart(3,'0')} · ${m.stage}`,icon:img(i),value:i}));
 const skillItems=skillIds.map(id=>({label:M[id].n,sub:`${EL[M[id].el??0]} · ${holders[id].length}마리`,value:id}));
 // ---------- 루트 입력 상태 ----------
 let S={start:null,end:null,skills:[],bans:[],mode:'easy',avF:false,avT:false};
@@ -538,7 +538,7 @@ function drawDex(){const q=QS.dex;
 // ---------- 상세 팝업 ----------
 function openDetail(i){
   const m=D[i];const want=new Set(S.skills);
-  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td>Lv.${lv}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${sig?' '+tp('','고유'):''}${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td style="color:${ELC[x.el??0]};font-weight:700;white-space:nowrap">${skI(x,14)}${EL[x.el??0]}</td><td>${DT[x.dt]||''}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${x.sp??'-'}</td></tr>`};
+  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td style="width:22px">${skI(x,18)}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${lv||'-'}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${sig?'필살기':'계승기'}</td></tr>`};
   const evo=(arr,dir)=>arr.map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div><div class="nm">${esc(D[j].ko)}</div><div class="mt">${D[j].stage}</div></div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">야생 출현 정보 없음</div>';
   const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['INT','INT'],['DEF','DEF'],['SPD','SPD']];
@@ -547,7 +547,7 @@ function openDetail(i){
   const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
   <div class="btnrow"><button class="btn" id="as" type="button">${ICS}여기서 출발</button><button class="btn" id="ae" type="button">${ICE}여기로 도착</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
-  <div class="sec"><h3>배운 스킬</h3><table class="mv"><tr><th>습득</th><th style="text-align:left">스킬</th><th>속성</th><th>분류</th><th>위력</th><th>SP</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
+  <div class="sec"><h3>스킬</h3><table class="mv"><tr><th></th><th style="text-align:left">스킬</th><th>습득</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
   <div class="sec"><h3>서포트 스킬</h3><b style="font-size:13px">${esc(m.sup[0])}</b><div style="color:var(--sub);font-size:12px">${esc(m.sup[1])}</div></div>
   <div class="sec"><h3>퇴화</h3>${evo(m.prev,'prev')}</div>
   <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>
@@ -571,7 +571,7 @@ function skBody(id){const x=M[id];const sg=!!sigH[id];const hs=sg?sigH[id].map(i
   return `<div class="accp"><div class="facts"><span class="tagp" style="color:${ELC[x.el??0]};font-weight:700">${EL[x.el??0]}속성</span>${tp('',DT[x.dt]||'보조')}${tp('','위력 '+(x.p||'-')+(x.n2>1?'×'+(x.n1===x.n2?x.n2:x.n1+'~'+x.n2):''))}${tp('','SP '+(x.sp??'-'))}${tp('',TG[x.tg]||'')}${x.aa?tp('','필중'):x.acc?tp('','명중 '+x.acc+'%'):''}</div>
    ${x.d?`<div class="hintx">${esc(x.d)}</div>`:''}
    ${sg?'':`<div class="btnrow" style="margin:10px 0"><button class="btn pri addsk" type="button">이 스킬로 루트 찾기</button></div>`}
-   <div class="count" style="margin-top:${sg?10:4}px">${sg?hs.length+'마리의 고유 스킬':hs.length+'마리가 배워요 (습득 레벨 순)'}</div>${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${sg?tp('','고유'):tp('','Lv.'+lv)}</div>`).join('')}</div>`}
+   <div class="count" style="margin-top:${sg?10:4}px">${sg?hs.length+'마리의 필살기':hs.length+'마리가 배워요 (습득 레벨 순)'}</div>${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${sg?tp('','필살기'):tp('','Lv.'+lv)}</div>`).join('')}</div>`}
 function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.querySelector('.accin').innerHTML=skBody(id);a.dataset.built=1;
     a.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
     const ab=a.querySelector('.addsk');if(ab)ab.onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
