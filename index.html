@@ -134,6 +134,7 @@ img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec
 .tagp.got{background:rgba(var(--accent-rgb),.14);color:#325ab1;font-weight:700}
 .sum{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .sum b{font-size:17px;font-weight:800}.sum span{font-size:12.5px;color:var(--sub);font-weight:600}
+.skd{display:flex;gap:10px;align-items:flex-start}.sks{display:flex;align-items:center;gap:8px;flex:0 0 auto;font-size:12px;font-weight:700;color:var(--accent)}.addsk{width:30px;height:30px;border:0;border-radius:8px;background:var(--bg);color:var(--accent);cursor:pointer;padding:5px;display:flex}.addsk svg{width:100%;height:100%}
 .facts{display:flex;flex-wrap:wrap;gap:5px}
 .steps{display:flex;flex-direction:column}
 .step{display:flex;gap:12px;align-items:center;cursor:pointer}
@@ -568,17 +569,15 @@ function openDetail(i){
 // ---------- 스킬 ----------
 let SKSEL=null;
 function skBody(id){const x=M[id];const sg=!!sigH[id];const hs=sg?sigH[id].map(i=>[i,0]).sort((a,b)=>D[a[0]].no-D[b[0]].no):holders[id].map(i=>[i,D[i].moves.find(m=>m[0]===id)[1]]).sort((a,b)=>a[1]-b[1]||D[a[0]].no-D[b[0]].no);
-  return `<div class="accp"><div class="facts"><span class="tagp" style="color:${ELC[x.el??0]};font-weight:700">${EL[x.el??0]}속성</span>${tp('',DT[x.dt]||'보조')}${tp('','위력 '+(x.p||'-')+(x.n2>1?'×'+(x.n1===x.n2?x.n2:x.n1+'~'+x.n2):''))}${tp('','SP '+(x.sp??'-'))}${tp('',TG[x.tg]||'')}${x.aa?tp('','필중'):x.acc?tp('','명중 '+x.acc+'%'):''}</div>
-   ${x.d?`<div class="hintx">${esc(x.d)}</div>`:''}
-   ${sg?'':`<div class="btnrow" style="margin:10px 0"><button class="btn pri addsk" type="button">이 스킬로 루트 찾기</button></div>`}
-   <div class="count" style="margin-top:${sg?10:4}px">${sg?hs.length+'마리의 필살기':hs.length+'마리가 배워요 (습득 레벨 순)'}</div>${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${sg?tp('','필살기'):tp('','Lv.'+lv)}</div>`).join('')}</div>`}
+  return `<div class="accp"><div class="skd"><div class="hintx" style="flex:1;margin:0">${esc(x.d||'')}</div><div class="sks"><span>SP ${x.sp??'-'}</span>${sg?'':`<button class="addsk" type="button" aria-label="이 스킬로 루트 찾기">${$('#vt-route svg').outerHTML}</button>`}</div></div>
+   <div style="margin-top:10px">${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${sg?'':tp('','Lv.'+lv)}</div>`).join('')}</div></div>`}
 function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.querySelector('.accin').innerHTML=skBody(id);a.dataset.built=1;
     a.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
     const ab=a.querySelector('.addsk');if(ab)ab.onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
   a.classList.toggle('open',open)}
 function drawSkillView(){const host=$('#skview');const openId=SKSEL;SKSEL=null;
   const q=QS.skill;chipsSk();const list=allSkillIds.filter(id=>(SKF==='all'||(SKF==='sig')===!!sigH[id])&&match(M[id].n,q));
-  host.innerHTML=`<div class="count">${list.length}개</div><div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div><div class="mt">${EL[M[id].el??0]} · ${DT[M[id].dt]||'보조'}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
+  host.innerHTML=`<div class="count">${list.length}개</div><div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
   host.querySelectorAll('.acc').forEach(a=>a.querySelector('.acch').onclick=()=>{const o=!a.classList.contains('open');if(o)host.querySelectorAll('.acc.open').forEach(b=>toggleAcc(b,false));toggleAcc(a,o)});
   if(openId!=null){const a=host.querySelector(`.acc[data-id="${openId}"]`);if(a){toggleAcc(a,true);setTimeout(()=>a.scrollIntoView({block:'nearest',behavior:'smooth'}),50)}}}
 function chipsSk(){const h=$('#chips-sk');h.innerHTML=[['all','전체'],['sig','필살기'],['inh','계승기']].map(([v,l])=>`<button class="chip${SKF===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
