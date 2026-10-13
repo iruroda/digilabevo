@@ -524,7 +524,6 @@ function stepActs(p,k,got,steps){const m=D[p[k]],a=[];
   if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`${CL[SK[j]]}을(를) ${d} 올린다`)});
   if(c.ABI)a.push(`ABI ${c.ABI}에 도달한다`);
   if(f&&f.fr>0)a.push(`우정을 ${f.fr} 올린다`);
-  if(f&&f.visit)a.push(`디지뱅크를 ${f.visit}번 이용한다`);
   if(c.Fus||(f&&f.fus))a.push('합체한다');
   if(c.Other)a.push('추가 조건을 만족한다');
   a.push(`<b>${esc(ro(D[to].ko))} ${evo?'진화':'퇴화'}한다</b>`);return a}
