@@ -143,7 +143,7 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .tn text{font-size:11px;fill:var(--txt);font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:3px;pointer-events:none}
 .treebox svg.focus .tn:not(.on){opacity:.18}
 .tn.sel circle{stroke:var(--txt);stroke-width:2.5}.tn.hit circle{stroke:var(--yellow);stroke-width:4}
-.tcol{font-size:11px;fill:var(--sub);font-weight:700}
+.tcol{font-size:11px;fill:var(--sub);font-weight:700}.tbox{fill:#f0f0f0}
 .sitefooter{font-size:7.5px;color:var(--accent);text-align:left;line-height:1.5;padding:12px;user-select:none}
 #menuOverlay,#modalOv{position:fixed;inset:0;background:var(--ov);opacity:0;pointer-events:none;transition:opacity .18s ease}
 #menuOverlay{z-index:30}#menuOverlay.open{opacity:1;pointer-events:auto}
@@ -536,16 +536,28 @@ function buildTree(){
   const seen=new Set([r]),q=[r];while(q.length){const x=q.pop();D[x].next.forEach(t=>{if(!seen.has(t)){seen.add(t);q.push(t)}})}
   const nDown=seen.size-1;const up=new Set([r]);q.push(r);while(q.length){const x=q.pop();D[x].prev.forEach(t=>{if(!up.has(t)){up.add(t);q.push(t)}})}
   up.forEach(i=>seen.add(i));const nUp=up.size-1;const nodes=[...seen];
-  const cols=TST.map((s,c)=>nodes.filter(i=>D[i].stage===s)).filter(a=>a.length);const colIdx=new Map();cols.forEach((a,c)=>a.forEach(i=>colIdx.set(i,c)));
+  const OI=s=>ORD.indexOf(s);const xi=new Map();nodes.forEach(i=>{const o=OI(D[i].stage);if(o>=0)xi.set(i,o)});
+  nodes.forEach(i=>{if(xi.has(i))return;const ps=D[i].prev.filter(t=>xi.has(t)).map(t=>xi.get(t)+1),ns=D[i].next.filter(t=>xi.has(t)).map(t=>xi.get(t)-1);xi.set(i,ps.length?Math.min(...ps):ns.length?Math.max(0,Math.max(...ns)):3)});
+  const xs=[...new Set(xi.values())].sort((a,b)=>a-b);
+  const gk=i=>xs.indexOf(xi.get(i))*100+(OI(D[i].stage)>=0?0:1+TST.indexOf(D[i].stage));
+  const gkeys=[...new Set(nodes.map(gk))].sort((a,b)=>a-b);
+  const cols=gkeys.map(k=>nodes.filter(i=>gk(i)===k)),gx=gkeys.map(k=>Math.floor(k/100)),glab=cols.map(a=>D[a[0]].stage);
+  const colIdx=new Map();cols.forEach((a,c)=>a.forEach(i=>colIdx.set(i,c)));
   const dfs=new Map();let k=0;(function f(x){if(dfs.has(x))return;dfs.set(x,k++);D[x].next.forEach(f)})(r);(function g(x){if(dfs.has(x)&&x!==r)return;if(!dfs.has(x))dfs.set(x,k++);D[x].prev.forEach(g)})(r);
   cols.forEach(a=>a.sort((x,y)=>dfs.get(x)-dfs.get(y)));const pos=new Map();cols.forEach(a=>a.forEach((i,j)=>pos.set(i,j)));
   const nb=i=>[...D[i].next,...D[i].prev].filter(t=>seen.has(t));
   for(let it=0;it<24;it++){const seq=it%2?[...cols.keys()].reverse():[...cols.keys()];
-    seq.forEach(c=>{const a=cols[c];const bc=new Map(a.map(i=>{const ns=nb(i).filter(t=>colIdx.get(t)!==c&&(it%2?colIdx.get(t)>c:colIdx.get(t)<c));return[i,ns.length?ns.reduce((s,t)=>s+pos.get(t)/Math.max(1,cols[colIdx.get(t)].length)*a.length,0)/ns.length:pos.get(i)]}));a.sort((x,y)=>bc.get(x)-bc.get(y));a.forEach((i,j)=>pos.set(i,j))})}
+    seq.forEach(c=>{const a=cols[c];const bc=new Map(a.map(i=>{const ns=nb(i).filter(t=>gx[colIdx.get(t)]!==gx[c]&&(it%2?gx[colIdx.get(t)]>gx[c]:gx[colIdx.get(t)]<gx[c]));return[i,ns.length?ns.reduce((s,t)=>s+pos.get(t)/Math.max(1,cols[colIdx.get(t)].length)*a.length,0)/ns.length:pos.get(i)]}));a.sort((x,y)=>bc.get(x)-bc.get(y));a.forEach((i,j)=>pos.set(i,j))})}
   const box=$('#treebox');box.innerHTML='';const svg=mk('svg',{},box);
-  const STEP=17,CW=190,PADX=60,PADY=40;const maxN=Math.max(...cols.map(a=>a.length));const H=maxN*STEP+PADY*2,W=PADX*2+cols.length*CW;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);TW_=[W,H];svg.setAttribute('width',W*TZ);svg.setAttribute('height',H*TZ);
-  const X=i=>PADX+colIdx.get(i)*CW,Y=i=>{const a=cols[colIdx.get(i)];return H/2+(pos.get(i)-(a.length-1)/2)*STEP};
-  cols.forEach((a,c)=>{mk('text',{x:PADX+c*CW,y:22,class:'tcol','text-anchor':'middle'},svg).textContent=D[a[0]].stage+' ('+a.length+')'});
+  const STEP=17,CW=190,PADX=60,PADY=30,BP=8,LH=20,GAP=12;
+  const gh=g=>cols[g].length*STEP+BP*2;const colG=xs.map((_,x)=>cols.map((_,g)=>g).filter(g=>gx[g]===x));
+  const tot=colG.map(gs=>gs.reduce((t,g)=>t+LH+gh(g),0)+(gs.length-1)*GAP);const H=Math.max(...tot)+PADY*2,W=PADX*2+xs.length*CW;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);TW_=[W,H];svg.setAttribute('width',W*TZ);svg.setAttribute('height',H*TZ);
+  const bTop=[];colG.forEach((gs,x)=>{let y=(H-tot[x])/2;gs.forEach(g=>{bTop[g]=y+LH;y+=LH+gh(g)+GAP})});
+  const tw=t=>[...t].reduce((w,c)=>w+(c.charCodeAt(0)>255?11.5:6.6),0);
+  const X=i=>PADX+gx[colIdx.get(i)]*CW,Y=i=>{const g=colIdx.get(i);return bTop[g]+BP+STEP/2+pos.get(i)*STEP};
+  const bg=mk('g',{},svg);cols.forEach((a,g)=>{const bx=PADX+gx[g]*CW-14,bw=14+9+Math.max(...a.map(i=>tw(D[i].ko)))+10;
+    mk('rect',{x:bx,y:bTop[g],width:bw,height:gh(g),rx:10,class:'tbox'},bg);mk('text',{x:bx+2,y:bTop[g]-6,class:'tcol'},bg).textContent=glab[g]+' ('+a.length+')'});
   const eg=mk('g',{},svg),ng=mk('g',{},svg),E=[];
   nodes.forEach(i=>D[i].next.forEach(t=>{if(!seen.has(t))return;const x1=X(i),y1=Y(i),x2=X(t),y2=Y(t),mx=(x1+x2)/2;E.push([i,t,mk('path',{d:`M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:'tr-e'},eg)])}));
   const N=new Map();let sel=null;
