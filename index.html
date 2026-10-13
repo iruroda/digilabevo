@@ -578,7 +578,7 @@ function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.qu
   a.classList.toggle('open',open)}
 function drawSkillView(){const host=$('#skview');const openId=SKSEL;SKSEL=null;
   const q=QS.skill;chipsSk();const list=allSkillIds.filter(id=>(SKF==='all'||(SKF==='sig')===!!sigH[id])&&match(M[id].n,q));
-  host.innerHTML=`<div class="count">${list.length}개</div><div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
+  host.innerHTML=`<div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
   host.querySelectorAll('.acc').forEach(a=>a.querySelector('.acch').onclick=()=>{const o=!a.classList.contains('open');if(o)host.querySelectorAll('.acc.open').forEach(b=>toggleAcc(b,false));toggleAcc(a,o)});
   if(openId!=null){const a=host.querySelector(`.acc[data-id="${openId}"]`);if(a){toggleAcc(a,true);setTimeout(()=>a.scrollIntoView({block:'nearest',behavior:'smooth'}),50)}}}
 function chipsSk(){const h=$('#chips-sk');h.innerHTML=[['all','전체'],['sig','필살기'],['inh','계승기']].map(([v,l])=>`<button class="chip${SKF===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
