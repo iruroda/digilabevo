@@ -271,6 +271,8 @@ const SK=['HP','SP','ATK','DEF','INT','SPD'];
 function statAt(i,k,L){const [b,g]=D[i].bs[k];let v=Math.floor((b+g*(L-1))/100);return k==='HP'?v*10:v}
 // ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 합체(재료 디지몬) 200 ----------
 const BATTLE_EXP=80000,VISIT=3,FUSION=200,CAP=10;
+// 곤란도가 같을 때의 우선순위(디지뱅크 방문 > 전투 > 팜 훈련 > 우정 > 합체)를 아주 작은 가중치로 반영
+const tie=(v,n,tc,fr,fu)=>(v?1e-3:0)+n*2e-6+tc*3e-9+fr*2e-11+(fu?5e-12:0)+1e-13;
 const nBattles=(i,L)=>Math.ceil(EXPT[D[i].ec][Math.max(1,Math.min(99,L))-1]/BATTLE_EXP);
 function lvAfter(i,n){const t=EXPT[D[i].ec],e=n*BATTLE_EXP;let L=1;while(L<99&&t[L]<=e)L++;return L}
 const _ec=new Map();
@@ -323,17 +325,17 @@ function solveHard(start,end,skills,ban,w,budget){
       return {path:chain.map(q=>q.node),steps:chain.slice(1).map(q=>q.info),learn,cost:Math.round(s.c),hard:true}}
     const x=s.node;
     if(end==null||x===end){let nf=0,ok=true,g=s.mask;for(const [k,nb] of need(x)){if(!(s.mask>>k&1)){g|=1<<k;if(nb>nf)nf=nb}}
-      if(g===FULL){const fg=g&~s.mask;heapPush(heap,[s.c+nf,{fin:1,s,c:s.c+nf,fg}])}}
+      if(g===FULL){const fg=g&~s.mask;heapPush(heap,[s.c+nf+nf*2e-6,{fin:1,s,c:s.c+nf,fg}])}}
     for(const nb of D[x].prev){if(ban.has(nb))continue;
       for(const o of opts(x,nb,false)){const mask2=s.mask|o.g,v=(s.b===0||o.n>0)?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n+v+0.001,par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
+        add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n+v+tie(v,o.n,0,0,0),par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
     for(const nb of D[x].next){if(ban.has(nb))continue;const cd=D[nb].cond,cam=cd.CAM||0,fu=cd.Fus?FUSION:0;let pT=null,pm=-1;
       for(const o of opts(x,nb,true)){const mask2=s.mask|o.g;
         const T2=s.T.map((t,j)=>Math.max(t,o.tau[j]));
         if(pT&&pm===mask2&&T2.every((t,j)=>t===pT[j]))continue;pT=T2;pm=mask2;
         let tc=0;const tr=T2.map((t,j)=>{const d=t-s.T[j];if(d>0)tc+=j===0?Math.ceil(d/10):d;return d});
         const F2=Math.max(s.F,cam),fr=F2-s.F,v=(s.b===0||o.n>0)?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n+v+tc+fr+fu+0.001,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,g:mask2&~s.mask}})}}
+        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n+v+tc+fr+fu+tie(v,o.n,tc,fr,fu),par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,g:mask2&~s.mask}})}}
   }
   return {err:'이 조건으로는 갈 수 있는 경로가 없어요. 제외 목록을 줄이거나 ‘진화만’ 대신 다른 기준을 써보세요.'};
 }
