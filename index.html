@@ -146,10 +146,10 @@ img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .grid .empty{grid-column:1/-1}
 .card{position:relative;height:124px;background:var(--card);border-radius:8px;padding:5px 3px 4px;overflow:hidden;border:1px solid var(--border);cursor:pointer}
-.card .no{display:block;font-size:8.5px;color:var(--sub);font-weight:700;line-height:1.2}
-.card .stg{position:absolute;top:4px;right:4px;font-size:8.5px;color:var(--accent);font-weight:700}
+.card .no{color:var(--accent);margin-right:3px}
+.card .stg{position:absolute;top:4px;right:4px;font-size:8.5px;color:var(--sub);font-weight:700}
 .card img{position:absolute;top:24px;left:50%;transform:translateX(-50%);width:64px;height:64px}
-.card .nm{position:absolute;left:0;right:0;bottom:4px;font-size:10px;font-weight:700;line-height:1.15;text-align:center;word-break:keep-all;padding:0 4px}
+.card .nm{position:absolute;left:0;right:0;bottom:6px;color:var(--txt);font-size:10px;font-weight:700;line-height:1.15;text-align:center;word-break:keep-all;padding:0 4px}
 .count{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px}
 .rlist{display:flex;flex-direction:column;gap:6px}
 .rlist .rrow{padding:8px 12px;cursor:pointer}.rlist .rrow.sm{padding:7px 10px}
@@ -217,7 +217,7 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .phd{display:flex;gap:12px;align-items:center;margin-bottom:12px}
 .phd img{width:68px;height:68px}
 .pg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px 8px}.pc{font-size:12.5px;font-weight:800;white-space:nowrap}.pc b{color:var(--accent);margin-right:6px}.pc span{color:var(--txt)}
-.stgt{font-size:12px;font-weight:700;color:var(--sub);margin-left:4px}.modal h2 .ta{margin-right:6px;vertical-align:-5px}
+.tno{color:var(--accent)}.tnm{color:var(--txt)}.stgt{font-size:12px;font-weight:700;color:var(--sub);margin-left:4px}.modal h2 .ta{margin-right:6px;vertical-align:-5px}
 .mv td:not(:nth-child(2)),.mv th{white-space:nowrap}
 .lvbox{display:flex;gap:14px;align-items:center}.lvl{display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto}
 .tri{width:44px;height:22px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}.tri svg{width:100%;height:100%;fill:currentColor}
@@ -543,7 +543,7 @@ function openDetail(i){
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">야생 출현 정보 없음</div>';
   const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['INT','INT'],['DEF','DEF'],['SPD','SPD']];
   const cells=LS.map(([k,l])=>`<div class="sc"><b>${l}</b><span class="cv" data-k="${k}">${statAt(i,k,1)}</span></div>`).join('');
-  const title=`${taI(m,22)}No.${String(m.no).padStart(3,'0')} ${esc(m.ko)} <span class="stgt">${m.stage}</span>`;
+  const title=`${taI(m,22)}<span class="tno">No.${String(m.no).padStart(3,'0')}</span> <span class="tnm">${esc(m.ko)}</span> <span class="stgt">${m.stage}</span>`;
   const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
   <div class="btnrow"><button class="btn" id="as" type="button">${ICS}여기서 출발</button><button class="btn" id="ae" type="button">${ICE}여기로 도착</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
