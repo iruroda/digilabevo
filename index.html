@@ -83,6 +83,12 @@ body[data-view=route] header{padding-bottom:4px}
 .rcard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:8px}
 .lab{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
 .lab small{font-weight:600;font-size:11px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.two .field{min-width:0;margin:0!important}
+.tg{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:13px;font-weight:700;cursor:pointer}
+.tg input{position:absolute;opacity:0;pointer-events:none}
+.tg i{position:relative;width:42px;height:24px;border-radius:999px;background:#c4c4c4;transition:background .2s;flex:0 0 auto}
+.tg i::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.tg input:checked+i{background:var(--accent)}.tg input:checked+i::after{transform:translateX(18px)}
 .ic16{width:19px;height:19px;vertical-align:-3px;margin-right:5px;flex:0 0 auto}
 .btn .ic16{margin-right:6px}
 .field+.field{margin-top:14px}
@@ -232,16 +238,19 @@ input[type=range]{accent-color:var(--accent)}
 <div class="content">
  <section id="v-route">
   <div class="rcard">
+   <div class="two">
    <div class="field"><div class="lab"><span><svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11.8 12 H17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16.6 8.6 L21.8 12 L16.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>출발 디지몬</span></div><div id="pk-start"></div></div>
-   <div class="field"><div class="lab"><span><svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="12.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M2.4 12 H7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6.6 8.6 L11.8 12 L6.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>도착 디지몬</span> <small>비우면 스킬만 모으고 끝</small></div><div id="pk-end"></div></div>
+   <div class="field"><div class="lab"><span><svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="12.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M2.4 12 H7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6.6 8.6 L11.8 12 L6.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>도착 디지몬</span></div><div id="pk-end"></div></div>
+   </div>
   </div>
   <div class="rcard">
    <div class="field"><div class="lab">꼭 배우고 싶은 스킬 <small id="wc"></small></div><div id="pk-skill"></div><div class="chips" id="skills" style="padding:8px 0 0"></div></div>
-   <div class="field"><div class="lab">거치고 싶지 않은 디지몬</div><div id="pk-ban"></div><div class="chips" id="bans" style="padding:8px 0 0"></div></div>
   </div>
   <div class="rcard">
-   <div class="lab">루트 기준</div><div class="chips" id="modes" style="padding:0"></div>
-   <div class="hintx" id="modehint"></div>
+   <div class="lab">상세 설정</div>
+   <label class="tg"><span>우정 회피</span><input type="checkbox" id="tgF"><i></i></label>
+   <label class="tg"><span>특훈 회피</span><input type="checkbox" id="tgT"><i></i></label>
+   <div class="hintx">켜면 우정도 조건이나 팜 훈련이 필요한 진화를 가능한 한 피해서 찾아요. 피할 수 없으면 어쩔 수 없이 포함돼요.</div>
   </div>
   <div class="btnrow" style="margin-bottom:12px"><button class="btn pri" id="go" type="button">루트 찾기</button></div>
   <div id="result"></div>
@@ -323,11 +332,12 @@ function edgeCurve(from,to){const key=from*1000+to;let o=_ec.get(key);if(o)retur
   for(let n=nl;n<=nmax;n++){const L=lvAfter(from,n);const tau=SK.map((k,j)=>rq[j]?Math.max(0,rq[j]-statAt(from,k,L)):0);
     if(last&&tau.every((v,j)=>v===last[j]))continue;o.push({n,tau});last=tau;if(tau.every(v=>v===0))break}
   _ec.set(key,o);return o}
-function findRouteHard(start,end,skills,ban){
+function findRouteHard(start,end,skills,ban,av){
   // 정확한 탐색을 먼저 시도하고, 너무 오래 걸리면 목적지 쪽으로 더 강하게 쏠리는 근사 탐색으로 넘어간다
-  for(const [w,budget] of [[1,10000],[2,25000],[3,Infinity]]){const r=solveHard(start,end,skills,ban,w,budget);if(!r.over){if(w>1&&!r.err)r.approx=true;return r}}
+  for(const [w,budget] of [[1,10000],[2,25000],[3,Infinity]]){const r=solveHard(start,end,skills,ban,w,budget,av);if(!r.over){if(w>1&&!r.err)r.approx=true;return r}}
 }
-function solveHard(start,end,skills,ban,w,budget){
+function solveHard(start,end,skills,ban,w,budget,av){
+  const WF=av&&av.F?1000:1,WT=av&&av.T?1000:1;
   const K=skills.length,FULL=(1<<K)-1,W=1<<K,seen=new Map(),heap=[],Z=[0,0,0,0,0,0];
   // 노드별 스킬 습득에 필요한 전투 횟수
   const sn=new Map();const need=x=>{let r=sn.get(x);if(!r){r=[];skills.forEach((id,k)=>{const mv=D[x].moves.find(q=>q[0]===id);if(mv)r.push([k,nBattles(x,mv[1])])});sn.set(x,r)}return r};
@@ -358,39 +368,39 @@ function solveHard(start,end,skills,ban,w,budget){
     if(l.length>=CAP){let w=0;for(let i=1;i<l.length;i++)if(l[i].c>l[w].c)w=i;if(l[w].c<=st.c)return;l[w].dead=1;l.splice(w,1)}
     const h=hOf(st.node,st.mask);if(h===Infinity)return;l.push(st);heapPush(heap,[st.c+w*h,st])};
   let exp=0;
-  add({node:start,mask:0,b:0,T:Z,F:0,c:0,par:null,info:null});
+  add({node:start,mask:0,b:0,T:Z,F:0,c:0,r:0,par:null,info:null});
   while(heap.length){
     const [c0,s]=heapPop(heap);if(s.dead)continue;if(++exp>budget)return {over:1};
     if(s.fin){const chain=[];for(let q=s.s;q;q=q.par)chain.push(q);chain.reverse();
       // learn[i]: 루트 i번째 디지몬에서 새로 익힌 스킬 비트 (마지막 칸은 도착 디지몬)
       const learn=chain.map((q,ix)=>ix<chain.length-1?chain[ix+1].info.g:s.fg);
-      return {path:chain.map(q=>q.node),steps:chain.slice(1).map(q=>q.info),learn,cost:Math.round(s.c),hard:true}}
+      return {path:chain.map(q=>q.node),steps:chain.slice(1).map(q=>q.info),learn,cost:Math.round(s.r),hard:true}}
     const x=s.node;
     if(end==null||x===end){let nf=0,ok=true,g=s.mask;for(const [k,nb] of need(x)){if(!(s.mask>>k&1)){g|=1<<k;if(nb>nf)nf=nb}}
-      if(g===FULL){const fg=g&~s.mask;heapPush(heap,[s.c+nf+nf*5e-12,{fin:1,s,c:s.c+nf,fg}])}}
+      if(g===FULL){const fg=g&~s.mask;heapPush(heap,[s.c+nf+nf*5e-12,{fin:1,s,c:s.c+nf,r:s.r+nf,fg}])}}
     for(const nb of D[x].prev){if(ban.has(nb))continue;
       for(const o of opts(x,nb,false)){const mask2=s.mask|o.g,v=(s.b===0||o.n>0)?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n+v+tie(v,o.n,0,0,0),par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
+        add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n+v+tie(v,o.n,0,0,0),r:s.r+o.n+v,par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
     for(const nb of D[x].next){if(ban.has(nb))continue;const cd=D[nb].cond,cam=cd.CAM||0,fu=cd.Fus?FUSION:0;let pT=null,pm=-1;
       for(const o of opts(x,nb,true)){const mask2=s.mask|o.g;
         const T2=s.T.map((t,j)=>Math.max(t,o.tau[j]));
         if(pT&&pm===mask2&&T2.every((t,j)=>t===pT[j]))continue;pT=T2;pm=mask2;
         let tc=0;const tr=T2.map((t,j)=>{const d=t-s.T[j];if(d>0)tc+=j===0?Math.ceil(d/10):d;return d});
         const F2=Math.max(s.F,cam),fr=F2-s.F,v=(s.b===0||o.n>0)?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n+v+tc+fr+fu+tie(v,o.n,tc,fr,fu),par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,g:mask2&~s.mask}})}}
+        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n+v+tc*WT+fr*WF+fu+tie(v,o.n,tc,fr,fu),r:s.r+o.n+v+tc+fr+fu,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,g:mask2&~s.mask}})}}
   }
-  return {err:'이 조건으로는 갈 수 있는 루트가 없어요. 제외 목록을 줄이거나 ‘진화만’ 대신 다른 기준을 써보세요.'};
+  return {err:'이 조건으로는 갈 수 있는 루트가 없어요.'};
 }
 function heapPush(h,x){h.push(x);let i=h.length-1;while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p}}
 function heapPop(h){const t=h[0],l=h.pop();if(h.length){h[0]=l;let i=0;for(;;){let a=2*i+1,b=a+1,m=i;if(a<h.length&&h[a][0]<h[m][0])m=a;if(b<h.length&&h[b][0]<h[m][0])m=b;if(m===i)break;[h[m],h[i]]=[h[i],h[m]];i=m}}return t}
-function findRoute(start,end,skills,bans,modeKey){
+function findRoute(start,end,skills,bans,modeKey,av){
   const mo=MODES[modeKey],K=skills.length,FULL=(1<<K)-1,N=D.length,W=1<<K;
   const iso=i=>!D[i].next.length&&!D[i].prev.length;
   if(iso(start)||(end!=null&&iso(end)))return {err:'NX 디지몬은 진화·퇴화 관계가 없어서 루트를 만들 수 없어요.'};
   const cover=D.map(m=>{let b=0;skills.forEach((id,k)=>{if(m.moves.some(x=>x[0]===id))b|=1<<k});return b});
   const ban=new Set(bans);
   if(ban.has(start)||(end!=null&&ban.has(end)))return {err:'출발/도착 디지몬이 제외 목록에 있어요.'};
-  if(mo.easy)return findRouteHard(start,end,skills,ban);
+  if(mo.easy)return findRouteHard(start,end,skills,ban,av);
   const dist=new Float64Array(N*W).fill(Infinity),prev=new Int32Array(N*W).fill(-1),heap=[];
   const s0=start*W+cover[start];dist[s0]=0;heapPush(heap,[0,s0]);
   while(heap.length){
@@ -402,7 +412,7 @@ function findRoute(start,end,skills,bans,modeKey){
       const ns=nb*W+(mask|cover[nb]);const nd=d0+(isEvo?mo.evo:mo.dev)+0.001;
       if(nd<dist[ns]){dist[ns]=nd;prev[ns]=cur;heapPush(heap,[nd,ns])}}
   }
-  return {err:'이 조건으로는 갈 수 있는 루트가 없어요. 제외 목록을 줄이거나 ‘진화만’ 대신 다른 기준을 써보세요.'};
+  return {err:'이 조건으로는 갈 수 있는 루트가 없어요.'};
 }
 
 const MN={steps:'최소 단계',lessdev:'퇴화 최소',prefdev:'퇴화 우선',easy:'곤란도 최소',evoonly:'진화만'};Object.keys(MN).forEach(k=>MODES[k].name=MN[k]);
@@ -452,7 +462,7 @@ function picker(root,items,onPick,ph){
 const monItems=D.map((m,i)=>({label:m.ko,sub:`No.${m.no} · ${m.stage}`,icon:img(i),value:i}));
 const skillItems=skillIds.map(id=>({label:M[id].n,sub:`${EL[M[id].el??0]} · ${holders[id].length}마리`,value:id}));
 // ---------- 루트 입력 상태 ----------
-let S={start:null,end:null,skills:[],bans:[],mode:'steps'};
+let S={start:null,end:null,skills:[],bans:[],mode:'easy',avF:false,avT:false};
 function drawSel(){
   for(const [k,box] of [['start','#pk-start'],['end','#pk-end']]){
     const host=$(box);host.querySelector('.rrow')?.remove();
@@ -461,15 +471,12 @@ function drawSel(){
   $('#skills').innerHTML=S.skills.map((id,k)=>`<span class="chip tag">${esc(M[id].n)}<span class="x" data-k="${k}">×</span></span>`).join('');
   $('#skills').querySelectorAll('.x').forEach(b=>b.onclick=()=>{S.skills.splice(+b.dataset.k,1);drawSel()});
   $('#wc').textContent=`${S.skills.length}/8`;
-  $('#bans').innerHTML=S.bans.map((i,k)=>`<span class="chip ban">${esc(D[i].ko)}<span class="x" data-k="${k}" style="color:inherit">×</span></span>`).join('');
-  $('#bans').querySelectorAll('.x').forEach(b=>b.onclick=()=>{S.bans.splice(+b.dataset.k,1);drawSel()});
 }
 picker($('#pk-start'),monItems,v=>{S.start=v;drawSel()},'디지몬 이름 검색');
 picker($('#pk-end'),monItems,v=>{S.end=v;drawSel()},'디지몬 이름 검색');
 picker($('#pk-skill'),skillItems,v=>{if(S.skills.length<8&&!S.skills.includes(v)){S.skills.push(v);drawSel()}},'스킬 이름 검색');
-picker($('#pk-ban'),monItems,v=>{if(!S.bans.includes(v)){S.bans.push(v);drawSel()}},'제외할 디지몬 검색');
-function drawModes(){$('#modes').innerHTML=Object.entries(MODES).map(([k,m])=>`<button class="chip${S.mode===k?' active':''}" data-k="${k}" type="button">${m.name}</button>`).join('');
-  $('#modes').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S.mode=b.dataset.k;drawModes()});$('#modehint').textContent=MODES[S.mode].hint}
+function drawModes(){$('#tgF').checked=!!S.avF;$('#tgT').checked=!!S.avT}
+$('#tgF').onchange=e=>{S.avF=e.target.checked};$('#tgT').onchange=e=>{S.avT=e.target.checked};
 // ---------- 결과 ----------
 function condPills(to){const c=D[to].cond;
   return Object.keys(CL).filter(k=>c[k]).map(k=>tp('',`${CL[k]}${k==='Other'?'':' '+c[k]}`)).join('')||tp('','조건 없음')}
@@ -485,7 +492,7 @@ function runRoute(){
   const r=$('#result');
   if(S.start==null){r.innerHTML='<div class="empty">출발 디지몬을 먼저 골라주세요.</div>';return}
   if(S.end==null&&!S.skills.length){r.innerHTML='<div class="empty">도착 디지몬이나 배우고 싶은 스킬 중 하나는 골라주세요.</div>';return}
-  const res=findRoute(S.start,S.end,S.skills,S.bans,S.mode);LAST=null;
+  const res=findRoute(S.start,S.end,S.skills,S.bans,S.mode,{F:S.avF,T:S.avT});LAST=null;
   if(res.err){r.innerHTML=`<div class="empty">${res.err}</div>`;return}
   const p=res.path;const seen=new Set();let nE=0,nD=0,body='';
   p.forEach((i,k)=>{const m=D[i];
@@ -499,7 +506,7 @@ function runRoute(){
   if(res.approx)html+=`<div class="hintx">계산량이 많아서 근사 탐색으로 찾았어요. 최적 루트와 몇 % 안쪽으로 차이 날 수 있어요.</div>`;
   if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 스킬: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
   html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 루트 저장</button></div></div>`;
-  r.innerHTML=html;LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,len:p.length-1};
+  r.innerHTML=html;LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,len:p.length-1};
   r.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
   $('#saveRoute').onclick=askSaveRoute;
 }
@@ -647,7 +654,7 @@ function openSaved(){
   closeMenu();
   const draw=()=>{const b=$('#mbody');b.innerHTML=ROUTES.length?ROUTES.map(r=>`<div class="sv" data-id="${r.id}"><div class="tt"><b>${esc(r.name)}</b><span>${esc(routeSummary(r))} · ${MODES[r.mode]?MODES[r.mode].name:''}</span></div><button data-a="load" type="button">불러오기</button><button data-a="del" type="button">삭제</button></div>`).join(''):'<div class="empty" style="padding:30px 0">저장한 루트가 없어요.<br>루트를 찾은 뒤 ‘이 루트 저장’을 눌러보세요.</div>';
     b.querySelectorAll('.sv').forEach(row=>{const id=row.dataset.id;
-      row.querySelector('[data-a=load]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);S={start:r.start,end:r.end,skills:[...r.skills],bans:[...r.bans],mode:MODES[r.mode]?r.mode:'steps'};drawSel();drawModes();closeModal();view('route');runRoute()};
+      row.querySelector('[data-a=load]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);S={start:r.start,end:r.end,skills:[...r.skills],bans:[...(r.bans||[])],mode:'easy',avF:!!r.avF,avT:!!r.avT};drawSel();drawModes();closeModal();view('route');runRoute()};
       row.querySelector('[data-a=del]').onclick=()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();draw()}})};
   openModal('저장한 루트','',{dense:true});draw()}
 $('#mSaved').onclick=$('#savedBtn').onclick=openSaved;
