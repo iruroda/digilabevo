@@ -83,6 +83,8 @@ body[data-view=route] header{padding-bottom:4px}
 .rcard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:8px}
 .lab{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
 .lab small{font-weight:600;font-size:11px}
+.ic16{width:19px;height:19px;vertical-align:-3px;margin-right:5px;flex:0 0 auto}
+.btn .ic16{margin-right:6px}
 .field+.field{margin-top:14px}
 .pick{position:relative}
 .pick input{width:100%;padding:0 12px;height:34px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;outline:none;color:var(--txt)}
@@ -221,8 +223,8 @@ input[type=range]{accent-color:var(--accent)}
 <div class="content">
  <section id="v-route">
   <div class="rcard">
-   <div class="field"><div class="lab">출발 디지몬</div><div id="pk-start"></div></div>
-   <div class="field"><div class="lab">도착 디지몬 <small>비우면 스킬만 모으고 끝</small></div><div id="pk-end"></div></div>
+   <div class="field"><div class="lab"><span><svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11.8 12 H17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16.6 8.6 L21.8 12 L16.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>출발 디지몬</span></div><div id="pk-start"></div></div>
+   <div class="field"><div class="lab"><span><svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="12.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M2.4 12 H7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6.6 8.6 L11.8 12 L6.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>도착 디지몬</span> <small>비우면 스킬만 모으고 끝</small></div><div id="pk-end"></div></div>
   </div>
   <div class="rcard">
    <div class="field"><div class="lab">꼭 배우고 싶은 스킬 <small id="wc"></small></div><div id="pk-skill"></div><div class="chips" id="skills" style="padding:8px 0 0"></div></div>
@@ -399,6 +401,7 @@ const MN={steps:'최소 단계',lessdev:'퇴화 최소',prefdev:'퇴화 우선',
 const TAR={water:0,fire:1,plant:2,earth:3,electric:4,wind:5,light:6,dark:7,neutral:8},TAC={vaccine:0,virus:1,data:2,free:3};
 const taI=(m,s)=>`<i class="ta" style="--c:${TAC[m.type]??3};--r:${TAR[m.attr]??8}${s?`;--s:${s}px`:''}"></i>`;
 const skI=(x,s)=>`<i class="sk" style="--c:${x.dt===8?9:x.dt===0?10:(x.el??0)}${s?`;--s:${s}px`:''}"></i>`;
+const ICS=`<svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11.8 12 H17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16.6 8.6 L21.8 12 L16.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`,ICE=`<svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="12.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M2.4 12 H7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6.6 8.6 L11.8 12 L6.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 const tp=(cls,t,tip)=>`<span class="tagp ${cls||''}"${tip?` title="${esc(tip)}"`:''}>${t}</span>`;
 let SCROLLER=[];
 // ---------- 모달 ----------
@@ -511,7 +514,7 @@ function openDetail(i){
   const evo=(arr,dir)=>arr.map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div><div class="nm">${esc(D[j].ko)}</div><div class="mt">${D[j].stage}</div></div><div class="rq">${dir==='next'?condPills(j,i):tp('dev','퇴화')}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">야생 출현 정보 없음</div>';
   const b=openModal(m.ko,`<div class="phd"><img src="${img(i)}"><div><div class="n">No.${m.no}</div><div class="e">${esc(m.en)}</div><div class="facts" style="margin-top:6px">${tp('',m.stage)}${tp('',taI(m,14)+(TYPE[m.type]||''))}${tp('',(ATTR[m.attr]||'')+'속성')}</div></div></div>
-  <div class="btnrow"><button class="btn" id="as" type="button">여기서 출발</button><button class="btn" id="ae" type="button">여기로 도착</button></div>
+  <div class="btnrow"><button class="btn" id="as" type="button">${ICS}여기서 출발</button><button class="btn" id="ae" type="button">${ICE}여기로 도착</button></div>
   <div class="sec"><h3>능력치</h3><table><tr><th></th><th>Lv.1</th><th>Lv.50</th><th>Lv.99</th><th>Lv.<span id="lvn">75</span></th></tr>${stat}</table><div style="display:flex;gap:8px;align-items:center;margin-top:8px;color:var(--sub);font-size:11.5px;font-weight:700">레벨 <input type="range" id="lvs" min="1" max="99" value="75" style="flex:1"></div></div>
   <div class="sec"><h3>서포트 스킬</h3><b style="font-size:13px">${esc(m.sup[0])}</b><div style="color:var(--sub);font-size:12px">${esc(m.sup[1])}</div><div class="facts" style="margin-top:6px">${tp('','메모리 '+m.mem)}${tp('','장비 슬롯 '+m.slots)}</div></div>
   <div class="sec"><h3>도감 설명</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.desc)}</div></div>
