@@ -128,7 +128,13 @@ body[data-view=route] header{padding-bottom:4px}
 .card .nm{position:absolute;left:0;right:0;bottom:4px;font-size:10px;font-weight:700;line-height:1.15;text-align:center;word-break:keep-all;padding:0 4px}
 .count{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px}
 .rlist{display:flex;flex-direction:column;gap:6px}
-.rlist .rrow{padding:8px 12px;cursor:pointer}
+.rlist .rrow{padding:8px 12px;cursor:pointer}.rlist .rrow.sm{padding:7px 10px}
+.acc{background:var(--card);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+.acc>.rrow.acch{border:0;border-radius:0;background:none}
+.acc .sk{margin:0}.acc .chev{width:18px;height:18px;flex:0 0 auto;fill:none;stroke:var(--sub);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+.acc.open .chev{transform:rotate(180deg)}
+.accb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.acc.open .accb{grid-template-rows:1fr}
+.accin{overflow:hidden;min-height:0}.accp{padding:2px 12px 12px}
 table{border-collapse:collapse;width:100%}
 th,td{padding:5px 6px;text-align:right;font-size:12px;font-variant-numeric:tabular-nums}
 th:first-child,td:first-child{text-align:left}
@@ -514,21 +520,21 @@ function openDetail(i){
 }
 // ---------- 기술 ----------
 let SKSEL=null;
-function drawSkillView(){const host=$('#skview');
-  if(SKSEL!=null){showSkill(SKSEL,true);return}
-  const q=QS.skill;const list=skillIds.filter(id=>match(M[id].n,q)).slice(0,80);
-  host.innerHTML=`<div class="count">${q?list.length+'개':'기술 이름을 검색해보세요 (일부만 표시)'}</div><div class="rlist">${list.map(id=>`<div class="rrow" data-id="${id}"><div style="flex:1"><div class="nm">${esc(M[id].n)}</div><div class="mt">${skI(M[id],14)}${EL[M[id].el??0]} · ${DT[M[id].dt]||'보조'}</div></div>${tp('',holders[id].length+'마리')}</div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
-  host.querySelectorAll('[data-id]').forEach(e=>e.onclick=()=>showSkill(e.dataset.id))}
-function showSkill(id,keep){SKSEL=id;if(CUR!=='skill'&&!keep){view('skill');return}
-  const x=M[id];const hs=holders[id].map(i=>[i,D[i].moves.find(m=>m[0]===id)[1]]).sort((a,b)=>a[1]-b[1]||D[a[0]].no-D[b[0]].no);
-  $('#skview').innerHTML=`<div class="rcard"><div class="lab"><span>${esc(x.n)}</span></div>
-   <div class="facts"><span class="tagp" style="color:${ELC[x.el??0]};font-weight:700">${skI(x,14)}${EL[x.el??0]}속성</span>${tp('',DT[x.dt]||'보조')}${tp('','위력 '+(x.p||'-')+(x.n2>1?'×'+(x.n1===x.n2?x.n2:x.n1+'~'+x.n2):''))}${tp('','SP '+(x.sp??'-'))}${tp('',TG[x.tg]||'')}${x.aa?tp('','필중'):x.acc?tp('','명중 '+x.acc+'%'):''}</div>
+function skBody(id){const x=M[id];const hs=holders[id].map(i=>[i,D[i].moves.find(m=>m[0]===id)[1]]).sort((a,b)=>a[1]-b[1]||D[a[0]].no-D[b[0]].no);
+  return `<div class="accp"><div class="facts"><span class="tagp" style="color:${ELC[x.el??0]};font-weight:700">${EL[x.el??0]}속성</span>${tp('',DT[x.dt]||'보조')}${tp('','위력 '+(x.p||'-')+(x.n2>1?'×'+(x.n1===x.n2?x.n2:x.n1+'~'+x.n2):''))}${tp('','SP '+(x.sp??'-'))}${tp('',TG[x.tg]||'')}${x.aa?tp('','필중'):x.acc?tp('','명중 '+x.acc+'%'):''}</div>
    ${x.d?`<div class="hintx">${esc(x.d)}</div>`:''}
-   <div class="btnrow" style="margin-top:10px"><button class="btn" id="skBack" type="button">목록으로</button><button class="btn pri" id="addsk" type="button">이 기술로 경로 찾기</button></div></div>
-   <div class="count">${hs.length}마리가 배워요 (습득 레벨 순)</div><div class="rlist">${hs.map(([i,lv])=>`<div class="rrow" data-i="${i}"><img src="${img(i)}" style="width:34px;height:34px"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${tp('','Lv.'+lv)}</div>`).join('')}</div>`;
-  $('#skview').querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
-  $('#skBack').onclick=()=>{SKSEL=null;drawSkillView()};
-  $('#addsk').onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
+   <div class="btnrow" style="margin:10px 0"><button class="btn pri addsk" type="button">이 기술로 경로 찾기</button></div>
+   <div class="count" style="margin-top:4px">${hs.length}마리가 배워요 (습득 레벨 순)</div>${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${tp('','Lv.'+lv)}</div>`).join('')}</div>`}
+function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.querySelector('.accin').innerHTML=skBody(id);a.dataset.built=1;
+    a.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
+    a.querySelector('.addsk').onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
+  a.classList.toggle('open',open)}
+function drawSkillView(){const host=$('#skview');const openId=SKSEL;SKSEL=null;
+  const q=QS.skill;const list=skillIds.filter(id=>match(M[id].n,q)).slice(0,80);
+  host.innerHTML=`<div class="count">${q?list.length+'개':'기술 이름을 검색해보세요 (일부만 표시)'}</div><div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div><div class="mt">${EL[M[id].el??0]} · ${DT[M[id].dt]||'보조'}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
+  host.querySelectorAll('.acc').forEach(a=>a.querySelector('.acch').onclick=()=>{const o=!a.classList.contains('open');if(o)host.querySelectorAll('.acc.open').forEach(b=>toggleAcc(b,false));toggleAcc(a,o)});
+  if(openId!=null){const a=host.querySelector(`.acc[data-id="${openId}"]`);if(a){toggleAcc(a,true);setTimeout(()=>a.scrollIntoView({block:'nearest',behavior:'smooth'}),50)}}}
+function showSkill(id){SKSEL=id;QS.skill=M[id].n;if(CUR!=='skill')view('skill');else{$('#q').value=QS.skill;drawSkillView()}}
 // ---------- 진화 트리 ----------
 const TST=[];D.forEach(m=>{if(!TST.includes(m.stage))TST.push(m.stage)});
 const ORD=['유년기 I','유년기 II','성장기','성숙기','완전체','궁극체','초궁극체'];TST.sort((a,b)=>{const x=ORD.indexOf(a),y=ORD.indexOf(b);return(x<0?99:x)-(y<0?99:y)});
