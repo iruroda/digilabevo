@@ -598,9 +598,15 @@ function buildTree(){
   up.forEach(i=>seen.add(i));const nUp=up.size-1;const nodes=[...seen];
   const OI=s=>ORD.indexOf(s);const xi=new Map();nodes.forEach(i=>{const o=OI(D[i].stage);if(o>=0)xi.set(i,o)});
   nodes.forEach(i=>{if(xi.has(i))return;const ps=D[i].prev.filter(t=>xi.has(t)).map(t=>xi.get(t)+1),ns=D[i].next.filter(t=>xi.has(t)).map(t=>xi.get(t)-1);xi.set(i,ps.length?Math.min(...ps):ns.length?Math.max(0,Math.max(...ns)):3)});
-  const lv=new Map(nodes.map(i=>[i,0]));for(let k=0;k<4;k++)nodes.forEach(i=>D[i].next.forEach(t=>{if(t!==i&&seen.has(t)&&xi.get(t)===xi.get(i))lv.set(t,Math.min(3,Math.max(lv.get(t),lv.get(i)+1)))}));
+  // 모습 체인지(각성/BM/LM 등): 같은 단계 안에서 이름이 이어지는 변형, 서로 오가는 쌍은 둘 다 종착 취급
+  const F=new Set(),FO=new Map(),pf=(a,b)=>{let k=0;while(k<a.length&&k<b.length&&a[k]===b[k])k++;return k};
+  nodes.forEach(i=>D[i].next.forEach(t=>{if(t===i||!seen.has(t)||D[t].stage!==D[i].stage||OI(D[i].stage)<0)return;
+    if(D[t].next.includes(i)){F.add(i);F.add(t)}else if(D[t].prev.length===1&&pf(D[i].ko,D[t].ko)>=3){F.add(t);FO.set(t,i)}}));
+  const lv=new Map(nodes.map(i=>[i,0]));for(let k=0;k<4;k++)nodes.forEach(i=>D[i].next.forEach(t=>{if(t!==i&&seen.has(t)&&xi.get(t)===xi.get(i)&&!F.has(i)&&!F.has(t))lv.set(t,Math.min(3,Math.max(lv.get(t),lv.get(i)+1)))}));
+  F.forEach(f=>{const fl=(FO.has(f)&&!F.has(FO.get(f))?lv.get(FO.get(f)):0)+1,x0=xi.get(f);
+    if(nodes.some(j=>!F.has(j)&&xi.get(j)===x0&&lv.get(j)>=fl)){lv.set(f,fl)}else if(x0+1<ORD.length){xi.set(f,x0+1);lv.set(f,0)}else lv.set(f,fl)});
   const xv=i=>xi.get(i)*10+lv.get(i);const xs=[...new Set(nodes.map(xv))].sort((a,b)=>a-b);
-  const gk=i=>xs.indexOf(xv(i))*100+(OI(D[i].stage)>=0?0:1+TST.indexOf(D[i].stage));
+  const gk=i=>xs.indexOf(xv(i))*100+(OI(D[i].stage)>=0?(F.has(i)?50:0):1+TST.indexOf(D[i].stage));
   const gkeys=[...new Set(nodes.map(gk))].sort((a,b)=>a-b);
   const cols=gkeys.map(k=>nodes.filter(i=>gk(i)===k)),gx=gkeys.map(k=>Math.floor(k/100)),glab=cols.map(a=>D[a[0]].stage);
   const colIdx=new Map();cols.forEach((a,c)=>a.forEach(i=>colIdx.set(i,c)));
@@ -628,7 +634,7 @@ function buildTree(){
     E.forEach(([a,b,p])=>{p.classList.toggle('up',u.has(a)&&u.has(b));p.classList.toggle('on',d.has(a)&&d.has(b))});N.forEach((n,j)=>n.classList.toggle('on',u.has(j)||d.has(j)));
     0};
   const unfocus=()=>{svg.classList.remove('focus');E.forEach(([a,b,p])=>p.classList.remove('on','up'));N.forEach(n=>n.classList.remove('on'));info()};
-  nodes.forEach(i=>{const end=!D[i].next.length;const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
+  nodes.forEach(i=>{const end=!D[i].next.length||F.has(i);const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
     if(D[i].stage==='유년기 I')mk('polygon',{points:'-5,-5.5 -5,5.5 6,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.2,class:'sh'},g);
     mk('text',{x:9,y:4},g).textContent=nm;N.set(i,g);
     g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
