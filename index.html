@@ -221,7 +221,7 @@ input[type=range]{accent-color:var(--accent)}
 <div id="mpanelWrap"><div id="mpanel" class="sb">
   <div class="mtitle"><svg class="logo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27.5" fill="none" stroke="#ffc401" stroke-width="9"/><circle cx="32" cy="32" r="10.8" fill="none" stroke="#ffc401" stroke-width="7"/></svg><span>디지랩 EVO</span><span class="info-btn" id="infoBtn" role="button" tabindex="0" aria-label="설명 보기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.2v.1"/></svg></span></div>
   <div class="mgrouptitle">경로</div>
-  <div class="msec" data-key="rt"><h3>설정<span class="car">▾</span></h3><div class="chips"><button class="chip" id="mTune" type="button">난이도 가중치</button><button class="chip" id="mSaved" type="button">저장한 경로</button></div></div>
+  <div class="msec" data-key="rt"><h3>설정<span class="car">▾</span></h3><div class="chips"><button class="chip" id="mSaved" type="button">저장한 경로</button></div></div>
   <div class="mgrouptitle mgap">도감</div>
   <div class="msec" data-key="stage"><h3>세대<span class="car">▾</span></h3><div class="chips" id="chips-stage"></div></div>
   <div class="msec" data-key="type"><h3>타입<span class="car">▾</span></h3><div class="chips" id="chips-type"></div></div>
@@ -246,7 +246,7 @@ const EL=['무','불','물','풀','전기','땅','바람','빛','어둠'];
 const ELC=['#8a93a3','#e5533d','#2f7fe0','#34a853','#d9a800','#a0713a','#4cb8b0','#c9a400','#7d4fc4'];
 const DT={0:'보조',1:'물리',2:'마법',8:'회복'};
 const TG={1:'자신',2:'아군 1',3:'아군 전체',4:'적 1',5:'적 전체'};
-const CL={LVL:'Lv',HP:'HP',SP:'SP',ATK:'공격',DEF:'방어',INT:'지력',SPD:'속도',ABI:'ABI',CAM:'CAM',Other:'추가 조건'};
+const CL={LVL:'Lv',HP:'HP',SP:'SP',ATK:'공격',DEF:'방어',INT:'지력',SPD:'속도',ABI:'ABI',CAM:'CAM',Other:'추가 조건',Fus:'합체'};
 const STAT=[['HP','HP'],['SP','SP'],['ATK','공격'],['DEF','방어'],['INT','지력'],['SPD','속도']];
 const img=i=>`icons/${D[i].no}.png`;
 // 한글 초성
@@ -264,34 +264,78 @@ const MODES={
  steps:{evo:1,dev:1,easy:0,hint:'진화·퇴화 단계 수가 가장 적은 경로'},
  lessdev:{evo:1,dev:6,easy:0,hint:'퇴화 1회를 진화 6회만큼 비싸게 보고 계산'},
  prefdev:{evo:1,dev:0.35,easy:0,hint:'퇴화를 진화의 1/3 비용으로 보고 계산'},
- easy:{evo:1,dev:1,easy:1,hint:'레벨 구간별로 스탯 조건을 못 채우는 진화에 가중치를 더해 계산 (메뉴의 ‘난이도 가중치’에서 조정)'},
+ easy:{evo:1,dev:1,easy:1,hint:'곤란도가 가장 낮은 경로 · 디지뱅크 방문 3, 전투 1회(80000exp) 1, 팜 훈련 스탯 1당 1(HP는 10당 1), 우정 1당 1, 합체 100'},
  evoonly:{evo:1,dev:Infinity,easy:0,hint:'퇴화 없이 진화 방향으로만 이동 (갈 수 없으면 실패)'}
 };
 const SK=['HP','SP','ATK','DEF','INT','SPD'];
-// 난이도 가중치: 구간(레벨)마다 '그 레벨이 되어도 못 채우는 스탯' 1개당 비용
-const TUNE_DEF={lv:[70,80,90,99],w:[0.5,0.75,1,1.5],imp:8,spec:2};
-let TUNE=JSON.parse(JSON.stringify(TUNE_DEF));
-try{const t=JSON.parse(localStorage.getItem('tune')||'null');if(t&&t.lv&&t.w&&t.lv.length===4&&t.w.length===4)TUNE=t}catch(e){}
 function statAt(i,k,L){const [b,g]=D[i].bs[k];let v=Math.floor((b+g*(L-1))/100);return k==='HP'?v*10:v}
-const _need={};
-function needLevel(i,k,req){const key=i*1000+SK.indexOf(k)*100000000+req*1;if(key in _need)return _need[key];
-  let r=100;for(let L=1;L<=99;L++){if(statAt(i,k,L)>=req){r=L;break}}return _need[key]=r}
-const _hc={};let _hv=0;
-function hardness(from,to){ // 진화 from→to : 스탯별 필요 레벨(100=Lv.99로도 불가)
-  const c=D[to].cond;const need={};let extra=0,hard=[];
-  SK.forEach(k=>{if(c[k]){const nl=needLevel(from,k,c[k]);need[k]=nl;
-    if(nl>TUNE.lv[0])hard.push(k);
-    TUNE.lv.forEach((t,j)=>{if(nl>t)extra+=TUNE.w[j]});
-    if(nl>99)extra+=TUNE.imp}});
-  if(c.Other)extra+=TUNE.spec;
-  return {hard,need,extra,spec:!!c.Other};
+// ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 합체(재료 디지몬) 100 ----------
+const BATTLE_EXP=80000,VISIT=3,FUSION=100,CAP=10;
+const nBattles=(i,L)=>Math.ceil(EXPT[D[i].ec][Math.max(1,Math.min(99,L))-1]/BATTLE_EXP);
+function lvAfter(i,n){const t=EXPT[D[i].ec],e=n*BATTLE_EXP;let L=1;while(L<99&&t[L]<=e)L++;return L}
+const _ec=new Map();
+function edgeCurve(from,to){const key=from*1000+to;let o=_ec.get(key);if(o)return o;
+  const c=D[to].cond,nl=nBattles(from,c.LVL||1),nmax=Math.max(nl,nBattles(from,99)),rq=SK.map(k=>c[k]||0);o=[];let last=null;
+  for(let n=nl;n<=nmax;n++){const L=lvAfter(from,n);const tau=SK.map((k,j)=>rq[j]?Math.max(0,rq[j]-statAt(from,k,L)):0);
+    if(last&&tau.every((v,j)=>v===last[j]))continue;o.push({n,tau});last=tau;if(tau.every(v=>v===0))break}
+  _ec.set(key,o);return o}
+function findRouteHard(start,end,skills,ban){
+  // 정확한 탐색을 먼저 시도하고, 너무 오래 걸리면 목적지 쪽으로 더 강하게 쏠리는 근사 탐색으로 넘어간다
+  for(const [w,budget] of [[1,12000],[2,30000],[3,Infinity]]){const r=solveHard(start,end,skills,ban,w,budget);if(!r.over){if(w>1&&!r.err)r.approx=true;return r}}
 }
-function edgeCost(mo,from,to,isEvo){
-  if(!isEvo)return mo.dev;
-  if(!mo.easy)return mo.evo;
-  const key=from*1000+to;if(_hc.v!==_hv){for(const k in _hc)delete _hc[k];_hc.v=_hv}
-  if(!(key in _hc))_hc[key]=hardness(from,to).extra;
-  return mo.evo+_hc[key];
+function solveHard(start,end,skills,ban,w,budget){
+  const K=skills.length,FULL=(1<<K)-1,W=1<<K,seen=new Map(),heap=[],Z=[0,0,0,0,0,0];
+  // 노드별 기술 습득에 필요한 전투 횟수
+  const sn=new Map();const need=x=>{let r=sn.get(x);if(!r){r=[];skills.forEach((id,k)=>{const mv=D[x].moves.find(q=>q[0]===id);if(mv)r.push([k,nBattles(x,mv[1])])});sn.set(x,r)}return r};
+  const gain=(x,n)=>{let g=0;for(const [k,nb] of need(x))if(nb<=n)g|=1<<k;return g};
+  const _eo=new Map();
+  const opts=(x,nb,evo)=>{const key=x*1000+nb+(evo?0:1e7);let o=_eo.get(key);if(o)return o;
+    const cur=evo?edgeCurve(x,nb):[{n:0,tau:Z}],nl=cur[0].n,ns=new Set(cur.map(q=>q.n));
+    for(const [,b] of need(x))if(b>=nl)ns.add(b);
+    const list=[...ns].sort((p,q)=>p-q);o=[];let lp=null,lg=-1;
+    for(const n of list){let st=cur[0];for(const q of cur)if(q.n<=n)st=q;const g=gain(x,n);
+      if(lp&&st===lp&&g===lg)continue;lp=st;lg=g;o.push({n,tau:st.tau,g})}
+    _eo.set(key,o);return o};
+  // A* 하한: 훈련·우정을 무시하고 (전투+디지뱅크+합체)만 센 완화 거리 — 목적지/기술 보유 디지몬까지
+  const N=D.length,rev=Array.from({length:N},()=>[]);
+  for(let u=0;u<N;u++){if(ban.has(u))continue;
+    for(const v of D[u].next)if(!ban.has(v)){const n0=edgeCurve(u,v)[0].n;rev[v].push([u,(n0>0?n0+VISIT:0)+(D[v].cond.Fus?FUSION:0)])}
+    for(const v of D[u].prev)if(!ban.has(v))rev[v].push([u,0])}
+  const back=(src)=>{const d=new Float64Array(N).fill(Infinity),h=[];src.forEach(([i,v])=>{if(v<d[i]){d[i]=v;heapPush(h,[v,i])}});
+    while(h.length){const [dv,v]=heapPop(h);if(dv>d[v])continue;for(const [u,w] of rev[v]){const nd=dv+w;if(nd<d[u]){d[u]=nd;heapPush(h,[nd,u])}}}return d};
+  const dEnd=end!=null?back([[end,0]]):null;
+  const dSk=skills.map((id,k)=>{const src=[];for(let i=0;i<N;i++)if(!ban.has(i)&&D[i].moves.some(q=>q[0]===id)){const e=dEnd?dEnd[i]:0;if(e<Infinity)src.push([i,e])}return back(src)});
+  const hOf=(x,mask)=>{let m=dEnd?dEnd[x]:0;for(let k=0;k<K;k++)if(!(mask>>k&1)&&dSk[k][x]>m)m=dSk[k][x];return m};
+  const ge=(a,T,F,c)=>a.c<=c&&a.F>=F&&a.T[0]>=T[0]&&a.T[1]>=T[1]&&a.T[2]>=T[2]&&a.T[3]>=T[3]&&a.T[4]>=T[4]&&a.T[5]>=T[5];
+  const le=(a,T,F,c)=>c<=a.c&&F>=a.F&&T[0]>=a.T[0]&&T[1]>=a.T[1]&&T[2]>=a.T[2]&&T[3]>=a.T[3]&&T[4]>=a.T[4]&&T[5]>=a.T[5];
+  const add=(st)=>{const key=st.node*W+st.mask;let l=seen.get(key);if(!l){l=[];seen.set(key,l)}
+    for(const a of l)if(ge(a,st.T,st.F,st.c))return;
+    for(let i=l.length-1;i>=0;i--)if(le(l[i],st.T,st.F,st.c)){l[i].dead=1;l.splice(i,1)}
+    if(l.length>=CAP){let w=0;for(let i=1;i<l.length;i++)if(l[i].c>l[w].c)w=i;if(l[w].c<=st.c)return;l[w].dead=1;l.splice(w,1)}
+    const h=hOf(st.node,st.mask);if(h===Infinity)return;l.push(st);heapPush(heap,[st.c+w*h,st])};
+  let exp=0;
+  add({node:start,mask:0,b:0,T:Z,F:0,c:0,par:null,info:null});
+  while(heap.length){
+    const [c0,s]=heapPop(heap);if(s.dead)continue;if(++exp>budget)return {over:1};
+    if(s.fin){const chain=[];for(let q=s.s;q;q=q.par)chain.push(q);chain.reverse();
+      // learn[i]: 경로 i번째 디지몬에서 새로 익힌 기술 비트 (마지막 칸은 도착 디지몬)
+      const learn=chain.map((q,ix)=>ix<chain.length-1?chain[ix+1].info.g:s.fg);
+      return {path:chain.map(q=>q.node),steps:chain.slice(1).map(q=>q.info),learn,cost:Math.round(s.c),hard:true}}
+    const x=s.node;
+    if(end==null||x===end){let nf=0,ok=true,g=s.mask;for(const [k,nb] of need(x)){if(!(s.mask>>k&1)){g|=1<<k;if(nb>nf)nf=nb}}
+      if(g===FULL){const fg=g&~s.mask;heapPush(heap,[s.c+nf,{fin:1,s,c:s.c+nf,fg}])}}
+    for(const nb of D[x].prev){if(ban.has(nb))continue;
+      for(const o of opts(x,nb,false)){const mask2=s.mask|o.g,v=(s.b===0||o.n>0)?VISIT:0;
+        add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n+v+0.001,par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
+    for(const nb of D[x].next){if(ban.has(nb))continue;const cd=D[nb].cond,cam=cd.CAM||0,fu=cd.Fus?FUSION:0;let pT=null,pm=-1;
+      for(const o of opts(x,nb,true)){const mask2=s.mask|o.g;
+        const T2=s.T.map((t,j)=>Math.max(t,o.tau[j]));
+        if(pT&&pm===mask2&&T2.every((t,j)=>t===pT[j]))continue;pT=T2;pm=mask2;
+        let tc=0;const tr=T2.map((t,j)=>{const d=t-s.T[j];if(d>0)tc+=j===0?Math.ceil(d/10):d;return d});
+        const F2=Math.max(s.F,cam),fr=F2-s.F,v=(s.b===0||o.n>0)?VISIT:0;
+        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n+v+tc+fr+fu+0.001,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,g:mask2&~s.mask}})}}
+  }
+  return {err:'이 조건으로는 갈 수 있는 경로가 없어요. 제외 목록을 줄이거나 ‘진화만’ 대신 다른 기준을 써보세요.'};
 }
 function heapPush(h,x){h.push(x);let i=h.length-1;while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p}}
 function heapPop(h){const t=h[0],l=h.pop();if(h.length){h[0]=l;let i=0;for(;;){let a=2*i+1,b=a+1,m=i;if(a<h.length&&h[a][0]<h[m][0])m=a;if(b<h.length&&h[b][0]<h[m][0])m=b;if(m===i)break;[h[m],h[i]]=[h[i],h[m]];i=m}}return t}
@@ -302,6 +346,7 @@ function findRoute(start,end,skills,bans,modeKey){
   const cover=D.map(m=>{let b=0;skills.forEach((id,k)=>{if(m.moves.some(x=>x[0]===id))b|=1<<k});return b});
   const ban=new Set(bans);
   if(ban.has(start)||(end!=null&&ban.has(end)))return {err:'출발/도착 디지몬이 제외 목록에 있어요.'};
+  if(mo.easy)return findRouteHard(start,end,skills,ban);
   const dist=new Float64Array(N*W).fill(Infinity),prev=new Int32Array(N*W).fill(-1),heap=[];
   const s0=start*W+cover[start];dist[s0]=0;heapPush(heap,[0,s0]);
   while(heap.length){
@@ -310,13 +355,13 @@ function findRoute(start,end,skills,bans,modeKey){
     if(mask===FULL&&(end==null||node===end)){const path=[];for(let c=cur;c!==-1;c=prev[c])path.push((c/W)|0);return {path:path.reverse(),cost:d0}}
     const moves=[];D[node].next.forEach(t=>moves.push([t,true]));if(mo.dev!==Infinity)D[node].prev.forEach(t=>moves.push([t,false]));
     for(const [nb,isEvo] of moves){if(ban.has(nb))continue;
-      const ns=nb*W+(mask|cover[nb]);const nd=d0+edgeCost(mo,node,nb,isEvo)+0.001;
+      const ns=nb*W+(mask|cover[nb]);const nd=d0+(isEvo?mo.evo:mo.dev)+0.001;
       if(nd<dist[ns]){dist[ns]=nd;prev[ns]=cur;heapPush(heap,[nd,ns])}}
   }
   return {err:'이 조건으로는 갈 수 있는 경로가 없어요. 제외 목록을 줄이거나 ‘진화만’ 대신 다른 기준을 써보세요.'};
 }
 
-const MN={steps:'최소 단계',lessdev:'퇴화 최소',prefdev:'퇴화 우선',easy:'쉬운 진화 우선',evoonly:'진화만'};Object.keys(MN).forEach(k=>MODES[k].name=MN[k]);
+const MN={steps:'최소 단계',lessdev:'퇴화 최소',prefdev:'퇴화 우선',easy:'곤란도 최소',evoonly:'진화만'};Object.keys(MN).forEach(k=>MODES[k].name=MN[k]);
 
 const tp=(cls,t,tip)=>`<span class="tagp ${cls||''}"${tip?` title="${esc(tip)}"`:''}>${t}</span>`;
 let SCROLLER=[];
@@ -331,7 +376,7 @@ function closeMenu(){$('#menubtn').classList.remove('open');$('#mpanel').classLi
 $('#menubtn').onclick=()=>{const o=!$('#mpanel').classList.contains('open');$('#menubtn').classList.toggle('open',o);$('#mpanel').classList.toggle('open',o);$('#menuOverlay').classList.toggle('open',o)};
 $('#menuOverlay').onclick=closeMenu;
 document.querySelectorAll('.msec h3').forEach(h=>h.onclick=()=>h.parentNode.classList.toggle('collapsed'));
-$('#infoBtn').onclick=()=>{closeMenu();openModal('디지랩 EVO',['디지몬 스토리 사이버 슬루스 / 해커즈 메모리의 진화 경로 탐색 도우미입니다.','출발·도착 디지몬 사이에 배우고 싶은 기술을 경유지로 넣으면, 그 기술을 모두 거치는 진화·퇴화 경로를 찾아줍니다.','진화에 필요한 스탯 조건을 레벨 구간별로 따져서, 쉬운 진화를 우선하는 경로도 만들 수 있습니다.','로그인하면 검색한 경로를 저장할 수 있습니다.'].map(t=>`<div class="ibrow"><span class="idash">-</span><span>${t}</span></div>`).join(''))};
+$('#infoBtn').onclick=()=>{closeMenu();openModal('디지랩 EVO',['디지몬 스토리 사이버 슬루스 / 해커즈 메모리의 진화 경로 탐색 도우미입니다.','출발·도착 디지몬 사이에 배우고 싶은 기술을 경유지로 넣으면, 그 기술을 모두 거치는 진화·퇴화 경로를 찾아줍니다.','전투·팜 훈련·우정·디지뱅크 방문·합체를 합산한 ‘곤란도’가 가장 낮은 경로도 찾을 수 있습니다.','로그인하면 검색한 경로를 저장할 수 있습니다.'].map(t=>`<div class="ibrow"><span class="idash">-</span><span>${t}</span></div>`).join(''))};
 // ---------- 보기 전환 ----------
 const VIEWS=['route','dex','skill','tree'];let CUR='route';const QS={dex:'',skill:'',tree:''};
 const PH={dex:'디지몬 이름 검색 (초성 가능)',skill:'기술 이름 검색 (초성 가능)',tree:'트리에서 이름 찾기'};
@@ -376,11 +421,15 @@ picker($('#pk-ban'),monItems,v=>{if(!S.bans.includes(v)){S.bans.push(v);drawSel(
 function drawModes(){$('#modes').innerHTML=Object.entries(MODES).map(([k,m])=>`<button class="chip${S.mode===k?' active':''}" data-k="${k}" type="button">${m.name}</button>`).join('');
   $('#modes').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{S.mode=b.dataset.k;drawModes()});$('#modehint').textContent=MODES[S.mode].hint}
 // ---------- 결과 ----------
-function condPills(to,from){const c=D[to].cond;const h=from!=null?hardness(from,to):{hard:[],need:{}};
-  const ks=Object.keys(CL).filter(k=>c[k]);
-  return ks.map(k=>{const nl=h.need[k];const hd=h.hard.includes(k);
-    const lv=nl!=null&&nl>=50?(nl>99?' · Lv.99↑':' · Lv.'+nl):'';
-    return tp(hd?'hard':'',`${CL[k]}${k==='Other'?'':' '+c[k]}${lv}`,hd?`${D[from].ko}는 ${nl>99?'Lv.99로도 부족':'Lv.'+nl+'에서 도달'}`:'')}).join('')||tp('','조건 없음')}
+function condPills(to){const c=D[to].cond;
+  return Object.keys(CL).filter(k=>c[k]).map(k=>tp('',`${CL[k]}${k==='Other'?'':' '+c[k]}`)).join('')||tp('','조건 없음')}
+function costPills(f){if(!f)return '';const a=[];
+  if(f.fus)a.push(tp('hard','합체 '+f.fus));
+  if(f.n>0)a.push(tp('','전투 '+f.n));
+  if(f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(tp('','훈련 '+CL[SK[j]]+' +'+d))});
+  if(f.fr>0)a.push(tp('','우정 +'+f.fr));
+  if(f.visit)a.push(tp('','디지뱅크 '+f.visit));
+  return a.length?`<div class="facts" style="margin-top:4px">${a.join('')}</div>`:''}
 let LAST=null;
 function runRoute(){
   const r=$('#result');
@@ -388,15 +437,16 @@ function runRoute(){
   if(S.end==null&&!S.skills.length){r.innerHTML='<div class="empty">도착 디지몬이나 배우고 싶은 기술 중 하나는 골라주세요.</div>';return}
   const res=findRoute(S.start,S.end,S.skills,S.bans,S.mode);LAST=null;
   if(res.err){r.innerHTML=`<div class="empty">${res.err}</div>`;return}
-  const p=res.path;const seen=new Set();let nE=0,nD=0,nH=0,body='';
+  const p=res.path;const seen=new Set();let nE=0,nD=0,body='';
   p.forEach((i,k)=>{const m=D[i];
-    const got=S.skills.filter(id=>!seen.has(id)&&m.moves.some(x=>x[0]===id));got.forEach(id=>seen.add(id));
+    const got=res.learn?S.skills.filter((id,q)=>res.learn[k]>>q&1):S.skills.filter(id=>!seen.has(id)&&m.moves.some(x=>x[0]===id));got.forEach(id=>seen.add(id));
     if(k>0){const from=p[k-1];const evo=D[from].next.includes(i);
-      if(evo){nE++;if(hardness(from,i).hard.length)nH++}else nD++;
-      body+=`<div class="link"><div class="ln"><i></i></div><div class="tx">${tp(evo?'evo':'dev',evo?'진화':'퇴화')}${evo?condPills(i,from):tp('dev','조건 없음')}</div></div>`}
+      if(evo)nE++;else nD++;
+      body+=`<div class="link"><div class="ln"><i></i></div><div class="tx">${tp(evo?'evo':'dev',evo?'진화':'퇴화')}${evo?condPills(i):tp('dev','조건 없음')}${costPills(res.steps&&res.steps[k-1])}</div></div>`}
     body+=`<div class="step" data-i="${i}"><img src="${img(i)}"><div><div class="nm">${esc(m.ko)}</div><div class="mt">${m.stage} · ${TYPE[m.type]||''} · ${ATTR[m.attr]||''}</div>${got.length?`<div class="facts" style="margin-top:4px">${got.map(id=>tp('got',`${esc(M[id].n)} · Lv.${m.moves.find(x=>x[0]===id)[1]}`)).join('')}</div>`:''}</div></div>`});
   let html=`<div class="rcard"><div class="sum"><b>${p.length-1}단계</b><span>${esc(D[p[0]].ko)} → ${esc(D[p[p.length-1]].ko)}</span></div>
-   <div class="facts" style="margin-bottom:12px">${tp('evo','진화 '+nE)}${tp('dev','퇴화 '+nD)}${nH?tp('hard','빡센 진화 '+nH,`첫 구간(Lv.${TUNE.lv[0]})까지 올려도 못 채우는 스탯이 있는 진화`):''}</div><div class="steps">${body}</div>`;
+   <div class="facts" style="margin-bottom:12px">${tp('evo','진화 '+nE)}${tp('dev','퇴화 '+nD)}${res.hard?tp('hard','곤란도 '+res.cost):''}</div><div class="steps">${body}</div>`;
+  if(res.approx)html+=`<div class="hintx">계산량이 많아서 근사 탐색으로 찾았어요. 최적 경로와 몇 % 안쪽으로 차이 날 수 있어요.</div>`;
   if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 기술: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
   html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 경로 저장</button></div></div>`;
   r.innerHTML=html;LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,len:p.length-1};
@@ -404,19 +454,6 @@ function runRoute(){
   $('#saveRoute').onclick=askSaveRoute;
 }
 $('#go').onclick=runRoute;
-// ---------- 난이도 가중치 ----------
-function openTune(){
-  const b=openModal('난이도 가중치',`<div style="font-size:12.5px;color:var(--sub);font-weight:600;margin-bottom:8px">‘쉬운 진화 우선’ 기준에서, 진화 한 번마다 출발 디지몬이 해당 레벨이 되어도 못 채우는 스탯 1개당 더하는 비용입니다. (진화 1회 = 1)</div><div id="tn"></div><div class="btnrow" style="margin-top:12px"><button class="btn" id="tdef" type="button">기본값으로</button><button class="btn pri" id="tok" type="button">확인</button></div>`,{dense:true});
-  const draw=()=>{$('#tn').innerHTML=TUNE.lv.map((l,j)=>`<div class="nrow">Lv.<input type="number" min="2" max="99" value="${l}" data-lv="${j}"> 못 채우면 스탯당 +<input type="number" step="0.25" min="0" value="${TUNE.w[j]}" data-w="${j}"></div>`).join('')+
-    `<div class="nrow">Lv.99로도 불가능하면 스탯당 추가 +<input type="number" step="0.5" min="0" value="${TUNE.imp}" data-imp></div><div class="nrow">추가 조건(아이템 등) 있으면 +<input type="number" step="0.5" min="0" value="${TUNE.spec}" data-spec></div>`;
-    const save=()=>{_hv++;try{localStorage.setItem('tune',JSON.stringify(TUNE))}catch(e){}};const t=$('#tn');
-    t.querySelectorAll('[data-lv]').forEach(e=>e.onchange=()=>{TUNE.lv[+e.dataset.lv]=Math.max(2,Math.min(99,+e.value||70));save()});
-    t.querySelectorAll('[data-w]').forEach(e=>e.onchange=()=>{TUNE.w[+e.dataset.w]=Math.max(0,+e.value||0);save()});
-    t.querySelector('[data-imp]').onchange=e=>{TUNE.imp=Math.max(0,+e.target.value||0);save()};
-    t.querySelector('[data-spec]').onchange=e=>{TUNE.spec=Math.max(0,+e.target.value||0);save()}};
-  draw();$('#tdef').onclick=()=>{TUNE=JSON.parse(JSON.stringify(TUNE_DEF));_hv++;try{localStorage.setItem('tune',JSON.stringify(TUNE))}catch(e){}draw()};$('#tok').onclick=closeModal;
-}
-$('#mTune').onclick=()=>{closeMenu();openTune()};
 // ---------- 도감 ----------
 const F={stage:null,type:null,attr:null};
 const stages=[...new Set(D.map(m=>m.stage))];
