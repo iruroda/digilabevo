@@ -538,8 +538,9 @@ function buildTree(){
   up.forEach(i=>seen.add(i));const nUp=up.size-1;const nodes=[...seen];
   const OI=s=>ORD.indexOf(s);const xi=new Map();nodes.forEach(i=>{const o=OI(D[i].stage);if(o>=0)xi.set(i,o)});
   nodes.forEach(i=>{if(xi.has(i))return;const ps=D[i].prev.filter(t=>xi.has(t)).map(t=>xi.get(t)+1),ns=D[i].next.filter(t=>xi.has(t)).map(t=>xi.get(t)-1);xi.set(i,ps.length?Math.min(...ps):ns.length?Math.max(0,Math.max(...ns)):3)});
-  const xs=[...new Set(xi.values())].sort((a,b)=>a-b);
-  const gk=i=>xs.indexOf(xi.get(i))*100+(OI(D[i].stage)>=0?0:1+TST.indexOf(D[i].stage));
+  const lv=new Map(nodes.map(i=>[i,0]));for(let k=0;k<4;k++)nodes.forEach(i=>D[i].next.forEach(t=>{if(t!==i&&seen.has(t)&&xi.get(t)===xi.get(i))lv.set(t,Math.min(3,Math.max(lv.get(t),lv.get(i)+1)))}));
+  const xv=i=>xi.get(i)*10+lv.get(i);const xs=[...new Set(nodes.map(xv))].sort((a,b)=>a-b);
+  const gk=i=>xs.indexOf(xv(i))*100+(OI(D[i].stage)>=0?0:1+TST.indexOf(D[i].stage));
   const gkeys=[...new Set(nodes.map(gk))].sort((a,b)=>a-b);
   const cols=gkeys.map(k=>nodes.filter(i=>gk(i)===k)),gx=gkeys.map(k=>Math.floor(k/100)),glab=cols.map(a=>D[a[0]].stage);
   const colIdx=new Map();cols.forEach((a,c)=>a.forEach(i=>colIdx.set(i,c)));
