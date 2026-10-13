@@ -55,12 +55,12 @@ header{position:sticky;top:0;z-index:15;background:linear-gradient(180deg,#fffff
 .viewtoggle{display:flex;gap:5px;flex:0 0 auto}
 .viewtoggle button{border-radius:8px;padding:6px 9px;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--bg);color:var(--txt);cursor:pointer;white-space:nowrap}
 .viewtoggle button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-body[data-view=route] #qwrap,body[data-view=route] #pkwrap,body[data-view=tree] #qwrap,body:not([data-view=tree]) #pkwrap{display:none}
+body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pkwrap,body[data-view=tree] #qwrap,body:not([data-view=tree]) #pkwrap{display:none}
 #pkwrap .pick input{padding:0 12px 0 38px}
 .tsearch{position:absolute;right:101px;bottom:12px;width:min(210px,calc(100% - 125px))}
 .tsearch input{width:100%;height:32px;padding:0 12px 0 34px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px;outline:none;color:var(--txt)}
 .tsearch input:focus{border-color:var(--accent)}.tsearch .qicon{left:11px}
-body[data-view=route] header{padding-bottom:4px}
+body[data-view=route] header,body[data-view=my] header{padding-bottom:4px}
 #menubtnWrap{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:33;display:flex;justify-content:flex-end;pointer-events:none}
 #menubtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:0;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;pointer-events:auto;flex-shrink:0}
 #menubtn span{display:block;width:19px;height:3px;border-radius:2px;background:var(--accent);transform-origin:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s ease}
@@ -234,6 +234,15 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .nrow input{width:60px;height:30px;border-radius:8px;border:1px solid var(--border);padding:0 6px;font-size:13px;outline:none}
 .nrow input:focus{border-color:var(--accent)}
 input[type=range]{accent-color:var(--accent)}
+.mycard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:10px 12px}
+.myh{display:flex;align-items:center;gap:6px}.myh .nm{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.myh .mt{font-size:11.5px;color:var(--sub);font-weight:600}
+.myh button{width:30px;height:30px;border:0;border-radius:8px;background:var(--bg);color:var(--accent);cursor:pointer;padding:5px;display:flex;flex:0 0 auto}.myh button svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.myh button[data-a=del]{color:var(--sub)}
+.mys{display:flex;align-items:flex-start;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
+.mn{flex:0 0 auto;width:84px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;text-align:center}.mn img{width:56px;height:56px}
+.mnm{font-size:11.5px;font-weight:800;word-break:keep-all;line-height:1.2}.mst{font-size:10px;color:var(--sub);font-weight:600}
+.mn .tagp{font-size:10px;padding:2px 5px;text-align:center;white-space:normal}
+.ml{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:6px}.ml .tagp{font-size:10px;padding:2px 5px;white-space:nowrap}.mlk{margin-bottom:1px}
 .sv{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border)}
 .sv:first-child{border-top:none}
 .sv .tt{flex:1;min-width:0}.sv .tt b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sv .tt span{font-size:11px;color:var(--sub);font-weight:600}
@@ -273,6 +282,7 @@ input[type=range]{accent-color:var(--accent)}
   <div id="result"></div>
  </section>
  <section id="v-dex" hidden><div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl">세대</div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div><div class="count" id="cnt"></div><div class="grid" id="cards"></div></section>
+ <section id="v-my" hidden><div id="myview"></div></section>
  <section id="v-skill" hidden><div id="skview"></div></section>
  <section id="v-tree" hidden>
   <div class="tbwrap"><div class="treebox sb" id="treebox"></div><div class="tsearch"><span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="tq" type="text" placeholder="그래프에서 이름 찾기" autocomplete="off" aria-label="그래프에서 이름 찾기"></div><div class="zoom"><button id="zout" type="button" aria-label="축소" title="축소">−</button><button id="zin" type="button" aria-label="확대" title="확대">+</button></div></div>
@@ -285,9 +295,9 @@ input[type=range]{accent-color:var(--accent)}
 <div id="mpanelWrap"><div id="mpanel" class="sb">
   <div class="mtitle"><svg class="logo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27.5" fill="none" stroke="#ffc401" stroke-width="9"/><circle cx="32" cy="32" r="10.8" fill="none" stroke="#ffc401" stroke-width="7"/></svg><span>디지랩 EVO</span><span class="info-btn" id="infoBtn" role="button" tabindex="0" aria-label="설명 보기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.2v.1"/></svg></span></div>
   <div class="mgrouptitle">루트</div>
-  <div class="msec" data-key="rt"><h3>설정<span class="car">▾</span></h3><div class="chips"><button class="chip" id="mSaved" type="button">저장한 루트</button></div></div>
+  <div class="msec" data-key="rt"><h3>설정<span class="car">▾</span></h3><div class="chips"><button class="chip" id="mSaved" type="button">내 루트</button></div></div>
   <div id="mgreet" class="mgreet"></div>
-  <div class="mfooter"><button class="btn" id="savedBtn" type="button">저장한 루트</button><button class="btn" id="loginBtn" type="button">로그인</button></div>
+  <div class="mfooter"><button class="btn" id="savedBtn" type="button">내 루트</button><button class="btn" id="loginBtn" type="button">로그인</button></div>
 </div></div>
 <div class="modal" id="modal"><div class="box"><button class="mclose" type="button" id="mx" aria-label="닫기"><span></span><span></span></button><h2 id="mh"></h2><div id="mbody" class="sb"></div></div></div>
 
@@ -448,13 +458,12 @@ $('#menuOverlay').onclick=closeMenu;
 document.querySelectorAll('.msec h3').forEach(h=>h.onclick=()=>h.parentNode.classList.toggle('collapsed'));
 $('#infoBtn').onclick=()=>{closeMenu();openModal('디지랩 EVO',['디지몬 스토리 사이버 슬루스 / 해커즈 메모리의 진화 루트 탐색 도우미입니다.','출발·도착 디지몬 사이에 배우고 싶은 스킬을 경유지로 넣으면, 그 스킬을 모두 거치는 진화·퇴화 루트를 찾아줍니다.','전투·팜 훈련·우정·디지뱅크 방문·합체를 합산한 ‘곤란도’가 가장 낮은 루트도 찾을 수 있습니다.','로그인하면 검색한 루트를 저장할 수 있습니다.'].map(t=>`<div class="ibrow"><span class="idash">-</span><span>${t}</span></div>`).join(''))};
 // ---------- 보기 전환 ----------
-const VIEWS=['route','dex','skill','tree'];let CUR='route';const QS={dex:'',skill:'',tree:''};
+const VIEWS=['route','dex','skill','tree','my'];let CUR='route';const QS={dex:'',skill:'',tree:''};
 const PH={dex:'디지몬 이름 검색 (초성 가능)',skill:'스킬 이름 검색',tree:'그래프에서 이름 찾기'};
 function view(v){closeModal();CUR=v;document.body.dataset.view=v;VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
   const q=$('#q');q.placeholder=PH[v]||'';q.value=QS[v]||'';window.scrollTo(0,0);
-  if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree()}
+  if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree();if(v==='my')drawMy()}
 VIEWS.forEach(k=>$('#vt-'+k).onclick=()=>view(k));
-$('#vt-my').onclick=()=>openSaved();
 $('#hlogo').onclick=$('#htitle').onclick=()=>view('route');
 $('#q').addEventListener('input',()=>{QS[CUR]=$('#q').value;if(CUR==='dex')drawDex();else if(CUR==='skill')drawSkillView();else if(CUR==='tree')treeSearch()});
 $('#tq').addEventListener('input',()=>{QS.tree=$('#tq').value;treeSearch()});
@@ -492,13 +501,21 @@ $('#tgF').onchange=e=>{S.avF=e.target.checked};$('#tgT').onchange=e=>{S.avT=e.ta
 // ---------- 결과 ----------
 function condPills(to){const c=D[to].cond;
   return Object.keys(CL).filter(k=>c[k]).map(k=>tp('',`${CL[k]}${k==='Other'?'':' '+c[k]}`)).join('')||tp('','조건 없음')}
-function costPills(f){if(!f)return '';const a=[];
+function costArr(f){const a=[];if(!f)return a;
   if(f.fus)a.push(tp('hard','합체 '+f.fus));
   if(f.n>0)a.push(tp('','전투 '+f.n));
   if(f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(tp('','훈련 '+CL[SK[j]]+' +'+d))});
   if(f.fr>0)a.push(tp('','우정 +'+f.fr));
   if(f.visit)a.push(tp('','디지뱅크 '+f.visit));
-  return a.length?`<div class="facts" style="margin-top:4px">${a.join('')}</div>`:''}
+  return a}
+function costPills(f){const a=costArr(f);return a.length?`<div class="facts" style="margin-top:4px">${a.join('')}</div>`:''}
+// 가로 루트(내 루트): 디지몬 노드 사이에 진화/퇴화 + 조건 + 비용을 세로로 쌓은 연결부
+function routeStrip(p,got,steps){
+  return p.map((i,k)=>{const m=D[i];let h='';
+    if(k){const evo=D[p[k-1]].next.includes(i);h+=`<div class="ml"><div class="mlk">${tp(evo?'evo':'dev',evo?'진화':'퇴화')}</div>${evo?condPills(i):tp('dev','조건 없음')}${costArr(steps&&steps[k-1]).join('')}</div>`}
+    const g=(got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]);
+    h+=`<div class="mn" data-i="${i}"><img src="${img(i)}"><div class="mnm">${esc(m.ko)}</div><div class="mst">${m.stage}</div>${g.map(id=>tp('got',`${esc(M[id].n)}${m.moves.find(x=>x[0]===id)?' · Lv.'+m.moves.find(x=>x[0]===id)[1]:''}`)).join('')}</div>`;
+    return h}).join('')}
 let LAST=null;
 function runRoute(){
   const r=$('#result');
@@ -506,9 +523,9 @@ function runRoute(){
   if(S.end==null&&!S.skills.length){r.innerHTML='<div class="empty">도착 디지몬이나 배우고 싶은 스킬 중 하나는 골라주세요.</div>';return}
   const res=findRoute(S.start,S.end,S.skills,S.bans,S.mode,{F:S.avF,T:S.avT});LAST=null;
   if(res.err){r.innerHTML=`<div class="empty">${res.err}</div>`;return}
-  const p=res.path;const seen=new Set();let nE=0,nD=0,body='';
+  const p=res.path;const seen=new Set();let nE=0,nD=0,body='';const gotAll=[];
   p.forEach((i,k)=>{const m=D[i];
-    const got=res.learn?S.skills.filter((id,q)=>res.learn[k]>>q&1):S.skills.filter(id=>!seen.has(id)&&m.moves.some(x=>x[0]===id));got.forEach(id=>seen.add(id));
+    const got=res.learn?S.skills.filter((id,q)=>res.learn[k]>>q&1):S.skills.filter(id=>!seen.has(id)&&m.moves.some(x=>x[0]===id));got.forEach(id=>seen.add(id));gotAll.push(got.join(','));
     if(k>0){const from=p[k-1];const evo=D[from].next.includes(i);
       if(evo)nE++;else nD++;
       body+=`<div class="link"><div class="ln"><i></i></div><div class="tx">${tp(evo?'evo':'dev',evo?'진화':'퇴화')}${evo?condPills(i):tp('dev','조건 없음')}${costPills(res.steps&&res.steps[k-1])}</div></div>`}
@@ -518,7 +535,7 @@ function runRoute(){
   if(res.approx)html+=`<div class="hintx">계산량이 많아서 근사 탐색으로 찾았어요. 최적 루트와 몇 % 안쪽으로 차이 날 수 있어요.</div>`;
   if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 스킬: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
   html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 루트 저장</button></div></div>`;
-  r.innerHTML=html;LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,len:p.length-1};
+  r.innerHTML=html;LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,visit:f.visit}:null)))};
   r.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
   $('#saveRoute').onclick=askSaveRoute;
 }
@@ -668,15 +685,23 @@ function askSaveRoute(){
   const inp=$('#rname');inp.focus();inp.select();
   const go=()=>{ROUTES=mergeRoutes([{id:Date.now().toString(36),name:inp.value.trim()||def,t:Date.now(),...LAST}],ROUTES);persist();closeModal()};
   $('#rok').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()}}
-function openSaved(){
-  closeMenu();
-  const draw=()=>{const b=$('#mbody');b.innerHTML=ROUTES.length?ROUTES.map(r=>`<div class="sv" data-id="${r.id}"><div class="tt"><b>${esc(r.name)}</b><span>${esc(routeSummary(r))} · ${MODES[r.mode]?MODES[r.mode].name:''}</span></div><button data-a="load" type="button">불러오기</button><button data-a="del" type="button">삭제</button></div>`).join(''):'<div class="empty" style="padding:30px 0">저장한 루트가 없어요.<br>루트를 찾은 뒤 ‘이 루트 저장’을 눌러보세요.</div>';
-    b.querySelectorAll('.sv').forEach(row=>{const id=row.dataset.id;
-      row.querySelector('[data-a=load]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);S={start:r.start,end:r.end,skills:[...r.skills],bans:[...(r.bans||[])],mode:'easy',avF:!!r.avF,avT:!!r.avT};drawSel();drawModes();closeModal();view('route');runRoute()};
-      row.querySelector('[data-a=del]').onclick=()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();draw()}})};
-  openModal('저장한 루트','',{dense:true});draw()}
+function openSaved(){closeMenu();view('my')}
+const myCache=new Map();let myTok=0;
+function drawMy(){
+  const host=$('#myview');const tok=++myTok;
+  if(!ROUTES.length){host.innerHTML='<div class="empty" style="padding:30px 0">저장한 루트가 없어요.<br>루트를 찾은 뒤 ‘이 루트 저장’을 눌러보세요.</div>';return}
+  host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div style="flex:1;min-width:0"><div class="nm">${esc(r.name)}</div><div class="mt">${esc(routeSummary(r))}</div></div><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"><div class="hintx" style="margin:0">불러오는 중…</div></div></div>`).join('')}</div>`;
+  host.querySelectorAll('.mycard').forEach(row=>{const id=row.dataset.id;
+    row.querySelector('[data-a=del]').onclick=()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();drawMy()}});
+  const todo=[...host.querySelectorAll('.mycard')];
+  const next=()=>{if(tok!==myTok)return;const row=todo.shift();if(!row)return;const r=ROUTES.find(x=>x.id===row.dataset.id);const el=row.querySelector('.mys');
+    try{let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],r.mode||'easy',{F:!!r.avF,T:!!r.avT});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}
+      el.innerHTML=p.length?routeStrip(p,got,st):'<div class="hintx" style="margin:0">루트를 찾지 못했어요.</div>';
+      el.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i))}catch(e){console.error(e);el.innerHTML=''}
+    setTimeout(next,0)};
+  setTimeout(next,0)}
 $('#mSaved').onclick=$('#savedBtn').onclick=openSaved;
-function updateAuthUI(){$('#loginBtn').textContent=CUR_USER?'로그아웃':'로그인';$('#mgreet').textContent=CUR_USER?CUR_NAME+'님, 안녕하세요.':'로그인하면 검색한 루트를 저장해 둘 수 있습니다.'}
+function updateAuthUI(){if(CUR==='my')drawMy();$('#loginBtn').textContent=CUR_USER?'로그아웃':'로그인';$('#mgreet').textContent=CUR_USER?CUR_NAME+'님, 안녕하세요.':'로그인하면 검색한 루트를 저장해 둘 수 있습니다.'}
 $('#loginBtn').onclick=()=>{
   if(CUR_USER){fbAuth&&fbAuth.signOut();return}
   if(!fbAuth){closeMenu();openModal('로그인 준비 중','<div class="ibrow"><span class="idash">-</span><span>Firebase 웹앱 설정이 아직 연결되지 않았습니다.</span></div><div class="ibrow"><span class="idash">-</span><span><b>firebase-config.js</b>에 설정값을 넣으면 구글 로그인이 켜집니다.</span></div><div class="ibrow"><span class="idash">-</span><span>그 전에도 루트 저장은 이 브라우저에 됩니다.</span></div>');return}
