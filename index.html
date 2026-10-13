@@ -238,11 +238,15 @@ input[type=range]{accent-color:var(--accent)}
 .myh{display:flex;align-items:center;gap:6px}.myh .nm{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.myh .mt{font-size:11.5px;color:var(--sub);font-weight:600}
 .myh button{width:30px;height:30px;border:0;border-radius:8px;background:var(--bg);color:var(--accent);cursor:pointer;padding:5px;display:flex;flex:0 0 auto}.myh button svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 .myh button[data-a=del]{color:var(--sub)}
-.mys{display:flex;align-items:flex-start;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
-.mn{flex:0 0 auto;width:84px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;text-align:center}.mn img{width:56px;height:56px}
-.mnm{font-size:11.5px;font-weight:800;word-break:keep-all;line-height:1.2}.mst{font-size:10px;color:var(--sub);font-weight:600}
-.mn .tagp{font-size:10px;padding:2px 5px;text-align:center;white-space:normal}
-.ml{flex:0 0 auto;width:78px;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:6px}.ml .tagp{font-size:10px;padding:2px 5px;white-space:nowrap}.mlk{margin-bottom:1px}
+.mys{margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
+.flow{display:flex}.flow.h{align-items:flex-start;width:max-content}.flow.v{flex-direction:column;align-items:flex-start}
+.fn{display:flex;align-items:center;cursor:pointer}.fn img{width:52px;height:52px;flex:0 0 auto}.fnm{font-size:12.5px;font-weight:800;word-break:keep-all;line-height:1.25}
+.fa{font-size:11px;font-weight:600;color:var(--txt);line-height:1.35}.fa b{color:var(--accent);font-weight:800}
+.flow.h .fn{flex-direction:column;gap:3px;width:84px;text-align:center}.flow.h .fe{width:132px;flex:0 0 auto;padding-top:0;display:flex;flex-direction:column;align-items:center}
+.flow.h .fl{width:100%;height:2px;background:var(--accent);margin-top:25px;position:relative;border-radius:1px}.flow.h .fl::after{content:'';position:absolute;right:-1px;top:-4px;border-left:7px solid var(--accent);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.flow.h .fa{margin-top:6px;text-align:center;padding:0 4px}.flow.h .fa div+div{margin-top:2px}
+.flow.v .fn{gap:12px;padding:2px 0}.flow.v .fe{display:flex;gap:12px;margin-left:25px}
+.flow.v .fl{width:2px;background:var(--accent);flex:0 0 auto;border-radius:1px;margin:2px 0}.flow.v .fa{padding:8px 0}.flow.v .fa div+div{margin-top:2px}
 .sv{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border)}
 .sv:first-child{border-top:none}
 .sv .tt{flex:1;min-width:0}.sv .tt b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sv .tt span{font-size:11px;color:var(--sub);font-weight:600}
@@ -509,13 +513,25 @@ function costArr(f){const a=[];if(!f)return a;
   if(f.visit)a.push(tp('','디지뱅크 '+f.visit));
   return a}
 function costPills(f){const a=costArr(f);return a.length?`<div class="facts" style="margin-top:4px">${a.join('')}</div>`:''}
-// 가로 루트(내 루트): 디지몬 노드 사이에 진화/퇴화 + 조건 + 비용을 세로로 쌓은 연결부
-function routeStrip(p,got,steps){
-  return p.map((i,k)=>{const m=D[i];let h='';
-    if(k){const evo=D[p[k-1]].next.includes(i);h+=`<div class="ml"><div class="mlk">${tp(evo?'evo':'dev',evo?'진화':'퇴화')}</div>${evo?condPills(i):tp('dev','조건 없음')}${costArr(steps&&steps[k-1]).join('')}</div>`}
-    const g=(got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]);
-    h+=`<div class="mn" data-i="${i}"><img src="${img(i)}"><div class="mnm">${esc(m.ko)}</div><div class="mst">${m.stage}</div>${g.map(id=>tp('got',`${esc(M[id].n)}${m.moves.find(x=>x[0]===id)?' · Lv.'+m.moves.find(x=>x[0]===id)[1]:''}`)).join('')}</div>`;
-    return h}).join('')}
+// 루트 흐름도: 디지몬(아이콘+이름) → 해야 할 일 → 다음 디지몬. dir 'h' 가로 / 'v' 세로
+const ro=n=>{const t=n.replace(/\)$/,''),c=t[t.length-1]?.charCodeAt(0);if(c>=0xAC00&&c<=0xD7A3){const f=(c-0xAC00)%28;return n+(f===0||f===8?'로':'으로')}return n+'(으)로'};
+function stepActs(p,k,got,steps){const m=D[p[k]],a=[];
+  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 스킬을 습득한다${mv?` (Lv.${mv[1]})`:''}`)});
+  if(k>=p.length-1)return a;
+  const to=p[k+1],c=D[to].cond,f=steps&&steps[k],evo=m.next.includes(to);
+  if(c.LVL)a.push(`Lv.${c.LVL}에 도달한다`);
+  if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`${CL[SK[j]]}을(를) ${d} 올린다`)});
+  if(c.ABI)a.push(`ABI ${c.ABI}에 도달한다`);
+  if(f&&f.fr>0)a.push(`우정을 ${f.fr} 올린다`);
+  if(f&&f.visit)a.push(`디지뱅크를 ${f.visit}번 이용한다`);
+  if(c.Fus||(f&&f.fus))a.push('합체한다');
+  if(c.Other)a.push('추가 조건을 만족한다');
+  a.push(`<b>${esc(ro(D[to].ko))} ${evo?'진화':'퇴화'}한다</b>`);return a}
+function routeFlow(p,got,steps,dir){
+  return `<div class="flow ${dir}">`+p.map((i,k)=>{const m=D[i];
+    const acts=stepActs(p,k,got,steps),last=k===p.length-1;
+    return `<div class="fn" data-i="${i}"><img src="${img(i)}"><div class="fnm">${esc(m.ko)}</div></div>`+
+      (last?(acts.length?`<div class="fe"><div class="fa">${acts.map(t=>`<div>${t}</div>`).join('')}</div></div>`:''):`<div class="fe"><div class="fl"></div><div class="fa">${acts.map(t=>`<div>${t}</div>`).join('')}</div></div>`)}).join('')+'</div>'}
 let LAST=null;
 function runRoute(){
   const r=$('#result');
@@ -526,12 +542,10 @@ function runRoute(){
   const p=res.path;const seen=new Set();let nE=0,nD=0,body='';const gotAll=[];
   p.forEach((i,k)=>{const m=D[i];
     const got=res.learn?S.skills.filter((id,q)=>res.learn[k]>>q&1):S.skills.filter(id=>!seen.has(id)&&m.moves.some(x=>x[0]===id));got.forEach(id=>seen.add(id));gotAll.push(got.join(','));
-    if(k>0){const from=p[k-1];const evo=D[from].next.includes(i);
-      if(evo)nE++;else nD++;
-      body+=`<div class="link"><div class="ln"><i></i></div><div class="tx">${tp(evo?'evo':'dev',evo?'진화':'퇴화')}${evo?condPills(i):tp('dev','조건 없음')}${costPills(res.steps&&res.steps[k-1])}</div></div>`}
-    body+=`<div class="step" data-i="${i}"><img src="${img(i)}"><div><div class="nm">${esc(m.ko)}</div><div class="mt">${taI(m)}${m.stage} · ${TYPE[m.type]||''} · ${ATTR[m.attr]||''}</div>${got.length?`<div class="facts" style="margin-top:4px">${got.map(id=>tp('got',`${esc(M[id].n)} · Lv.${m.moves.find(x=>x[0]===id)[1]}`)).join('')}</div>`:''}</div></div>`});
+    if(k>0){if(D[p[k-1]].next.includes(i))nE++;else nD++}});
+  body=routeFlow(p,gotAll,res.steps,'v');
   let html=`<div class="rcard"><div class="sum"><b>${p.length-1}단계</b><span>${esc(D[p[0]].ko)} → ${esc(D[p[p.length-1]].ko)}</span></div>
-   <div class="facts" style="margin-bottom:12px">${tp('evo','진화 '+nE)}${tp('dev','퇴화 '+nD)}${res.hard?tp('hard','곤란도 '+res.cost):''}</div><div class="steps">${body}</div>`;
+   <div class="facts" style="margin-bottom:12px">${tp('evo','진화 '+nE)}${tp('dev','퇴화 '+nD)}${res.hard?tp('hard','곤란도 '+res.cost):''}</div>${body}`;
   if(res.approx)html+=`<div class="hintx">계산량이 많아서 근사 탐색으로 찾았어요. 최적 루트와 몇 % 안쪽으로 차이 날 수 있어요.</div>`;
   if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 스킬: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
   html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 루트 저장</button></div></div>`;
@@ -696,7 +710,7 @@ function drawMy(){
   const todo=[...host.querySelectorAll('.mycard')];
   const next=()=>{if(tok!==myTok)return;const row=todo.shift();if(!row)return;const r=ROUTES.find(x=>x.id===row.dataset.id);const el=row.querySelector('.mys');
     try{let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],r.mode||'easy',{F:!!r.avF,T:!!r.avT});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}
-      el.innerHTML=p.length?routeStrip(p,got,st):'<div class="hintx" style="margin:0">루트를 찾지 못했어요.</div>';
+      el.innerHTML=p.length?routeFlow(p,got,st,'h'):'<div class="hintx" style="margin:0">루트를 찾지 못했어요.</div>';
       el.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i))}catch(e){console.error(e);el.innerHTML=''}
     setTimeout(next,0)};
   setTimeout(next,0)}
