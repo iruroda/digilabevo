@@ -234,7 +234,7 @@ input[type=range]{accent-color:var(--accent)}
   <div id="result"></div>
  </section>
  <section id="v-dex" hidden><div class="count" id="cnt"></div><div class="grid" id="cards"></div></section>
- <section id="v-skill" hidden><div id="skview"></div></section>
+ <section id="v-skill" hidden><div class="chips" id="chips-sk" style="padding:0 0 10px"></div><div id="skview"></div></section>
  <section id="v-tree" hidden>
   <div class="hintx" id="tinfo" style="padding:0 4px 8px"></div>
   <div class="tbwrap"><div class="treebox sb" id="treebox"></div><div class="tsearch"><span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="tq" type="text" placeholder="트리에서 이름 찾기" autocomplete="off" aria-label="트리에서 이름 찾기"></div><div class="zoom"><button id="zout" type="button" aria-label="축소" title="축소">−</button><button id="zin" type="button" aria-label="확대" title="확대">+</button></div></div>
@@ -282,7 +282,10 @@ const match=(name,q)=>{q=q.trim().toLowerCase();if(!q)return true;return name.to
 
 // 기술 -> 습득 디지몬
 const holders={};D.forEach((m,i)=>m.moves.forEach(([id])=>{(holders[id]=holders[id]||[]).push(i)}));
+const sigH={};D.forEach((m,i)=>m.sig.forEach(([id])=>{(sigH[id]=sigH[id]||[]).push(i)}));
 const skillIds=Object.keys(holders).sort((a,b)=>M[a].n.localeCompare(M[b].n,'ko'));
+const allSkillIds=Object.keys(M).filter(id=>holders[id]||sigH[id]).sort((a,b)=>M[a].n.localeCompare(M[b].n,'ko'));
+let SKF='all';
 
 
 // ---------- 경로 탐색: (디지몬, 모은 기술 비트마스크) 상태 다익스트라 ----------
@@ -520,21 +523,23 @@ function openDetail(i){
 }
 // ---------- 기술 ----------
 let SKSEL=null;
-function skBody(id){const x=M[id];const hs=holders[id].map(i=>[i,D[i].moves.find(m=>m[0]===id)[1]]).sort((a,b)=>a[1]-b[1]||D[a[0]].no-D[b[0]].no);
+function skBody(id){const x=M[id];const sg=!!sigH[id];const hs=sg?sigH[id].map(i=>[i,0]).sort((a,b)=>D[a[0]].no-D[b[0]].no):holders[id].map(i=>[i,D[i].moves.find(m=>m[0]===id)[1]]).sort((a,b)=>a[1]-b[1]||D[a[0]].no-D[b[0]].no);
   return `<div class="accp"><div class="facts"><span class="tagp" style="color:${ELC[x.el??0]};font-weight:700">${EL[x.el??0]}속성</span>${tp('',DT[x.dt]||'보조')}${tp('','위력 '+(x.p||'-')+(x.n2>1?'×'+(x.n1===x.n2?x.n2:x.n1+'~'+x.n2):''))}${tp('','SP '+(x.sp??'-'))}${tp('',TG[x.tg]||'')}${x.aa?tp('','필중'):x.acc?tp('','명중 '+x.acc+'%'):''}</div>
    ${x.d?`<div class="hintx">${esc(x.d)}</div>`:''}
-   <div class="btnrow" style="margin:10px 0"><button class="btn pri addsk" type="button">이 기술로 경로 찾기</button></div>
-   <div class="count" style="margin-top:4px">${hs.length}마리가 배워요 (습득 레벨 순)</div>${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${tp('','Lv.'+lv)}</div>`).join('')}</div>`}
+   ${sg?'':`<div class="btnrow" style="margin:10px 0"><button class="btn pri addsk" type="button">이 기술로 경로 찾기</button></div>`}
+   <div class="count" style="margin-top:${sg?10:4}px">${sg?hs.length+'마리의 고유 기술':hs.length+'마리가 배워요 (습득 레벨 순)'}</div>${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div><div class="mt">${D[i].stage}</div></div>${sg?tp('','고유'):tp('','Lv.'+lv)}</div>`).join('')}</div>`}
 function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.querySelector('.accin').innerHTML=skBody(id);a.dataset.built=1;
     a.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
-    a.querySelector('.addsk').onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
+    const ab=a.querySelector('.addsk');if(ab)ab.onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
   a.classList.toggle('open',open)}
 function drawSkillView(){const host=$('#skview');const openId=SKSEL;SKSEL=null;
-  const q=QS.skill;const list=skillIds.filter(id=>match(M[id].n,q)).slice(0,80);
-  host.innerHTML=`<div class="count">${q?list.length+'개':'기술 이름을 검색해보세요 (일부만 표시)'}</div><div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div><div class="mt">${EL[M[id].el??0]} · ${DT[M[id].dt]||'보조'}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
+  const q=QS.skill;chipsSk();const list=allSkillIds.filter(id=>(SKF==='all'||(SKF==='sig')===!!sigH[id])&&match(M[id].n,q));
+  host.innerHTML=`<div class="count">${list.length}개</div><div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div><div class="mt">${EL[M[id].el??0]} · ${DT[M[id].dt]||'보조'}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없어요.</div>'}</div>`;
   host.querySelectorAll('.acc').forEach(a=>a.querySelector('.acch').onclick=()=>{const o=!a.classList.contains('open');if(o)host.querySelectorAll('.acc.open').forEach(b=>toggleAcc(b,false));toggleAcc(a,o)});
   if(openId!=null){const a=host.querySelector(`.acc[data-id="${openId}"]`);if(a){toggleAcc(a,true);setTimeout(()=>a.scrollIntoView({block:'nearest',behavior:'smooth'}),50)}}}
-function showSkill(id){SKSEL=id;QS.skill=M[id].n;if(CUR!=='skill')view('skill');else{$('#q').value=QS.skill;drawSkillView()}}
+function chipsSk(){const h=$('#chips-sk');h.innerHTML=[['all','전체'],['sig','필살기'],['inh','계승기']].map(([v,l])=>`<button class="chip${SKF===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
+  h.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{SKF=b.dataset.v;drawSkillView()})}
+function showSkill(id){SKSEL=id;SKF='all';QS.skill=M[id].n;if(CUR!=='skill')view('skill');else{$('#q').value=QS.skill;drawSkillView()}}
 // ---------- 진화 트리 ----------
 const TST=[];D.forEach(m=>{if(!TST.includes(m.stage))TST.push(m.stage)});
 const ORD=['유년기 I','유년기 II','성장기','성숙기','완전체','궁극체','초궁극체'];TST.sort((a,b)=>{const x=ORD.indexOf(a),y=ORD.indexOf(b);return(x<0?99:x)-(y<0?99:y)});
