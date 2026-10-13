@@ -548,7 +548,7 @@ function openDetail(i){
   <div class="btnrow"><button class="btn" id="as" type="button">${ICS}여기서 출발</button><button class="btn" id="ae" type="button">${ICE}여기로 도착</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
   <div class="sec"><h3>스킬</h3><table class="mv"><tr><th></th><th style="text-align:left">스킬</th><th>습득</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
-  <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="color:var(--txt);font-size:12px;line-height:1.4">${esc(m.sup[1])}</div></div>
+  <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
   <div class="sec"><h3>퇴화</h3>${evo(m.prev,'prev')}</div>
   <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>
   <div class="sec"><h3>프로필</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.desc)}</div></div>
