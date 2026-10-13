@@ -275,7 +275,6 @@ input[type=range]{accent-color:var(--accent)}
  <section id="v-dex" hidden><div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl">세대</div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div><div class="count" id="cnt"></div><div class="grid" id="cards"></div></section>
  <section id="v-skill" hidden><div id="skview"></div></section>
  <section id="v-tree" hidden>
-  <div class="hintx" id="tinfo" style="padding:0 4px 8px"></div>
   <div class="tbwrap"><div class="treebox sb" id="treebox"></div><div class="tsearch"><span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="tq" type="text" placeholder="그래프에서 이름 찾기" autocomplete="off" aria-label="그래프에서 이름 찾기"></div><div class="zoom"><button id="zout" type="button" aria-label="축소" title="축소">−</button><button id="zin" type="button" aria-label="확대" title="확대">+</button></div></div>
  </section>
 </div>
@@ -624,10 +623,10 @@ function buildTree(){
   nodes.forEach(i=>D[i].next.forEach(t=>{if(!seen.has(t))return;const x1=X(i),y1=Y(i),x2=X(t),y2=Y(t),mx=(x1+x2)/2;E.push([i,t,mk('path',{d:`M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:'tr-e'},eg)])}));
   const N=new Map();let sel=null;
   const walk=(i,dir,set)=>{set.add(i);D[i][dir].forEach(t=>{if(seen.has(t)&&!set.has(t))walk(t,dir,set)})};
-  const info=()=>{const ends=nodes.filter(i=>!D[i].next.length).length;$('#tinfo').textContent=`${nodes.length}마리 (진화로 ${nDown} · 퇴화로 ${nUp}) · 끝 디지몬 ${ends}마리(■) · 점에 올리면 강조, 클릭하면 고정`};
+  const info=()=>{const ends=nodes.filter(i=>!D[i].next.length).length;0};
   const focus=i=>{const u=new Set(),d=new Set();walk(i,'prev',u);walk(i,'next',d);svg.classList.add('focus');
     E.forEach(([a,b,p])=>{p.classList.toggle('up',u.has(a)&&u.has(b));p.classList.toggle('on',d.has(a)&&d.has(b))});N.forEach((n,j)=>n.classList.toggle('on',u.has(j)||d.has(j)));
-    $('#tinfo').textContent=`${D[i].ko}: 진화로 ${d.size-1}마리 · 끝 디지몬 ${[...d].filter(j=>!D[j].next.length).length}마리 · 조상 ${u.size-1}마리`};
+    0};
   const unfocus=()=>{svg.classList.remove('focus');E.forEach(([a,b,p])=>p.classList.remove('on','up'));N.forEach(n=>n.classList.remove('on'));info()};
   nodes.forEach(i=>{const end=!D[i].next.length;const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
     if(D[i].stage==='유년기 I')mk('polygon',{points:'-5,-5.5 -5,5.5 6,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.2,class:'sh'},g);
