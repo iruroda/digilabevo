@@ -264,13 +264,13 @@ const MODES={
  steps:{evo:1,dev:1,easy:0,hint:'진화·퇴화 단계 수가 가장 적은 경로'},
  lessdev:{evo:1,dev:6,easy:0,hint:'퇴화 1회를 진화 6회만큼 비싸게 보고 계산'},
  prefdev:{evo:1,dev:0.35,easy:0,hint:'퇴화를 진화의 1/3 비용으로 보고 계산'},
- easy:{evo:1,dev:1,easy:1,hint:'곤란도가 가장 낮은 경로 · 디지뱅크 방문 3, 전투 1회(80000exp) 1, 팜 훈련 스탯 1당 1(HP는 10당 1), 우정 1당 1, 합체 100'},
+ easy:{evo:1,dev:1,easy:1,hint:'곤란도가 가장 낮은 경로 · 디지뱅크 방문 3, 전투 1회(80000exp) 1, 팜 훈련 스탯 1당 1(HP는 10당 1), 우정 1당 1, 합체 200'},
  evoonly:{evo:1,dev:Infinity,easy:0,hint:'퇴화 없이 진화 방향으로만 이동 (갈 수 없으면 실패)'}
 };
 const SK=['HP','SP','ATK','DEF','INT','SPD'];
 function statAt(i,k,L){const [b,g]=D[i].bs[k];let v=Math.floor((b+g*(L-1))/100);return k==='HP'?v*10:v}
-// ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 합체(재료 디지몬) 100 ----------
-const BATTLE_EXP=80000,VISIT=3,FUSION=100,CAP=10;
+// ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 합체(재료 디지몬) 200 ----------
+const BATTLE_EXP=80000,VISIT=3,FUSION=200,CAP=10;
 const nBattles=(i,L)=>Math.ceil(EXPT[D[i].ec][Math.max(1,Math.min(99,L))-1]/BATTLE_EXP);
 function lvAfter(i,n){const t=EXPT[D[i].ec],e=n*BATTLE_EXP;let L=1;while(L<99&&t[L]<=e)L++;return L}
 const _ec=new Map();
