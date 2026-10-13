@@ -39,9 +39,11 @@ header{position:sticky;top:0;z-index:15;background:linear-gradient(180deg,#fffff
 .card .ta{--s:14px;position:absolute;right:3px;top:15px;margin:0}
 .tbwrap{position:relative}
 @media(max-width:480px){.viewtoggle button:not(.active) .bl{display:none}.viewtoggle button:not(.active){padding:6px 8px}}
-.zoom{position:absolute;right:12px;bottom:12px;display:flex;border:1px solid var(--border);background:#fff;border-radius:999px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12)}
-.zoom button{width:38px;height:32px;border:0;background:none;color:var(--txt);font-size:18px;font-weight:700;cursor:pointer;line-height:1}
-.zoom button+button{border-left:1px solid var(--border)}.zoom button:disabled{color:#bbb;cursor:default}
+.treebox{scrollbar-width:none}.treebox::-webkit-scrollbar{display:none;width:0;height:0}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:3px}
+.zoom button{width:38px;height:32px;border:0;background:#767676;color:#fff;font-size:18px;font-weight:700;cursor:pointer;line-height:1}
+.zoom button:first-child{border-radius:999px 0 0 999px}.zoom button:last-child{border-radius:0 999px 999px 0}
+.zoom button:disabled{background:#c4c4c4;cursor:default}
 
 .title h1{font-size:16px;font-weight:800;margin:0;letter-spacing:-.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .viewtoggle{display:flex;gap:5px;flex:0 0 auto}
