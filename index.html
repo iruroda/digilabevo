@@ -139,10 +139,10 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .tr-e{fill:none;stroke:#c4c4c4;stroke-width:1;opacity:.6}
 .tr-e.on{stroke:var(--accent);stroke-width:2;opacity:1}.tr-e.up{stroke:var(--sub);stroke-width:2;opacity:1}
 .treebox svg.focus .tr-e:not(.on):not(.up){opacity:.08}
-.tn circle{fill:#9a9a9a;cursor:pointer}.tn.end circle{fill:var(--accent)}
+.tn .sh{fill:#8a8a8a;cursor:pointer}.tn .hit{fill:transparent;cursor:pointer}
 .tn text{font-size:11px;fill:var(--txt);font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:3px;pointer-events:none}
 .treebox svg.focus .tn:not(.on){opacity:.18}
-.tn.sel circle{stroke:var(--txt);stroke-width:2.5}.tn.hit circle{stroke:var(--yellow);stroke-width:4}
+.tn.sel .sh{stroke:var(--txt);stroke-width:2.5}.tn.hl .sh{stroke:var(--yellow);stroke-width:4}
 .tcol{font-size:11px;fill:var(--sub);font-weight:700}.tbox{fill:#f0f0f0}
 .sitefooter{font-size:7.5px;color:var(--accent);text-align:left;line-height:1.5;padding:12px;user-select:none}
 #menuOverlay,#modalOv{position:fixed;inset:0;background:var(--ov);opacity:0;pointer-events:none;transition:opacity .18s ease}
@@ -562,12 +562,14 @@ function buildTree(){
   nodes.forEach(i=>D[i].next.forEach(t=>{if(!seen.has(t))return;const x1=X(i),y1=Y(i),x2=X(t),y2=Y(t),mx=(x1+x2)/2;E.push([i,t,mk('path',{d:`M${x1},${y1}C${mx},${y1} ${mx},${y2} ${x2},${y2}`,class:'tr-e'},eg)])}));
   const N=new Map();let sel=null;
   const walk=(i,dir,set)=>{set.add(i);D[i][dir].forEach(t=>{if(seen.has(t)&&!set.has(t))walk(t,dir,set)})};
-  const info=()=>{const ends=nodes.filter(i=>!D[i].next.length).length;$('#tinfo').textContent=`${nodes.length}마리 (진화로 ${nDown} · 퇴화로 ${nUp}) · 끝 디지몬 ${ends}마리(파란 점) · 점에 올리면 강조, 클릭하면 고정`};
+  const info=()=>{const ends=nodes.filter(i=>!D[i].next.length).length;$('#tinfo').textContent=`${nodes.length}마리 (진화로 ${nDown} · 퇴화로 ${nUp}) · 끝 디지몬 ${ends}마리(■) · 점에 올리면 강조, 클릭하면 고정`};
   const focus=i=>{const u=new Set(),d=new Set();walk(i,'prev',u);walk(i,'next',d);svg.classList.add('focus');
     E.forEach(([a,b,p])=>{p.classList.toggle('up',u.has(a)&&u.has(b));p.classList.toggle('on',d.has(a)&&d.has(b))});N.forEach((n,j)=>n.classList.toggle('on',u.has(j)||d.has(j)));
     $('#tinfo').textContent=`${D[i].ko}: 진화로 ${d.size-1}마리 · 끝 디지몬 ${[...d].filter(j=>!D[j].next.length).length}마리 · 조상 ${u.size-1}마리`};
   const unfocus=()=>{svg.classList.remove('focus');E.forEach(([a,b,p])=>p.classList.remove('on','up'));N.forEach(n=>n.classList.remove('on'));info()};
-  nodes.forEach(i=>{const end=!D[i].next.length;const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);mk('circle',{r:end?5.5:4.2},g);mk('text',{x:9,y:4},g).textContent=D[i].ko;N.set(i,g);
+  nodes.forEach(i=>{const end=!D[i].next.length;const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:16,height:18,class:'hit',rx:4,'data-w':14+tw(nm)},g);
+    if(D[i].stage==='유년기 I')mk('polygon',{points:'-5,-5.5 -5,5.5 6,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.2,class:'sh'},g);
+    mk('text',{x:9,y:4},g).textContent=nm;N.set(i,g);
     g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
     g.onclick=()=>{if(sel===i){sel=null;unfocus()}else{sel=i;N.forEach((n,j)=>n.classList.toggle('sel',j===r||j===i));focus(i)}};});
   TG_={N,nodes};info();treeLabels();treeSearch();
@@ -580,8 +582,8 @@ function zoomBtns(){$('#zout').disabled=TZ<=.5;$('#zin').disabled=TZ>=2}
 (()=>{const b=$('#treebox');
 b.addEventListener('wheel',e=>{e.preventDefault();const r=b.getBoundingClientRect();setZoom(TZ*Math.exp(-Math.sign(e.deltaY)*Math.min(Math.abs(e.deltaY),100)*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
 $('#zin').onclick=()=>setZoom(TZ*1.25);$('#zout').onclick=()=>setZoom(TZ/1.25);zoomBtns()})();
-function treeLabels(){$('#tlab').classList.toggle('on',TLAB);$('#tend').classList.toggle('on',TEND);if(!TG_)return;TG_.N.forEach((n,i)=>{n.querySelector('text').style.display=TLAB&&(!TEND||!D[i].next.length)?'':'none'})}
-function treeSearch(){if(!TG_)return;const v=QS.tree.trim();TG_.N.forEach((n,i)=>n.classList.toggle('hit',!!v&&D[i].ko.includes(v)));
+function treeLabels(){$('#tlab').classList.toggle('on',TLAB);$('#tend').classList.toggle('on',TEND);if(!TG_)return;TG_.N.forEach((n,i)=>{const on=TLAB&&(!TEND||!D[i].next.length);n.querySelector('text').style.display=on?'':'none';const h=n.querySelector('.hit');h.setAttribute('width',on?h.dataset.w:16)})}
+function treeSearch(){if(!TG_)return;const v=QS.tree.trim();TG_.N.forEach((n,i)=>n.classList.toggle('hl',!!v&&D[i].ko.includes(v)));
   if(v){const f=[...TG_.N].find(([i])=>D[i].ko.includes(v));if(f){const t=f[1].getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);$('#treebox').scrollTo({left:+t[1]*TZ-120,top:+t[2]*TZ-150,behavior:'smooth'})}}}
 // ---------- 저장한 경로 + 로그인 ----------
 let CUR_USER=null,CUR_NAME=null,ROUTES=[];
