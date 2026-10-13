@@ -225,7 +225,7 @@ input[type=range]{accent-color:var(--accent)}
  <section id="v-dex" hidden><div class="count" id="cnt"></div><div class="grid" id="cards"></div></section>
  <section id="v-skill" hidden><div id="skview"></div></section>
  <section id="v-tree" hidden>
-  <div class="rcard" style="padding:10px 12px"><div id="pk-root"></div><div class="chips" style="padding:8px 0 0"><button class="chip" id="tlab" type="button">이름 표시</button><button class="chip" id="tend" type="button">끝 디지몬만 이름 표시</button></div><div class="hintx" id="tinfo"></div></div>
+  <div class="rcard" style="padding:10px 12px"><div id="pk-root"></div><div class="hintx" id="tinfo"></div></div>
   <div class="tbwrap"><div class="treebox sb" id="treebox"></div><div class="zoom"><button id="zout" type="button" aria-label="축소" title="축소">−</button><button id="zin" type="button" aria-label="확대" title="확대">+</button></div></div>
  </section>
 </div>
@@ -527,10 +527,10 @@ function showSkill(id,keep){SKSEL=id;if(CUR!=='skill'&&!keep){view('skill');retu
 const TST=[];D.forEach(m=>{if(!TST.includes(m.stage))TST.push(m.stage)});
 const ORD=['유년기 I','유년기 II','성장기','성숙기','완전체','궁극체','초궁극체'];TST.sort((a,b)=>{const x=ORD.indexOf(a),y=ORD.indexOf(b);return(x<0?99:x)-(y<0?99:y)});
 ELC.fill('var(--txt)');
-let TROOT=D.findIndex(m=>m.ko==='쿠라몬'),TG_=null,TLAB=true,TEND=false;
+let TROOT=D.findIndex(m=>m.ko==='쿠라몬'),TG_=null;
 const NS='http://www.w3.org/2000/svg',mk=(t,a,p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p&&p.appendChild(e);return e};
 picker($('#pk-root'),monItems.filter((_,i)=>D[i].next.length||D[i].prev.length),v=>{TROOT=v;buildTree()},'시작 디지몬 고르기 (현재: 쿠라몬)');
-$('#tlab').onclick=()=>{TLAB=!TLAB;treeLabels()};$('#tend').onclick=()=>{TEND=!TEND;treeLabels()};
+
 function buildTree(){
   const r=TROOT;$('#pk-root input').placeholder=`시작 디지몬 고르기 (현재: ${D[r].ko})`;
   const seen=new Set([r]),q=[r];while(q.length){const x=q.pop();D[x].next.forEach(t=>{if(!seen.has(t)){seen.add(t);q.push(t)}})}
@@ -568,12 +568,12 @@ function buildTree(){
     E.forEach(([a,b,p])=>{p.classList.toggle('up',u.has(a)&&u.has(b));p.classList.toggle('on',d.has(a)&&d.has(b))});N.forEach((n,j)=>n.classList.toggle('on',u.has(j)||d.has(j)));
     $('#tinfo').textContent=`${D[i].ko}: 진화로 ${d.size-1}마리 · 끝 디지몬 ${[...d].filter(j=>!D[j].next.length).length}마리 · 조상 ${u.size-1}마리`};
   const unfocus=()=>{svg.classList.remove('focus');E.forEach(([a,b,p])=>p.classList.remove('on','up'));N.forEach(n=>n.classList.remove('on'));info()};
-  nodes.forEach(i=>{const end=!D[i].next.length;const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:16,height:18,class:'hit',rx:4,'data-w':14+tw(nm)},g);
+  nodes.forEach(i=>{const end=!D[i].next.length;const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
     if(D[i].stage==='유년기 I')mk('polygon',{points:'-5,-5.5 -5,5.5 6,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.2,class:'sh'},g);
     mk('text',{x:9,y:4},g).textContent=nm;N.set(i,g);
     g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
     g.onclick=()=>{if(sel===i){sel=null;unfocus()}else{sel=i;N.forEach((n,j)=>n.classList.toggle('sel',j===r||j===i));focus(i)}};});
-  TG_={N,nodes};info();treeLabels();treeSearch();
+  TG_={N,nodes};info();treeSearch();
   const rt=N.get(r).getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);box.scrollTo({left:Math.max(0,+rt[1]*TZ-40),top:Math.max(0,+rt[2]*TZ-box.clientHeight/2)})}
 let TZ=1,TW_=[0,0];
 function setZoom(z,cx,cy){const b=$('#treebox'),sv=b.querySelector('svg');z=Math.min(2,Math.max(.5,Math.round(z*1000)/1000));if(!sv||z===TZ){return}
@@ -583,7 +583,6 @@ function zoomBtns(){$('#zout').disabled=TZ<=.5;$('#zin').disabled=TZ>=2}
 (()=>{const b=$('#treebox');
 b.addEventListener('wheel',e=>{e.preventDefault();const r=b.getBoundingClientRect();setZoom(TZ*Math.exp(-Math.sign(e.deltaY)*Math.min(Math.abs(e.deltaY),100)*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
 $('#zin').onclick=()=>setZoom(TZ*1.25);$('#zout').onclick=()=>setZoom(TZ/1.25);zoomBtns()})();
-function treeLabels(){$('#tlab').classList.toggle('on',TLAB);$('#tend').classList.toggle('on',TEND);if(!TG_)return;TG_.N.forEach((n,i)=>{const on=TLAB&&(!TEND||!D[i].next.length);n.querySelector('text').style.display=on?'':'none';const h=n.querySelector('.hit');h.setAttribute('width',on?h.dataset.w:16)})}
 function treeSearch(){if(!TG_)return;const v=QS.tree.trim();TG_.N.forEach((n,i)=>n.classList.toggle('hl',!!v&&D[i].ko.includes(v)));
   if(v){const f=[...TG_.N].find(([i])=>D[i].ko.includes(v));if(f){const t=f[1].getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);$('#treebox').scrollTo({left:+t[1]*TZ-120,top:+t[2]*TZ-150,behavior:'smooth'})}}}
 // ---------- 저장한 경로 + 로그인 ----------
