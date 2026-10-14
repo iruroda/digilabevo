@@ -176,7 +176,7 @@ th,td{padding:5px 6px;text-align:right;font-size:12px;font-variant-numeric:tabul
 th:first-child,td:first-child{text-align:left}
 th{color:var(--sub);font-weight:700;font-size:11px}
 tr+tr td{border-top:1px solid var(--border)}
-.mv td:nth-child(2){text-align:left}
+.mv td,.mv th{text-align:center}.mvc{display:inline-flex;align-items:center;justify-content:center;gap:6px}
 .md{color:var(--sub);font-size:11px;line-height:1.4;margin-top:2px;font-weight:500}
 tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .treebox{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:auto;height:calc(100vh - 250px);min-height:300px}
@@ -209,11 +209,11 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 #mpanel .chips{padding:0}
 .mgreet{font-size:12.5px;font-weight:600;color:var(--sub);margin-top:auto;padding-top:36px}
 .mfooter{padding-top:8px;display:flex;gap:8px}
-.modal{position:fixed;inset:0;background:var(--ov);z-index:25;display:flex;align-items:center;justify-content:center;padding:56px 24px 24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility 0s .2s}
+.modal{position:fixed;inset:0;background:var(--ov);z-index:40;display:flex;align-items:center;justify-content:center;padding:56px 24px 24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility 0s .2s}
 .modal.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s,visibility 0s}
 .modal .box{transform:translateY(12px) scale(.96);transition:transform .22s cubic-bezier(.33,0,.2,1)}
 .modal.open .box{transform:none}
-.modal .box{position:relative;background:#fff;border-radius:16px;padding:18px 24px 20px;max-width:320px;width:100%;max-height:calc(100vh - 80px);display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.modal .box{position:relative;background:#fff;border-radius:16px;padding:18px 24px 20px;max-width:320px;width:100%;max-height:min(calc(100vh - 80px),70vh);display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .modal.wide .box{max-width:440px}
 .modal h2{font-size:17px;font-weight:800;color:var(--accent);margin:0 0 14px;padding-right:20px}
 .mclose{position:absolute;top:10px;right:10px;width:28px;height:28px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
@@ -232,7 +232,7 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .phd img{width:68px;height:68px}
 .pg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px 8px}.pc{font-size:12.5px;font-weight:800;white-space:nowrap}.pc b{color:var(--accent);margin-right:6px}.pc span{color:var(--txt)}
 .tno{color:var(--accent)}.tnm{color:var(--txt)}.stgt{font-size:12px;font-weight:700;color:var(--sub);margin-left:4px}.modal h2 .ta{margin-right:6px;vertical-align:-5px}
-.mv td:not(:nth-child(2)),.mv th{white-space:nowrap}
+.mv td:not(:first-child),.mv th{white-space:nowrap}
 .lvbox{display:flex;gap:14px;align-items:center}.lvl{display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto}
 .tri{width:44px;height:22px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}.tri svg{width:100%;height:100%;fill:currentColor}
 .lvi{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--accent);font-size:15px}
@@ -270,7 +270,7 @@ input[type=range]{accent-color:var(--accent)}
 /* 헤더 아이콘 버튼: 여백 축소, 아이콘·글씨 확대 */
 .viewtoggle button{font-size:12.5px;padding:5px 5px}.viewtoggle button svg{width:18px;height:18px}.viewtoggle button.active{padding:5px 8px}.viewtoggle{gap:3px}
 @media(max-width:430px){.viewtoggle button:not(.active){padding:5px 4px}.viewtoggle button.active{padding:5px 7px}.viewtoggle{gap:2px}}
-#vt-my:disabled,#mSaved:disabled,#savedBtn:disabled,#saveRoute:disabled{pointer-events:auto}
+#vt-my:disabled,#mSaved:disabled,#savedBtn:disabled,#saveRoute:disabled{pointer-events:auto}#mpanel:not(.open) button{pointer-events:none!important}
 button:disabled,.btn:disabled{cursor:default!important}
 body:not(.authed) .tn .rb{display:none!important}
 .ed{width:1.15em;height:1.15em;border:0;background:none;color:var(--accent);padding:0;margin-left:6px;display:inline-flex;cursor:pointer;flex:0 0 auto}.ed svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
@@ -497,12 +497,12 @@ function slideViews(o,n,snap,H0){const so=$('#v-'+o),sn=$('#v-'+n),c=document.qu
   const tr='transform .26s cubic-bezier(.33,0,.2,1)';
   c.style.position='relative';c.style.overflowX='clip';hw.style.overflowX='clip';
   so.hidden=false;so.style.cssText=`position:absolute;top:${top+dH}px;left:${pad}px;width:${W-pad*2}px;transform:translateX(0)`;
-  sn.style.transform=`translateX(${dir*W}px)`;sh.style.transform=`translateX(${dir*W}px)`;
+  sn.style.transform=`translateX(${dir*W}px)`;sh.style.transform=`translateX(${dir*W}px)`;const ft=document.querySelector('.sitefooter');ft.style.transition='none';ft.style.transform=`translateX(${dir*W}px)`;document.body.style.overflowX='clip';
   if(snap){snap.style.transform='translateX(0)';hw.appendChild(snap)}
   void c.offsetWidth;
-  [so,sn,sh,snap].forEach(e=>e&&(e.style.transition=tr));
-  requestAnimationFrame(()=>{so.style.transform=`translateX(${-dir*W}px)`;sn.style.transform='translateX(0)';sh.style.transform='translateX(0)';if(snap)snap.style.transform=`translateX(${-dir*W}px)`});
-  let done=false,t;const fin=()=>{if(done)return;done=true;clearTimeout(t);slideDone=null;so.hidden=true;so.style.cssText='';sn.style.transform='';sn.style.transition='';sh.style.transform='';sh.style.transition='';snap&&snap.remove();c.style.position='';c.style.overflowX='';hw.style.overflowX=''};
+  [so,sn,sh,snap,ft].forEach(e=>e&&(e.style.transition=tr));
+  requestAnimationFrame(()=>{so.style.transform=`translateX(${-dir*W}px)`;sn.style.transform='translateX(0)';sh.style.transform='translateX(0)';ft.style.transform='translateX(0)';if(snap)snap.style.transform=`translateX(${-dir*W}px)`});
+  let done=false,t;const fin=()=>{if(done)return;done=true;clearTimeout(t);slideDone=null;so.hidden=true;so.style.cssText='';sn.style.transform='';sn.style.transition='';sh.style.transform='';sh.style.transition='';ft.style.transform='';ft.style.transition='';document.body.style.overflowX='';snap&&snap.remove();c.style.position='';c.style.overflowX='';hw.style.overflowX=''};
   slideDone=fin;sn.addEventListener('transitionend',e=>{if(e.target===sn&&e.propertyName==='transform')fin()},{once:true});t=setTimeout(fin,360)}
 function view(v){closeModal();if(slideDone)slideDone();const old=VIEWS.find(k=>!$('#v-'+k).hidden),mo=old&&old!==v&&!matchMedia('(prefers-reduced-motion:reduce)').matches,snap=mo?subSnap():null,H0=$('#hdwrap').offsetHeight;
   CUR=v;document.body.dataset.view=v;VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
@@ -530,12 +530,15 @@ const SIC='<svg viewBox="0.5 0.5 24 24" width="15" height="15"><circle cx="11" c
 function picker(root,items,onPick,ph){
   root.innerHTML=`<div class="pick"><span class="qicon">${SIC}</span><input aria-label="${ph}" autocomplete="off"><button class="qclear" type="button" aria-label="검색어 지우기">${XIC}</button><div class="drop"></div></div>`;
   const inp=root.querySelector('input'),drop=root.querySelector('.drop');let list=[],hl=0;
-  const render=()=>{const q=inp.value;list=items.filter(it=>match(it.label,q)).slice(0,60);hl=0;
-    drop.innerHTML=list.map((it,k)=>`<div data-k="${k}" class="${k==hl?'hl':''}">${it.icon?`<img src="${it.icon}">`:it.ih||''}${esc(it.label)}<small>${esc(it.sub||'')}</small></div>`).join('')||'<div style="color:var(--sub)">검색 결과가 없습니다.</div>';drop.classList.add('open')};
+  let all=[],shown=0;
+  const rowH=(it,k)=>`<div data-k="${k}" class="${k==hl?'hl':''}">${it.icon?`<img src="${it.icon}">`:it.ih||''}${esc(it.label)}<small>${esc(it.sub||'')}</small></div>`;
+  const more=()=>{if(shown>=all.length)return;const n=Math.min(shown+60,all.length);list=all.slice(0,n);drop.insertAdjacentHTML('beforeend',all.slice(shown,n).map((it,j)=>rowH(it,shown+j)).join(''));shown=n};
+  const render=()=>{const q=inp.value;all=items.filter(it=>match(it.label,q));shown=0;list=[];hl=0;drop.innerHTML='';more();if(!all.length)drop.innerHTML='<div style="color:var(--sub)">검색 결과가 없습니다.</div>';drop.scrollTop=0;drop.classList.add('open')};
+  drop.addEventListener('scroll',()=>{if(drop.scrollTop+drop.clientHeight>=drop.scrollHeight-80)more()});
   const pick=k=>{if(!list[k])return;onPick(list[k].value);inp.value='';drop.classList.remove('open');inp.blur()};
   root.querySelector('.qclear').addEventListener('mousedown',e=>{e.preventDefault();inp.value='';inp.focus();render()});
   inp.addEventListener('focus',render);inp.addEventListener('input',render);
-  inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){hl=Math.max(0,Math.min(list.length-1,hl+(e.key==='ArrowDown'?1:-1)));[...drop.children].forEach((c,k)=>c.classList.toggle('hl',k==hl));drop.children[hl]?.scrollIntoView({block:'nearest'});e.preventDefault()}else if(e.key==='Enter'){pick(hl);e.preventDefault()}else if(e.key==='Escape')drop.classList.remove('open')});
+  inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){if(e.key==='ArrowDown'&&hl>=list.length-2)more();hl=Math.max(0,Math.min(list.length-1,hl+(e.key==='ArrowDown'?1:-1)));[...drop.children].forEach((c,k)=>c.classList.toggle('hl',k==hl));drop.children[hl]?.scrollIntoView({block:'nearest'});e.preventDefault()}else if(e.key==='Enter'){pick(hl);e.preventDefault()}else if(e.key==='Escape')drop.classList.remove('open')});
   drop.addEventListener('mousedown',e=>{const t=e.target.closest('[data-k]');if(t){e.preventDefault();pick(+t.dataset.k)}});
   inp.addEventListener('blur',()=>setTimeout(()=>drop.classList.remove('open'),100));
 }
@@ -605,7 +608,7 @@ const gridHtml=(items,rows,colW,perChar,minCols)=>{const {cols,sp}=packCols(item
   return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},14px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
 // 디지몬 박스에 쓰는 행동 (명사형): 스킬 습득 · Lv · 특훈 · 재능 · 우정
 function boxActs(p,k,got,steps){const m=D[p[k]],a=[];
-  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 배움${mv?` (Lv. ${mv[1]})`:''}`)});
+  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 습득${mv?` (Lv. ${mv[1]})`:''}`)});
   if(k>=p.length-1)return a;
   const to=p[k+1],c=D[to].cond,f=steps&&steps[k];
   if(isMC(p[k],to)||!m.next.includes(to))return a;
@@ -668,16 +671,16 @@ function drawDex(){const q=QS.dex;
 // ---------- 상세 팝업 ----------
 function openDetail(i){
   const m=D[i];const want=new Set(S.skills);
-  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td style="width:22px">${skI(x,18)}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${sig?1:(lv||'-')}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${sig?'필살기':'계승기'}</td></tr>`};
+  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td><div class="mvc">${skI(x,18)}<b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b></div>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${sig?1:(lv||'-')}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${sig?'필살기':'계승기'}</td></tr>`};
   const evo=(arr,dir)=>arr.filter(j=>dir==='mc'||!isMC(i,j)).map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div class="nm">${esc(D[j].ko)}</div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">없음</div>';
   const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['INT','INT'],['DEF','DEF'],['SPD','SPD']];
   const cells=LS.map(([k,l])=>`<div class="sc"><b>${l}</b><span class="cv" data-k="${k}">${statAt(i,k,1)}</span></div>`).join('');
   const title=`${taI(m,22)}<span class="tno">No.${String(m.no).padStart(3,'0')}</span> <span class="tnm">${esc(m.ko)}</span> <span class="stgt">${m.stage}</span>`;
   const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
-  <div class="btnrow"><button class="btn" id="as" type="button">${ICS}여기서 출발</button><button class="btn" id="ae" type="button">${ICE}여기로 도착</button></div>
+  <div class="btnrow"><button class="btn" id="as" type="button">${ICS}출발 디지몬</button><button class="btn" id="ae" type="button">${ICE}도착 디지몬</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
-  <div class="sec"><h3>스킬</h3><table class="mv"><tr><th></th><th style="text-align:left">스킬</th><th>배움</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
+  <div class="sec"><h3>스킬</h3><table class="mv"><tr><th>배운 스킬</th><th>습득</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
   <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
   <div class="sec"><h3>퇴화</h3>${evo(m.prev,'prev')}</div>
   <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>${MCP[i].length?`<div class="sec"><h3>모드 체인지</h3>${evo(MCP[i],'mc')}</div>`:''}
