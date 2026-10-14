@@ -66,11 +66,7 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 .tsearch input{width:100%;height:32px;padding:0 34px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px;outline:none;color:var(--txt)}
 .tsearch input:focus{border-color:var(--accent)}.tsearch .qicon{left:11px}.tsearch .qclear{right:6px}
 #menubtnWrap{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:33;display:flex;justify-content:flex-end;pointer-events:none}
-#menubtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:0;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;pointer-events:auto;flex-shrink:0}
-#menubtn span{display:block;width:19px;height:3px;border-radius:2px;background:var(--accent);transform-origin:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s ease}
-#menubtn.open span:nth-child(1){transform:translateY(8px) rotate(45deg)}
-#menubtn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
-#menubtn.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+#loginBtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:5px;border:none;background:none;color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;flex-shrink:0}#loginBtn svg{width:100%;height:100%}
 .searchwrap{position:relative;margin:0}
 .qline{display:flex;gap:6px;align-items:center}.qline .searchwrap{flex:1;min-width:0}.qline .chips{display:none;flex-wrap:nowrap;gap:5px;padding:0}.qline .chip{padding:0 9px}body[data-view=skill] .qline .chips{display:flex}
 .search{width:100%;padding:9px 38px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--txt);font-size:14px;outline:none;height:34px}
@@ -111,7 +107,7 @@ img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec
 .dn:focus{border-color:var(--accent)}.dn:focus::placeholder{color:transparent}.dn::placeholder{color:rgba(var(--sub-rgb),.6);font-weight:600}
 select.dn{-webkit-appearance:none;appearance:none;padding:0 14px 0 4px;text-align-last:center;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23767676' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 5px center/8px}
 .dc{grid-column:span 2;display:flex;gap:4px;min-width:0}.dc .chip{padding:0 7px;font-size:11px;flex:1 1 auto;justify-content:center;min-width:0}
-#vt-my:disabled,#mSaved:disabled,#savedBtn:disabled,#saveRoute:disabled{opacity:.4;cursor:default;pointer-events:none}
+#vt-my:disabled,#saveRoute:disabled{opacity:.4;cursor:default;pointer-events:none}
 #go:disabled{background:#c4c4c4;border-color:#c4c4c4;color:#fff;cursor:default;pointer-events:none}
 .ic16{width:19px;height:19px;vertical-align:-3px;margin-right:5px;flex:0 0 auto}
 .lab>span{display:inline-flex;align-items:center}.lab>span .ic16{vertical-align:0}
@@ -193,22 +189,6 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .rootbadge{position:absolute;left:12px;top:12px;z-index:5;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none}.rootbadge img{width:44px;height:44px;display:block}.rootbadge div{font-size:11px;font-weight:700;color:var(--txt);max-width:70px;text-align:center;line-height:1.2}
 .tcol{font-size:11px;fill:var(--sub);font-weight:700}.tbox{fill:#f0f0f0}
 .sitefooter{font-size:7.5px;color:var(--accent);text-align:left;line-height:1.5;padding:12px;user-select:none}
-#menuOverlay,#modalOv{position:fixed;inset:0;background:var(--ov);opacity:0;pointer-events:none;transition:opacity .18s ease}
-#menuOverlay{z-index:30}#menuOverlay.open{opacity:1;pointer-events:auto}
-#mpanelWrap{position:fixed;inset:0;max-width:520px;margin:0 auto;z-index:31;display:flex;justify-content:flex-end;pointer-events:none}
-#mpanel{position:relative;width:min(320px,88vw);height:100%;background:#fff;padding:0 16px 16px;overflow-y:auto;display:flex;flex-direction:column;overscroll-behavior:contain;box-shadow:-6px 0 24px rgba(0,0,0,.18);opacity:0;transform:scale(.96);transform-origin:top right;pointer-events:none;transition:opacity .15s ease,transform .15s ease}
-#mpanel.open{opacity:1;transform:scale(1);pointer-events:auto}
-.mtitle{display:flex;align-items:center;gap:8px;position:sticky;top:0;padding:16px 0 8px;background:#fff;z-index:1;line-height:1}
-.mtitle span{font-size:15px;font-weight:800}
-.mgrouptitle{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:800;margin:8px 0 0}
-.mgrouptitle.mgap{margin-top:24px}
-.mgrouptitle::after{content:'';flex:1;height:1px;background:var(--border)}
-.msec h3{font-size:12px;color:var(--sub);margin:12px 0 8px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
-.msec h3 .car{font-size:10px;transition:transform .2s}
-.msec.collapsed h3{margin-bottom:0}.msec.collapsed .car{transform:rotate(-90deg)}.msec .chips{overflow:hidden}
-#mpanel .chips{padding:0}
-.mgreet{font-size:12.5px;font-weight:600;color:var(--sub);margin-top:auto;padding-top:36px}
-.mfooter{padding-top:8px;display:flex;gap:8px}
 .modal{position:fixed;inset:0;background:var(--ov);z-index:40;display:flex;align-items:center;justify-content:center;padding:56px 24px 24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility 0s .2s}
 .modal.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s,visibility 0s}
 .modal .box{transform:translateY(12px) scale(.96);transition:transform .22s cubic-bezier(.33,0,.2,1)}
@@ -270,7 +250,7 @@ input[type=range]{accent-color:var(--accent)}
 /* 헤더 아이콘 버튼: 여백 축소, 아이콘·글씨 확대 */
 .viewtoggle button{font-size:12.5px;padding:5px 5px}.viewtoggle button svg{width:18px;height:18px}.viewtoggle button.active{padding:5px 8px}.viewtoggle{gap:3px}
 @media(max-width:430px){.viewtoggle button:not(.active){padding:5px 4px}.viewtoggle button.active{padding:5px 7px}.viewtoggle{gap:2px}}
-#vt-my:disabled,#mSaved:disabled,#savedBtn:disabled,#saveRoute:disabled{pointer-events:auto}#mpanel:not(.open) button{pointer-events:none!important}
+#vt-my:disabled,#saveRoute:disabled{pointer-events:auto}
 button:disabled,.btn:disabled{cursor:default!important}
 body:not(.authed) .tn .rb{display:none!important}
 .ed{width:1.15em;height:1.15em;border:0;background:none;color:var(--accent);padding:0;margin-left:6px;display:inline-flex;cursor:pointer;flex:0 0 auto}.ed svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
@@ -348,15 +328,7 @@ body.sdo{padding-bottom:170px}
 </div>
 <div class="sitefooter">본 사이트는 팬이 만든 비공식 사이트로, 반다이남코, Toei Animation 등 디지몬 관련 권리자와는 어떠한 관계도 없습니다. 디지몬은 각 권리자의 상표이며, 모든 게임 콘텐츠와 이미지는 각 권리자에게 귀속됩니다.</div>
 </div>
-<div id="menubtnWrap"><button id="menubtn" type="button" aria-label="메뉴"><span></span><span></span><span></span></button></div>
-<div id="menuOverlay"></div>
-<div id="mpanelWrap"><div id="mpanel" class="sb">
-  <div class="mtitle"><svg class="logo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27.5" fill="none" stroke="#ffc401" stroke-width="9"/><circle cx="32" cy="32" r="10.8" fill="none" stroke="#ffc401" stroke-width="7"/></svg><span>디지랩 EVO</span></div>
-  <div class="mgrouptitle">루트</div>
-  <div class="msec" data-key="rt"><h3>설정<span class="car">▾</span></h3><div class="chips"><button class="chip" id="mSaved" type="button">내 루트</button></div></div>
-  <div id="mgreet" class="mgreet"></div>
-  <div class="mfooter"><button class="btn" id="savedBtn" type="button">내 루트</button><button class="btn" id="loginBtn" type="button">로그인</button></div>
-</div></div>
+<div id="menubtnWrap"><button id="loginBtn" type="button" aria-label="로그인"></button></div>
 <div class="modal" id="modal"><div class="box"><button class="mclose" type="button" id="mx" aria-label="닫기"><span></span><span></span></button><h2 id="mh"></h2><div id="mbody" class="sb"></div></div></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -488,11 +460,8 @@ const modal=$('#modal');
 function openModal(title,html,opt={}){if(opt.titleHtml)$('#mh').innerHTML=title;else $('#mh').textContent=title;const b=$('#mbody');b.innerHTML=html;b.className='sb'+(opt.dense?' dense':'');modal.classList.toggle('wide',!!opt.wide);modal.classList.add('open');document.documentElement.classList.add('lock');b.scrollTop=0;return b}
 function closeModal(){modal.classList.remove('open');document.documentElement.classList.remove('lock')}
 $('#mx').onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeMenu()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 // ---------- 메뉴 ----------
-function closeMenu(){$('#menubtn').classList.remove('open');$('#mpanel').classList.remove('open');$('#menuOverlay').classList.remove('open')}
-$('#menubtn').onclick=()=>{const o=!$('#mpanel').classList.contains('open');$('#menubtn').classList.toggle('open',o);$('#mpanel').classList.toggle('open',o);$('#menuOverlay').classList.toggle('open',o)};
-$('#menuOverlay').onclick=closeMenu;
 document.querySelectorAll('.msec h3').forEach(h=>h.onclick=()=>{const p=h.parentNode,c=p.querySelector('.chips'),col=p.classList.contains('collapsed');
   if(RM||!c.animate){p.classList.toggle('collapsed');c.style.display=col?'':'none';return}
   if(col){p.classList.remove('collapsed');c.style.display='';const hh=c.offsetHeight;c.animate([{height:'0px',opacity:0},{height:hh+'px',opacity:1}],{duration:240,easing:EASE})}
@@ -857,7 +826,6 @@ function editName(nameEl,cur,onDone){if(nameEl.dataset.editing)return;nameEl.dat
   inp.onkeydown=e=>{if(e.key==='Enter')end(true);else if(e.key==='Escape')end(false)};inp.onblur=()=>end(true)}
 let CURNAME='',SAVEDID=null;
 function saveRoute(){if(!LAST||SAVEDID)return;SAVEDID=Date.now().toString(36);ROUTES=mergeRoutes([{id:SAVEDID,name:CURNAME,t:Date.now(),...LAST}],ROUTES);persist();const b=$('#saveRoute');if(b)b.disabled=true}
-function openSaved(){closeMenu();view('my')}
 const myCache=new Map();let myTok=0;
 function routeData(r){let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],{F:!!r.avF,T:!!r.avT,...initOf(r)});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}return {p,got,st}}
 function renderMys(row,r){const el=row.querySelector('.mys');
@@ -905,13 +873,14 @@ function drawMy(){
     renderMys(row,r);
     setTimeout(next,0)};
   setTimeout(next,0)}
-$('#mSaved').onclick=$('#savedBtn').onclick=openSaved;
-function authGate(){const on=!!CUR_USER;document.body.classList.toggle('authed',on);['#vt-my','#mSaved','#savedBtn','#saveRoute'].forEach(q=>{const e=$(q);if(e)e.disabled=!on})}
-function updateAuthUI(){if(CUR==='my'){if(CUR_USER)drawMy();else view('route')}authGate();$('#loginBtn').textContent=CUR_USER?'로그아웃':'로그인';$('#mgreet').textContent=CUR_USER?CUR_NAME+'님, 안녕하세요.':'로그인하면 검색한 루트를 저장해 둘 수 있습니다.'}
+function authGate(){const on=!!CUR_USER;document.body.classList.toggle('authed',on);['#vt-my','#saveRoute'].forEach(q=>{const e=$(q);if(e)e.disabled=!on})}
+const ICLOGIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4.5a1.5 1.5 0 0 1 1.5 1.5v13a1.5 1.5 0 0 1-1.5 1.5H14"/><path d="M3.5 12H10"/><path d="M9 7.5L15 12L9 16.5Z" fill="currentColor" stroke-width="1.6"/></svg>',ICLOGOUT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H10"/><path d="M10 12h6.5"/><path d="M15.5 7.5L21 12l-5.5 4.5Z" fill="currentColor" stroke-width="1.6"/></svg>';
+$('#loginBtn').innerHTML=ICLOGIN;
+function updateAuthUI(){if(CUR==='my'){if(CUR_USER)drawMy();else view('route')}authGate();const b=$('#loginBtn');b.innerHTML=CUR_USER?ICLOGOUT:ICLOGIN;b.setAttribute('aria-label',CUR_USER?'로그아웃':'로그인')}
 $('#loginBtn').onclick=()=>{
   if(CUR_USER){fbAuth&&fbAuth.signOut();return}
-  if(!fbAuth){closeMenu();return}
-  fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(()=>closeMenu()).catch(err=>{if(err&&err.code==='auth/popup-closed-by-user')return;console.error('구글 로그인 실패(Firebase 콘솔에서 Google 로그인 방식 활성화 확인)',err)})};
+  if(!fbAuth)return
+  fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err=>{if(err&&err.code==='auth/popup-closed-by-user')return;console.error('구글 로그인 실패(Firebase 콘솔에서 Google 로그인 방식 활성화 확인)',err)})};
 if(fbAuth){fbAuth.onAuthStateChanged(user=>{
   if(user){CUR_USER=user.uid;CUR_NAME=user.displayName||user.email||'사용자';
     db.collection('digilabRoutes').doc(user.uid).get().then(doc=>{const remote=doc.exists?(doc.data().routes||[]):[];ROUTES=remote;updateAuthUI()}).catch(e=>{console.error('불러오기 실패(Firestore 규칙 확인 필요)',e);updateAuthUI()})}
@@ -927,7 +896,7 @@ document.addEventListener('mousedown',e=>{const b=e.target.closest&&e.target.clo
 window.addEventListener('mousemove',e=>{if(!d)return;const dx=e.clientX-d.x;if(Math.abs(dx)>4)mv=true;d.b.scrollLeft=d.l-dx});
 window.addEventListener('mouseup',()=>{if(d){d.b.classList.remove('grabbing');d=null}});
 document.addEventListener('click',e=>{if(mv){e.stopPropagation();e.preventDefault();mv=false}},true)})();
-hookScroll(window,document.documentElement);['#mpanel','#mbody','#treebox'].forEach(s=>hookScroll($(s),$(s)));
+hookScroll(window,document.documentElement);['#mbody','#treebox'].forEach(s=>hookScroll($(s),$(s)));
 // ---------- 시작 ----------
 drawSel();drawModes();drawFilters();updateAuthUI();view('route');
 
