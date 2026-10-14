@@ -249,7 +249,7 @@ input[type=range]{accent-color:var(--accent)}
 .mycard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:10px 12px}
 .myh{display:flex;align-items:center;gap:6px}.myh .nm{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.myh .mt{font-size:11.5px;color:var(--sub);font-weight:600}
 .myh button{width:30px;height:30px;border:0;border-radius:8px;background:var(--bg);color:var(--accent);cursor:pointer;padding:5px;display:flex;flex:0 0 auto}.myh button svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
-.myh button[data-a=del]{color:var(--sub);background:none}.myh button[data-a=undo]{background:none}
+.myh button[data-a=del]{color:var(--sub);background:none}.myh button[data-a=undo]{background:none;padding:7px}
 .myn{flex:1;min-width:0;display:flex;align-items:center}.myn .nm{min-width:0}
 .mys{cursor:grab;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
 .needs{margin:8px 0 12px}.mys .needs{margin:0 0 10px;position:sticky;left:0;width:100%}
@@ -873,11 +873,14 @@ function undoRoute(r){const s=r.hist&&r.hist.pop();if(!s)return;r.start=s.start;
 function drawMy(){
   const host=$('#myview');const tok=++myTok;
   if(!ROUTES.length){host.innerHTML='<div class="empty" style="padding:30px 0">저장한 루트가 없습니다.</div>';return}
-  host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div class="myn"><div class="nm">${esc(r.name)}</div><button class="ed" data-a="ren" type="button" aria-label="이름 변경">${PEN}</button></div><button data-a="undo" type="button" aria-label="되돌리기" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h9.5a6 6 0 0 1 0 12H10"/></svg></button><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"></div></div>`).join('')}</div>`;
+  host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div class="myn"><div class="nm">${esc(r.name)}</div><button class="ed" data-a="ren" type="button" aria-label="이름 변경">${PEN}</button></div><button data-a="undo" type="button" aria-label="되돌리기" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 19.5H14.5a5.5 5.5 0 0 0 0-11H8" fill="none"/><path d="M9.5 4.8L4 8.5L9.5 12.2Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"></div></div>`).join('')}</div>`;
   host.querySelectorAll('.mycard').forEach(row=>{const id=row.dataset.id;
     row.querySelector('[data-a=ren]').onclick=()=>editName(row.querySelector('.nm'),row.querySelector('.nm').textContent,v=>{const r=ROUTES.find(x=>x.id===id);if(r){r.name=v;persist()}});
     row.querySelector('[data-a=undo]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(!r)return;undoRoute(r);renderMys(row,r);row.querySelector('.mys').scrollLeft=0};
-    row.querySelector('[data-a=del]').onclick=()=>shrinkOut(row,()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();if(ROUTES.length){row.remove()}else drawMy()})});
+    row.querySelector('[data-a=del]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(!r)return;
+      const b=openModal('내 루트 삭제',`<div style="word-break:keep-all"><b>${esc(r.name)}</b> 루트를 삭제합니다.</div><div class="btnrow" style="margin-top:16px"><button class="btn pri" id="delok" type="button">확인</button><button class="btn" id="delno" type="button">취소</button></div>`);
+      b.querySelector('#delno').onclick=closeModal;
+      b.querySelector('#delok').onclick=()=>{closeModal();shrinkOut(row,()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();if(ROUTES.length){row.remove()}else drawMy()})}}});
   const todo=[...host.querySelectorAll('.mycard')];
   const next=()=>{if(tok!==myTok)return;const row=todo.shift();if(!row)return;const r=ROUTES.find(x=>x.id===row.dataset.id);
     renderMys(row,r);
