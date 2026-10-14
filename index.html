@@ -321,7 +321,8 @@ const EL=['무','불','물','풀','전기','땅','바람','빛','어둠'];
 const ELC=['#8a93a3','#e5533d','#2f7fe0','#34a853','#d9a800','#a0713a','#4cb8b0','#c9a400','#7d4fc4'];
 const DT={0:'보조',1:'물리',2:'마법',8:'회복'};
 const TG={1:'자신',2:'아군 1',3:'아군 전체',4:'적 1',5:'적 전체'};
-const CL={LVL:'Lv',HP:'HP',SP:'SP',ATK:'ATK',DEF:'DEF',INT:'INT',SPD:'SPD',ABI:'재능',CAM:'우정',Other:'추가 조건',Fus:'합체'};
+const CL={LVL:'Lv',HP:'HP',SP:'SP',ATK:'ATK',DEF:'DEF',INT:'INT',SPD:'SPD',ABI:'재능',CAM:'우정',Fus:'합체'};
+const MCP=Array.from({length:D.length},()=>[]),MCS=new Set();DIGI_MC.forEach(([a,b,both])=>{MCP[a].push(b);MCP[b].push(a);MCS.add(a*1000+b);MCS.add(b*1000+a)});const isMC=(a,b)=>MCS.has(a*1000+b);
 const STAT=[['HP','HP'],['SP','SP'],['ATK','ATK'],['DEF','DEF'],['INT','INT'],['SPD','SPD']];
 const img=i=>`icons/${D[i].no}.png`;
 // 한글 초성
@@ -380,7 +381,7 @@ function solveHard(start,end,skills,ban,w,budget,av){
   // A* 하한: 훈련·우정을 무시하고 (전투+디지뱅크+합체)만 센 완화 거리 — 목적지/스킬 보유 디지몬까지
   const N=D.length,rev=Array.from({length:N},()=>[]);
   for(let u=0;u<N;u++){if(ban.has(u))continue;
-    for(const v of D[u].next)if(!ban.has(v)){const n0=edgeCurve(u,v)[0].n;rev[v].push([u,(n0>0?n0+VISIT:0)+(D[v].cond.Fus?FUSION:0)])}
+    for(const v of D[u].next)if(!ban.has(v)){if(isMC(u,v)){rev[v].push([u,0]);continue}const n0=edgeCurve(u,v)[0].n;rev[v].push([u,(n0>0?n0+VISIT:0)+(D[v].cond.Fus?FUSION:0)])}
     for(const v of D[u].prev)if(!ban.has(v))rev[v].push([u,0])}
   const back=(src)=>{const d=new Float64Array(N).fill(Infinity),h=[];src.forEach(([i,v])=>{if(v<d[i]){d[i]=v;heapPush(h,[v,i])}});
     while(h.length){const [dv,v]=heapPop(h);if(dv>d[v])continue;for(const [u,w] of rev[v]){const nd=dv+w;if(nd<d[u]){d[u]=nd;heapPush(h,[nd,u])}}}return d};
@@ -405,10 +406,12 @@ function solveHard(start,end,skills,ban,w,budget,av){
     const x=s.node;
     if(end==null||x===end){let nf=0,ok=true,g=s.mask;for(const [k,nb] of need(x)){if(!(s.mask>>k&1)){g|=1<<k;if(nb>nf)nf=nb}}
       if(g===FULL){const fg=g&~s.mask;heapPush(heap,[s.c+nf+nf*5e-12,{fin:1,s,c:s.c+nf,r:s.r+nf,fg}])}}
-    for(const nb of D[x].prev){if(ban.has(nb))continue;
+    for(const nb of MCP[x]){if(ban.has(nb))continue;
+      add({node:nb,mask:s.mask,b:s.b,T:s.T,F:s.F,c:s.c+1e-9,r:s.r,par:s,info:{evo:false,mc:true,n:0,visit:0,tr:null,fr:0,fus:0,g:0}})}
+    for(const nb of D[x].prev){if(ban.has(nb)||isMC(x,nb))continue;
       for(const o of opts(x,nb,false)){const mask2=s.mask|o.g,v=(s.b===0||o.n>0)?VISIT:0;
         add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n+v+tie(v,o.n,0,0,0),r:s.r+o.n+v,par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
-    for(const nb of D[x].next){if(ban.has(nb))continue;const cd=D[nb].cond,cam=cd.CAM||0,fu=cd.Fus?FUSION:0;let pT=null,pm=-1;
+    for(const nb of D[x].next){if(ban.has(nb)||isMC(x,nb))continue;const cd=D[nb].cond,cam=cd.CAM||0,fu=cd.Fus?FUSION:0;let pT=null,pm=-1;
       for(const o of opts(x,nb,true)){const mask2=s.mask|o.g;
         const T2=s.T.map((t,j)=>Math.max(t,o.tau[j]));
         if(pT&&pm===mask2&&T2.every((t,j)=>t===pT[j]))continue;pT=T2;pm=mask2;
@@ -504,8 +507,15 @@ picker($('#pk-skill'),skillItems,v=>{if(S.skills.length<8&&!S.skills.includes(v)
 function drawModes(){$('#tgF').checked=!!S.avF;$('#tgT').checked=!!S.avT}
 $('#tgF').onchange=e=>{S.avF=e.target.checked};$('#tgT').onchange=e=>{S.avT=e.target.checked};
 // ---------- 결과 ----------
-function condPills(to){const c=D[to].cond;
-  return Object.keys(CL).filter(k=>c[k]).map(k=>tp('',k==='LVL'?`Lv.${c[k]}`:`${CL[k]}${k==='Other'?'':' '+c[k]+(k==='CAM'?'%':'')}`)).join('')||tp('','조건 없음')}
+const partner=(from,to)=>from==null?null:D[to].prev.find(p=>p!==from);
+function condArr(to,from){const c=D[to].cond,a=[];
+  if(c.LVL)a.push(`Lv.${c.LVL}`);
+  ['HP','SP','ATK','DEF','INT','SPD'].forEach(k=>{if(c[k])a.push(`${CL[k]} ${c[k]}`)});
+  if(c.ABI)a.push(`${CL.ABI} ${c.ABI}`);
+  if(c.Fus){const p=partner(from,to);a.push(`우정 ${c.CAM||100}%의 ${p!=null?esc(D[p].ko):'다른 디지몬'}`)}else if(c.CAM)a.push(`우정 ${c.CAM}%`);
+  if(c.Item)a.push(c.Item);if(c.Clear)a.push('해커스 메모리 클리어');
+  return a}
+function condPills(to,from){return condArr(to,from).map(t=>tp('',t)).join('')||tp('','조건 없음')}
 function costArr(f){const a=[];if(!f)return a;
   if(f.fus)a.push(tp('hard','합체 '+f.fus));
   if(f.n>0)a.push(tp('','전투 '+f.n));
@@ -520,24 +530,28 @@ function stepActs(p,k,got,steps){const m=D[p[k]],a=[];
   (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 스킬을 습득한다${mv?` (Lv.${mv[1]})`:''}`)});
   if(k>=p.length-1)return a;
   const to=p[k+1],c=D[to].cond,f=steps&&steps[k],evo=m.next.includes(to);
+  if(isMC(p[k],to)){a.push(`<b>${esc(ro(D[to].ko))} 모드 체인지한다</b>`);return a}
+  if(!evo){a.push(`<b>${esc(ro(D[to].ko))} 퇴화한다</b>`);return a}
   if(c.LVL)a.push(`Lv.${c.LVL}에 도달한다`);
   if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`${CL[SK[j]]}를 ${d} 올린다`)});
   if(c.ABI)a.push(`${CL.ABI} ${c.ABI}에 도달한다`);
-  if(f&&f.fr>0)a.push(`우정을 ${f.fr} 올린다`);
-  if(c.Fus||(f&&f.fus))a.push('합체한다');
-  if(c.Other)a.push('추가 조건을 만족한다');
+  if(c.Fus){const pt=partner(p[k],to);a.push(`합체 재료: 우정 ${c.CAM||100}%의 ${pt!=null?esc(D[pt].ko):'다른 디지몬'} (사라짐)`)}
+  else if(f&&f.fr>0)a.push(`우정을 ${f.fr} 올린다`);
+  if(c.Item)a.push(`${c.Item} 필요`);
+  if(c.Clear)a.push('해커스 메모리 클리어 필요');
   a.push(`<b>${esc(ro(D[to].ko))} ${evo?'진화':'퇴화'}한다</b>`);return a}
 // 전체 루트에서 꼭 필요한 정보 (특훈 → 재능 → 우정 → 추가 조건)
-function routeNeeds(p,steps){const tr=[0,0,0,0,0,0];let abi=0,cam=0;const ex=[];
-  p.forEach((i,k)=>{if(!k)return;const c=D[i].cond,f=steps&&steps[k-1];
+function routeNeeds(p,steps){const tr=[0,0,0,0,0,0];let abi=0,cam=0;const items=[],par=[];let clr=false;
+  p.forEach((i,k)=>{if(!k)return;const c=D[i].cond,f=steps&&steps[k-1];if(isMC(p[k-1],i)||!D[p[k-1]].next.includes(i))return;
     if(f&&f.tr)f.tr.forEach((d,j)=>{tr[j]+=d||0});
     if(c.ABI)abi=Math.max(abi,c.ABI);
-    if(f&&f.fr>0&&c.CAM)cam=Math.max(cam,c.CAM);
-    if(c.Other)ex.push(D[i].ko)});
+    if(c.Fus){const pt=partner(p[k-1],i);par.push(`우정 ${c.CAM||100}%의 ${pt!=null?D[pt].ko:'다른 디지몬'}`)}else if(f&&f.fr>0&&c.CAM)cam=Math.max(cam,c.CAM);
+    if(c.Item&&!items.includes(c.Item))items.push(c.Item);if(c.Clear)clr=true});
   const a=[];tr.forEach((d,j)=>{if(d>0)a.push(tp('',`특훈 ${CL[SK[j]]} ${d} 필요`))});
   if(abi)a.push(tp('',`재능 ${abi} 필요`));
   if(cam)a.push(tp('',`우정 ${cam}% 필요`));
-  if(ex.length)a.push(tp('',`추가 조건: ${ex.map(esc).join(', ')}`));
+  items.forEach(t=>a.push(tp('',`${esc(t)} 필요`)));if(clr)a.push(tp('','해커스 메모리 클리어 필요'));
+  par.forEach(t=>a.push(tp('',`${esc(t)} 필요`)));
   return a.length?`<div class="facts needs">${a.join('')}</div>`:''}
 function routeFlow(p,got,steps,dir){
   return `<div class="flow ${dir}">`+p.map((i,k)=>{const m=D[i];
@@ -582,7 +596,7 @@ function drawDex(){const q=QS.dex;
 function openDetail(i){
   const m=D[i];const want=new Set(S.skills);
   const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td style="width:22px">${skI(x,18)}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${lv||'-'}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${sig?'필살기':'계승기'}</td></tr>`};
-  const evo=(arr,dir)=>arr.map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div class="nm">${esc(D[j].ko)}</div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
+  const evo=(arr,dir)=>arr.filter(j=>dir==='mc'||!isMC(i,j)).map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div class="nm">${esc(D[j].ko)}</div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">야생 출현 정보 없음</div>';
   const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['INT','INT'],['DEF','DEF'],['SPD','SPD']];
   const cells=LS.map(([k,l])=>`<div class="sc"><b>${l}</b><span class="cv" data-k="${k}">${statAt(i,k,1)}</span></div>`).join('');
@@ -593,7 +607,7 @@ function openDetail(i){
   <div class="sec"><h3>스킬</h3><table class="mv"><tr><th></th><th style="text-align:left">스킬</th><th>습득</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
   <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
   <div class="sec"><h3>퇴화</h3>${evo(m.prev,'prev')}</div>
-  <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>
+  <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>${MCP[i].length?`<div class="sec"><h3>모드 체인지</h3>${evo(MCP[i],'mc')}</div>`:''}
   <div class="sec"><h3>프로필</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.desc)}</div></div>
   <div class="sec"><h3>출현 장소</h3>${enc}</div>`,{dense:true,wide:true,titleHtml:true});
   const lvn=$('#lvn');const setLv=L=>{b.querySelectorAll('.cv').forEach(td=>td.textContent=statAt(i,td.dataset.k,L))};
@@ -640,10 +654,9 @@ function buildTree(){
   up.forEach(i=>seen.add(i));const nUp=up.size-1;const nodes=[...seen];
   const OI=s=>ORD.indexOf(s);const xi=new Map();nodes.forEach(i=>{const o=OI(D[i].stage);if(o>=0)xi.set(i,o)});
   nodes.forEach(i=>{if(xi.has(i))return;const ps=D[i].prev.filter(t=>xi.has(t)).map(t=>xi.get(t)+1),ns=D[i].next.filter(t=>xi.has(t)).map(t=>xi.get(t)-1);xi.set(i,ps.length?Math.min(...ps):ns.length?Math.max(0,Math.max(...ns)):3)});
-  // 모습 체인지(각성/BM/LM 등): 같은 단계 안에서 이름이 이어지는 변형, 서로 오가는 쌍은 둘 다 종착 취급
-  const F=new Set(),FO=new Map(),pf=(a,b)=>{let k=0;while(k<a.length&&k<b.length&&a[k]===b[k])k++;return k};
-  nodes.forEach(i=>D[i].next.forEach(t=>{if(t===i||!seen.has(t)||D[t].stage!==D[i].stage||OI(D[i].stage)<0)return;
-    if(D[t].next.includes(i)){F.add(i);F.add(t)}else if(D[t].prev.length===1&&pf(D[i].ko,D[t].ko)>=3){F.add(t);FO.set(t,i)}}));
+  // 모드 체인지: 종착(정사각형) 취급. 같은 단계 안의 쌍은 다음 열 아래 병렬로 모은다
+  const F=new Set(),FO=new Map(),SQ=new Set();
+  DIGI_MC.forEach(([a,b,both])=>{if(!seen.has(a)||!seen.has(b))return;SQ.add(b);if(both)SQ.add(a);if(D[a].stage!==D[b].stage||OI(D[a].stage)<0)return;F.add(b);if(both)F.add(a);else FO.set(b,a)});
   const lv=new Map(nodes.map(i=>[i,0]));for(let k=0;k<4;k++)nodes.forEach(i=>D[i].next.forEach(t=>{if(t!==i&&seen.has(t)&&xi.get(t)===xi.get(i)&&!F.has(i)&&!F.has(t))lv.set(t,Math.min(3,Math.max(lv.get(t),lv.get(i)+1)))}));
   F.forEach(f=>{const fl=(FO.has(f)&&!F.has(FO.get(f))?lv.get(FO.get(f)):0)+1,x0=xi.get(f);
     if(nodes.some(j=>!F.has(j)&&xi.get(j)===x0&&lv.get(j)>=fl)){lv.set(f,fl)}else if(x0+1<ORD.length){xi.set(f,x0+1);lv.set(f,0)}else lv.set(f,fl)});
@@ -676,7 +689,7 @@ function buildTree(){
     E.forEach(([a,b,p])=>{p.classList.toggle('up',u.has(a)&&u.has(b));p.classList.toggle('on',d.has(a)&&d.has(b))});N.forEach((n,j)=>n.classList.toggle('on',u.has(j)||d.has(j)));
     0};
   const unfocus=()=>{svg.classList.remove('focus');E.forEach(([a,b,p])=>p.classList.remove('on','up'));N.forEach(n=>n.classList.remove('on'));info()};
-  nodes.forEach(i=>{const end=!D[i].next.length||F.has(i);const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
+  nodes.forEach(i=>{const end=!D[i].next.length||SQ.has(i);const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
     if(D[i].stage==='유년기 I')mk('polygon',{points:'-5,-5.5 -5,5.5 6,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.2,class:'sh'},g);
     mk('text',{x:9,y:4},g).textContent=nm;N.set(i,g);
     g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
