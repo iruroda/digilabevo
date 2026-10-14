@@ -626,7 +626,7 @@ function routeNeeds(p,steps){const tr=[0,0,0,0,0,0],trT=[0,0,0,0,0,0];let abi=0,
 // 루트 박스 흐름도 상수 (px)
 const BH=88,BIC=70,BCOL=88,BR=5,BRE=4;
 const twb=(t,hg,ot)=>[...String(t).replace(/<[^>]*>/g,'')].reduce((w,c)=>w+(c.charCodeAt(0)>255?hg:c===' '?3.4:/[()]/.test(c)?4.2:ot),0);
-let _WE=0;const boxWE=()=>_WE||(_WE=Math.ceil(Math.max(...D.map(m=>twb(ro(m.ko)+' 진화',11.8,6.9))))+16+4);
+let _WE=0;const boxWE=()=>_WE||(_WE=Math.max(8+BIC+8+BCOL+8,Math.ceil(Math.max(...D.map(m=>twb(ro(m.ko)+' 진화',11.8,6.9))))+16+4));
 function packCols(items,rows,colW,perChar){let col=1,used=0;const sp=items.map(t=>Math.min(rows,Math.max(1,Math.ceil((twb(t,perChar[0],perChar[1])+2)/colW))));sp.forEach(s=>{if(used+s>rows){col++;used=0}used+=s});return {cols:col,sp}}
 const gridHtml=(items,rows,colW,perChar,minCols)=>{const {cols,sp}=packCols(items,rows,colW,perChar);const c=Math.max(cols,minCols||1);
   return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},14px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
