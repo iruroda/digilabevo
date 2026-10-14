@@ -321,7 +321,7 @@ const EL=['무','불','물','풀','전기','땅','바람','빛','어둠'];
 const ELC=['#8a93a3','#e5533d','#2f7fe0','#34a853','#d9a800','#a0713a','#4cb8b0','#c9a400','#7d4fc4'];
 const DT={0:'보조',1:'물리',2:'마법',8:'회복'};
 const TG={1:'자신',2:'아군 1',3:'아군 전체',4:'적 1',5:'적 전체'};
-const CL={LVL:'Lv',HP:'HP',SP:'SP',ATK:'ATK',DEF:'DEF',INT:'INT',SPD:'SPD',ABI:'재능',CAM:'우정',Fus:'합체'};
+const CL={LVL:'Lv',HP:'HP',SP:'SP',ATK:'ATK',DEF:'DEF',INT:'INT',SPD:'SPD',ABI:'재능',CAM:'우정',Fus:'조그레스 진화'};
 const MCP=Array.from({length:D.length},()=>[]),MCS=new Set();DIGI_MC.forEach(([a,b,both])=>{MCP[a].push(b);MCP[b].push(a);MCS.add(a*1000+b);MCS.add(b*1000+a)});const isMC=(a,b)=>MCS.has(a*1000+b);
 const STAT=[['HP','HP'],['SP','SP'],['ATK','ATK'],['DEF','DEF'],['INT','INT'],['SPD','SPD']];
 const img=i=>`icons/${D[i].no}.png`;
@@ -343,14 +343,14 @@ const MODES={
  steps:{evo:1,dev:1,easy:0,hint:'진화·퇴화 단계 수가 가장 적은 루트'},
  lessdev:{evo:1,dev:6,easy:0,hint:'퇴화 1회를 진화 6회만큼 비싸게 보고 계산'},
  prefdev:{evo:1,dev:0.35,easy:0,hint:'퇴화를 진화의 1/3 비용으로 보고 계산'},
- easy:{evo:1,dev:1,easy:1,hint:'곤란도가 가장 낮은 루트 · 디지뱅크 방문 3, 전투 1회(80000exp) 1, 팜 훈련 스탯 1당 1(HP는 10당 1), 우정 1당 1, 합체 200'},
+ easy:{evo:1,dev:1,easy:1,hint:'곤란도가 가장 낮은 루트 · 디지뱅크 방문 3, 전투 1회(80000exp) 1, 팜 훈련 스탯 1당 1(HP는 10당 1), 우정 1당 1, 조그레스 진화 200'},
  evoonly:{evo:1,dev:Infinity,easy:0,hint:'퇴화 없이 진화 방향으로만 이동 (갈 수 없으면 실패)'}
 };
 const SK=['HP','SP','ATK','DEF','INT','SPD'];
 function statAt(i,k,L){const [b,g]=D[i].bs[k];let v=Math.floor((b+g*(L-1))/100);return k==='HP'?v*10:v}
-// ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 합체(재료 디지몬) 200 ----------
+// ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 조그레스 진화(재료 디지몬) 200 ----------
 const BATTLE_EXP=80000,VISIT=3,FUSION=200,CAP=10;
-// 곤란도가 같을 때: 디지뱅크 방문 > 전투 > 팜 훈련 > 우정 > 합체 순으로 ‘감수할 만한’ 비용이라, 합체를 가장 피하고 방문을 가장 덜 피한다
+// 곤란도가 같을 때: 디지뱅크 방문 > 전투 > 팜 훈련 > 우정 > 조그레스 진화 순으로 ‘감수할 만한’ 비용이라, 조그레스 진화를 가장 피하고 방문을 가장 덜 피한다
 const tie=(v,n,tc,fr,fu)=>(fu?1e-3:0)+fr*5e-6+tc*2e-9+n*5e-12+(v?1e-13:0);
 const nBattles=(i,L)=>Math.ceil(EXPT[D[i].ec][Math.max(1,Math.min(99,L))-1]/BATTLE_EXP);
 function lvAfter(i,n){const t=EXPT[D[i].ec],e=n*BATTLE_EXP;let L=1;while(L<99&&t[L]<=e)L++;return L}
@@ -378,7 +378,7 @@ function solveHard(start,end,skills,ban,w,budget,av){
     for(const n of list){let st=cur[0];for(const q of cur)if(q.n<=n)st=q;const g=gain(x,n);
       if(lp&&st===lp&&g===lg)continue;lp=st;lg=g;o.push({n,tau:st.tau,g})}
     _eo.set(key,o);return o};
-  // A* 하한: 훈련·우정을 무시하고 (전투+디지뱅크+합체)만 센 완화 거리 — 목적지/스킬 보유 디지몬까지
+  // A* 하한: 훈련·우정을 무시하고 (전투+디지뱅크+조그레스 진화)만 센 완화 거리 — 목적지/스킬 보유 디지몬까지
   const N=D.length,rev=Array.from({length:N},()=>[]);
   for(let u=0;u<N;u++){if(ban.has(u))continue;
     for(const v of D[u].next)if(!ban.has(v)){if(isMC(u,v)){rev[v].push([u,0]);continue}const n0=edgeCurve(u,v)[0].n;rev[v].push([u,(n0>0?n0+VISIT:0)+(D[v].cond.Fus?FUSION:0)])}
@@ -517,7 +517,7 @@ function condArr(to,from){const c=D[to].cond,a=[];
   return a}
 function condPills(to,from){return condArr(to,from).map(t=>tp('',t)).join('')||tp('','조건 없음')}
 function costArr(f){const a=[];if(!f)return a;
-  if(f.fus)a.push(tp('hard','합체 '+f.fus));
+  if(f.fus)a.push(tp('hard','조그레스 진화 '+f.fus));
   if(f.n>0)a.push(tp('','전투 '+f.n));
   if(f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(tp('','훈련 '+CL[SK[j]]+' +'+d))});
   if(f.fr>0)a.push(tp('','우정 +'+f.fr));
@@ -535,7 +535,7 @@ function stepActs(p,k,got,steps){const m=D[p[k]],a=[];
   if(c.LVL)a.push(`Lv.${c.LVL}에 도달한다`);
   if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`${CL[SK[j]]}를 ${d} 올린다`)});
   if(c.ABI)a.push(`${CL.ABI} ${c.ABI}에 도달한다`);
-  if(c.Fus){const pt=partner(p[k],to);a.push(`합체 재료: 우정 ${c.CAM||100}%의 ${pt!=null?esc(D[pt].ko):'다른 디지몬'} (사라짐)`)}
+  if(c.Fus){const pt=partner(p[k],to);a.push(`조그레스 진화: 우정 ${c.CAM||100}%의 ${pt!=null?esc(D[pt].ko):'다른 디지몬'} 필요 (사라짐)`)}
   else if(f&&f.fr>0)a.push(`우정을 ${f.fr} 올린다`);
   if(c.Item)a.push(`${c.Item} 필요`);
   if(c.Clear)a.push('해커스 메모리 클리어 필요');
@@ -656,7 +656,8 @@ function buildTree(){
   nodes.forEach(i=>{if(xi.has(i))return;const ps=D[i].prev.filter(t=>xi.has(t)).map(t=>xi.get(t)+1),ns=D[i].next.filter(t=>xi.has(t)).map(t=>xi.get(t)-1);xi.set(i,ps.length?Math.min(...ps):ns.length?Math.max(0,Math.max(...ns)):3)});
   // 모드 체인지: 종착(정사각형) 취급. 같은 단계 안의 쌍은 다음 열 아래 병렬로 모은다
   const F=new Set(),FO=new Map(),SQ=new Set();
-  DIGI_MC.forEach(([a,b,both])=>{if(!seen.has(a)||!seen.has(b))return;SQ.add(b);if(both)SQ.add(a);if(D[a].stage!==D[b].stage||OI(D[a].stage)<0)return;F.add(b);if(both)F.add(a);else FO.set(b,a)});
+  DIGI_MC.forEach(([a,b])=>{if(seen.has(a)&&seen.has(b)){SQ.add(a);SQ.add(b)}});
+  [...DIGI_MC,...DIGI_FORM].forEach(([a,b,both])=>{if(!seen.has(a)||!seen.has(b))return;if(D[a].stage!==D[b].stage||OI(D[a].stage)<0)return;F.add(b);if(both)F.add(a);else FO.set(b,a)});
   const lv=new Map(nodes.map(i=>[i,0]));for(let k=0;k<4;k++)nodes.forEach(i=>D[i].next.forEach(t=>{if(t!==i&&seen.has(t)&&xi.get(t)===xi.get(i)&&!F.has(i)&&!F.has(t))lv.set(t,Math.min(3,Math.max(lv.get(t),lv.get(i)+1)))}));
   F.forEach(f=>{const fl=(FO.has(f)&&!F.has(FO.get(f))?lv.get(FO.get(f)):0)+1,x0=xi.get(f);
     if(nodes.some(j=>!F.has(j)&&xi.get(j)===x0&&lv.get(j)>=fl)){lv.set(f,fl)}else if(x0+1<ORD.length){xi.set(f,x0+1);lv.set(f,0)}else lv.set(f,fl)});
