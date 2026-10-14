@@ -766,7 +766,7 @@ function buildTree(){
     0};
   const unfocus=()=>{svg.classList.remove('focus');E.forEach(([a,b,p])=>p.classList.remove('on','up'));N.forEach(n=>n.classList.remove('on'));info()};
   nodes.forEach(i=>{const end=!D[i].next.length||SQ.has(i);const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
-    if(D[i].stage==='유년기 I')mk('polygon',{points:'-5,-5.5 -5,5.5 6,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.2,class:'sh'},g);
+    if(D[i].stage==='유년기 I')mk('polygon',{points:'-2.87,-4.97 -2.87,4.97 5.73,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.3,class:'sh'},g);
     mk('text',{x:9,y:4},g).textContent=nm;N.set(i,g);
     g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
     g.onclick=()=>{if(sel===i){sel=null;unfocus()}else{sel=i;N.forEach((n,j)=>n.classList.toggle('sel',j===r||j===i));focus(i)}};});
