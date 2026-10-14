@@ -113,11 +113,6 @@ select.dn{-webkit-appearance:none;appearance:none;padding:0 14px 0 4px;text-alig
 .dc{grid-column:span 2;display:flex;gap:4px;min-width:0}.dc .chip{padding:0 7px;font-size:11px;flex:1 1 auto;justify-content:center;min-width:0}
 #vt-my:disabled,#mSaved:disabled,#savedBtn:disabled,#saveRoute:disabled{opacity:.4;cursor:default;pointer-events:none}
 #go:disabled{background:#c4c4c4;border-color:#c4c4c4;color:#fff;cursor:default;pointer-events:none}
-.tg{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:13px;font-weight:700;cursor:pointer}
-.tg input{position:absolute;opacity:0;pointer-events:none}
-.tg i{position:relative;width:42px;height:24px;border-radius:999px;background:#c4c4c4;transition:background .2s;flex:0 0 auto}
-.tg i::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
-.tg input:checked+i{background:var(--accent)}.tg input:checked+i::after{transform:translateX(18px)}
 .ic16{width:19px;height:19px;vertical-align:-3px;margin-right:5px;flex:0 0 auto}
 .lab>span{display:inline-flex;align-items:center}.lab>span .ic16{vertical-align:0}
 .btn .ic16{margin-right:6px}
@@ -214,11 +209,11 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 #mpanel .chips{padding:0}
 .mgreet{font-size:12.5px;font-weight:600;color:var(--sub);margin-top:auto;padding-top:36px}
 .mfooter{padding-top:8px;display:flex;gap:8px}
-.modal{position:fixed;inset:var(--hh,0px) 0 0 0;background:var(--ov);z-index:14;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility 0s .2s}
+.modal{position:fixed;inset:0;background:var(--ov);z-index:25;display:flex;align-items:center;justify-content:center;padding:56px 24px 24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility 0s .2s}
 .modal.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s,visibility 0s}
 .modal .box{transform:translateY(12px) scale(.96);transition:transform .22s cubic-bezier(.33,0,.2,1)}
 .modal.open .box{transform:none}
-.modal .box{position:relative;background:#fff;border-radius:16px;padding:18px 24px 20px;max-width:320px;width:100%;max-height:calc(100vh - var(--hh,0px) - 48px);display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.modal .box{position:relative;background:#fff;border-radius:16px;padding:18px 24px 20px;max-width:320px;width:100%;max-height:calc(100vh - 80px);display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .modal.wide .box{max-width:440px}
 .modal h2{font-size:17px;font-weight:800;color:var(--accent);margin:0 0 14px;padding-right:20px}
 .mclose{position:absolute;top:10px;right:10px;width:28px;height:28px;background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
@@ -271,6 +266,12 @@ input[type=range]{accent-color:var(--accent)}
 .sv:first-child{border-top:none}
 .sv .tt{flex:1;min-width:0}.sv .tt b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sv .tt span{font-size:11px;color:var(--sub);font-weight:600}
 .sv button{height:28px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:11.5px;font-weight:700;cursor:pointer;color:var(--txt)}
+/* 헤더 아이콘 버튼: 여백 축소, 아이콘·글씨 확대 */
+.viewtoggle button{font-size:12.5px;padding:5px 5px}.viewtoggle button svg{width:18px;height:18px}.viewtoggle button.active{padding:5px 8px}.viewtoggle{gap:3px}
+@media(max-width:430px){.viewtoggle button:not(.active){padding:5px 4px}.viewtoggle button.active{padding:5px 7px}.viewtoggle{gap:2px}}
+#vt-my:disabled,#mSaved:disabled,#savedBtn:disabled,#saveRoute:disabled{pointer-events:auto}
+button:disabled,.btn:disabled{cursor:default!important}
+body:not(.authed) .tn .rb{display:none!important}
 </style>
 </head>
 <body data-view="route">
@@ -371,13 +372,6 @@ let SKF='all';
 
 
 // ---------- 루트 탐색: (디지몬, 모은 스킬 비트마스크) 상태 다익스트라 ----------
-const MODES={
- steps:{evo:1,dev:1,easy:0},
- lessdev:{evo:1,dev:6,easy:0},
- prefdev:{evo:1,dev:0.35,easy:0},
- easy:{evo:1,dev:1,easy:1},
- evoonly:{evo:1,dev:Infinity,easy:0}
-};
 const SK=['HP','SP','ATK','DEF','INT','SPD'];
 function statAt(i,k,L){const [b,g]=D[i].bs[k];let v=Math.floor((b+g*(L-1))/100);return k==='HP'?v*10:v}
 // ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 조그레스 진화(재료 디지몬) 200 ----------
@@ -455,29 +449,13 @@ function solveHard(start,end,skills,ban,w,budget,av){
 }
 function heapPush(h,x){h.push(x);let i=h.length-1;while(i>0){const p=(i-1)>>1;if(h[p][0]<=h[i][0])break;[h[p],h[i]]=[h[i],h[p]];i=p}}
 function heapPop(h){const t=h[0],l=h.pop();if(h.length){h[0]=l;let i=0;for(;;){let a=2*i+1,b=a+1,m=i;if(a<h.length&&h[a][0]<h[m][0])m=a;if(b<h.length&&h[b][0]<h[m][0])m=b;if(m===i)break;[h[m],h[i]]=[h[i],h[m]];i=m}}return t}
-function findRoute(start,end,skills,bans,modeKey,av){
-  const mo=MODES[modeKey],K=skills.length,FULL=(1<<K)-1,N=D.length,W=1<<K;
+function findRoute(start,end,skills,bans,av){
   const iso=i=>!D[i].next.length&&!D[i].prev.length;
   if(iso(start)||(end!=null&&iso(end)))return {err:'조건을 만족하는 루트가 없습니다.'};
-  const cover=D.map(m=>{let b=0;skills.forEach((id,k)=>{if(m.moves.some(x=>x[0]===id))b|=1<<k});return b});
   const ban=new Set(bans);
   if(ban.has(start)||(end!=null&&ban.has(end)))return {err:'조건을 만족하는 루트가 없습니다.'};
-  if(mo.easy)return findRouteHard(start,end,skills,ban,av);
-  const dist=new Float64Array(N*W).fill(Infinity),prev=new Int32Array(N*W).fill(-1),heap=[];
-  const s0=start*W+cover[start];dist[s0]=0;heapPush(heap,[0,s0]);
-  while(heap.length){
-    const [d0,cur]=heapPop(heap);if(d0>dist[cur])continue;
-    const node=(cur/W)|0,mask=cur%W;
-    if(mask===FULL&&(end==null||node===end)){const path=[];for(let c=cur;c!==-1;c=prev[c])path.push((c/W)|0);return {path:path.reverse(),cost:d0}}
-    const moves=[];D[node].next.forEach(t=>moves.push([t,true]));if(mo.dev!==Infinity)D[node].prev.forEach(t=>moves.push([t,false]));
-    for(const [nb,isEvo] of moves){if(ban.has(nb))continue;
-      const ns=nb*W+(mask|cover[nb]);const nd=d0+(isEvo?mo.evo:mo.dev)+0.001;
-      if(nd<dist[ns]){dist[ns]=nd;prev[ns]=cur;heapPush(heap,[nd,ns])}}
-  }
-  return {err:'조건을 만족하는 루트가 없습니다.'};
+  return findRouteHard(start,end,skills,ban,av);
 }
-
-const MN={steps:'최소 단계',lessdev:'퇴화 최소',prefdev:'퇴화 우선',easy:'곤란도 최소',evoonly:'진화만'};Object.keys(MN).forEach(k=>MODES[k].name=MN[k]);
 
 const TAR={water:0,fire:1,plant:2,earth:3,electric:4,wind:5,light:6,dark:7,neutral:8},TAC={vaccine:0,virus:1,data:2,free:3};
 const taI=(m,s)=>`<i class="ta" style="--c:${TAC[m.type]??3};--r:${TAR[m.attr]??8}${s?`;--s:${s}px`:''}"></i>`;
@@ -487,7 +465,7 @@ const tp=(cls,t)=>`<span class="tagp ${cls||''}">${t}</span>`;
 let SCROLLER=[];
 // ---------- 모달 ----------
 const modal=$('#modal');
-function openModal(title,html,opt={}){if(opt.titleHtml)$('#mh').innerHTML=title;else $('#mh').textContent=title;const b=$('#mbody');b.innerHTML=html;b.className='sb'+(opt.dense?' dense':'');modal.classList.toggle('wide',!!opt.wide);modal.style.setProperty('--hh',document.querySelector('#hdwrap').offsetHeight+'px');modal.classList.add('open');document.documentElement.classList.add('lock');b.scrollTop=0;return b}
+function openModal(title,html,opt={}){if(opt.titleHtml)$('#mh').innerHTML=title;else $('#mh').textContent=title;const b=$('#mbody');b.innerHTML=html;b.className='sb'+(opt.dense?' dense':'');modal.classList.toggle('wide',!!opt.wide);modal.classList.add('open');document.documentElement.classList.add('lock');b.scrollTop=0;return b}
 function closeModal(){modal.classList.remove('open');document.documentElement.classList.remove('lock')}
 $('#mx').onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeMenu()}});
@@ -501,7 +479,6 @@ document.querySelectorAll('.msec h3').forEach(h=>h.onclick=()=>{const p=h.parent
   else{const hh=c.offsetHeight;p.classList.add('collapsed');c.animate([{height:hh+'px',opacity:1},{height:'0px',opacity:0}],{duration:240,easing:EASE}).onfinish=()=>{c.style.display='none'}}});
 // ---------- 보기 전환 ----------
 const VIEWS=['route','dex','skill','tree','my'];let CUR='route';const QS={dex:'',skill:'',tree:''};
-const PH={dex:'디지몬 이름 검색 (초성 가능)',skill:'스킬 이름 검색',tree:'그래프에서 이름 찾기'};
 // 탭 전환: 최상단 헤더는 그대로, 서브헤더+본문이 한 장처럼 책장 넘기듯 좌우로 밀려 나가고 들어온다
 let slideDone=null;
 function subSnap(){const sh=$('#subhd');if(getComputedStyle(sh).display==='none')return null;
@@ -560,7 +537,7 @@ function picker(root,items,onPick,ph){
 const monItems=D.map((m,i)=>({label:m.ko,sub:`No.${String(m.no).padStart(3,'0')}`,icon:img(i),value:i}));
 const skillItems=skillIds.map(id=>({label:M[id].n,sub:sigH[id]?'필살기':'계승기',value:id}));
 // ---------- 루트 입력 상태 ----------
-let S={start:null,end:null,skills:[],bans:[],mode:'easy',avF:false,avT:false,P:{HP:0,SP:0,ATK:0,DEF:0,INT:0,SPD:0},cam0:0,pers:''};
+let S={start:null,end:null,skills:[],bans:[],avF:false,avT:false,P:{HP:0,SP:0,ATK:0,DEF:0,INT:0,SPD:0},cam0:0,pers:''};
 const PERS=['내구형','활력형','공격형','방어형','지력형','민첩형'];
 const initOf=o=>({P:SK.map(k=>(o.P&&o.P[k])||0),C:o.cam0||0,pi:PERS.indexOf(o.pers)});
 let selShown={start:null,end:null},skShown=[];
@@ -598,15 +575,7 @@ function condArr(to,from){const c=D[to].cond,a=[];
   if(c.Fus){const p=partner(from,to);a.push(`우정 ${c.CAM||100}%의 ${p!=null?esc(D[p].ko):'다른 디지몬'}`)}else if(c.CAM)a.push(`우정 ${c.CAM}%`);
   if(c.Item)a.push(c.Item);if(c.Clear)a.push('해커스 메모리 클리어');
   return a}
-function condPills(to,from){return condArr(to,from).map(t=>tp('',t)).join('')||tp('','조건 없음')}
-function costArr(f){const a=[];if(!f)return a;
-  if(f.fus)a.push(tp('hard','조그레스 진화 '+f.fus));
-  if(f.n>0)a.push(tp('','전투 '+f.n));
-  if(f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(tp('','훈련 '+CL[SK[j]]+' +'+d))});
-  if(f.fr>0)a.push(tp('','우정 +'+f.fr));
-  if(f.visit)a.push(tp('','디지뱅크 '+f.visit));
-  return a}
-function costPills(f){const a=costArr(f);return a.length?`<div class="facts" style="margin-top:4px">${a.join('')}</div>`:''}
+function condPills(to,from){return condArr(to,from).map(t=>tp('',t)).join('')}
 // 루트 흐름도: 디지몬(아이콘+이름) → 해야 할 일 → 다음 디지몬. dir 'h' 가로 / 'v' 세로
 const ro=n=>{const t=n.replace(/\)$/,''),c=t[t.length-1]?.charCodeAt(0);if(c>=0xAC00&&c<=0xD7A3){const f=(c-0xAC00)%28;return n+(f===0||f===8?'로':'으로')}return n+'(으)로'};
 // 전체 루트에서 꼭 필요한 정보 (특훈 → 재능 → 우정 → 추가 조건)
@@ -614,13 +583,13 @@ function routeNeeds(p,steps){const tr=[0,0,0,0,0,0],trT=[0,0,0,0,0,0];let abi=0,
   p.forEach((i,k)=>{if(!k)return;const c=D[i].cond,f=steps&&steps[k-1];if(isMC(p[k-1],i)||!D[p[k-1]].next.includes(i))return;
     if(f&&f.tr)f.tr.forEach((d,j)=>{tr[j]+=d||0;if(f.T)trT[j]=Math.max(trT[j],f.T[j])});
     if(c.ABI)abi=Math.max(abi,c.ABI);
-    if(c.Fus){const pt=partner(p[k-1],i);par.push(`우정 ${c.CAM||100}%의 ${pt!=null?D[pt].ko:'다른 디지몬'}`)}else if(f&&f.fr>0&&c.CAM)cam=Math.max(cam,c.CAM);
+    if(c.Fus){const pt=partner(p[k-1],i);par.push(`우정 ${c.CAM||100}% ${pt!=null?D[pt].ko:'다른 디지몬'}`)}else if(f&&f.fr>0&&c.CAM)cam=Math.max(cam,c.CAM);
     if(c.Item&&!items.includes(c.Item))items.push(c.Item);if(c.Clear)clr=true});
-  const a=[];tr.forEach((d,j)=>{if(d>0)a.push(tp('',`특훈 ${CL[SK[j]]} ${trT[j]||d} 필요`))});
-  if(abi)a.push(tp('',`재능 ${abi} 필요`));
-  if(cam)a.push(tp('',`우정 ${cam}% 필요`));
-  items.forEach(t=>a.push(tp('',`${esc(t)} 필요`)));if(clr)a.push(tp('','해커스 메모리 클리어 필요'));
-  par.forEach(t=>a.push(tp('',`${esc(t)} 필요`)));
+  const a=[];tr.forEach((d,j)=>{if(d>0)a.push(tp('',`특훈 ${CL[SK[j]]} +${trT[j]||d}`))});
+  if(abi)a.push(tp('',`재능 ${abi} 이상`));
+  if(cam)a.push(tp('',`우정 ${cam}% 이상`));
+  items.forEach(t=>a.push(tp('',esc(t))));if(clr)a.push(tp('','해커스 메모리 클리어'));
+  par.forEach(t=>a.push(tp('',esc(t))));
   return a.length?`<div class="facts needs">${a.join('')}</div>`:''}
 // 루트 박스 흐름도 상수 (px)
 const BH=88,BIC=70,BCOL=88,BR=5,BRE=4;
@@ -662,7 +631,7 @@ function runRoute(){
   const r=$('#result');
   if(S.start==null){r.innerHTML='';return}
   if(S.end==null&&!S.skills.length){r.innerHTML='';return}
-  const res=findRoute(S.start,S.end,S.skills,S.bans,S.mode,{F:S.avF,T:S.avT,...initOf(S)});LAST=null;
+  const res=findRoute(S.start,S.end,S.skills,S.bans,{F:S.avF,T:S.avT,...initOf(S)});LAST=null;
   if(res.err){r.innerHTML=`<div class="empty">${res.err}</div>`;return}
   const p=res.path;const seen=new Set();let nE=0,nD=0,body='';const gotAll=[];
   p.forEach((i,k)=>{const m=D[i];
@@ -670,9 +639,8 @@ function runRoute(){
     if(k>0){if(D[p[k-1]].next.includes(i))nE++;else nD++}});
   body=routeFlow(p,gotAll,res.steps,'v');
   let html=`<div class="rcard"><div class="sum"><b>${esc(D[p[0]].ko)} → ${esc(D[p[p.length-1]].ko)}</b></div>${routeNeeds(p,res.steps)}${body}`;
-  if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 스킬: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
   html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 루트 저장</button></div></div>`;
-  r.innerHTML=html;growIn(r.querySelector('.rcard'));LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,P:{...S.P},cam0:S.cam0,pers:S.pers,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,T:f.T,F:f.F,visit:f.visit}:null)))};
+  r.innerHTML=html;growIn(r.querySelector('.rcard'));LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],avF:S.avF,avT:S.avT,P:{...S.P},cam0:S.cam0,pers:S.pers,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,T:f.T,F:f.F,visit:f.visit}:null)))};
   r.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
   $('#saveRoute').onclick=askSaveRoute;authGate();
 }
@@ -815,18 +783,15 @@ function treeSearch(){if(!TG_)return;const v=QS.tree.trim();TG_.N.forEach((n,i)=
   if(v){const f=[...TG_.N].find(([i])=>D[i].ko.includes(v));if(f){const t=f[1].getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);$('#treebox').scrollTo({left:+t[1]*TZ-120,top:+t[2]*TZ-150,behavior:'smooth'})}}}
 // ---------- 저장한 루트 + 로그인 ----------
 let CUR_USER=null,CUR_NAME=null,ROUTES=[];
-const rkey=()=>'digilab_routes_'+(CUR_USER||'guest');
-const loadLocal=()=>{try{return JSON.parse(localStorage.getItem(rkey())||'[]')}catch(e){return[]}};
-const saveLocal=()=>{try{localStorage.setItem(rkey(),JSON.stringify(ROUTES))}catch(e){}};
 let fbAuth=null,db=null;
 try{if(window.firebase&&window.FIREBASE_CONFIG&&window.FIREBASE_CONFIG.apiKey){firebase.initializeApp(window.FIREBASE_CONFIG);fbAuth=firebase.auth();db=firebase.firestore()}}catch(e){console.error('Firebase 초기화 실패',e)}
 const mergeRoutes=(a,b)=>{const m=new Map();[...a,...b].forEach(r=>m.set(r.id,r));return [...m.values()].sort((x,y)=>y.t-x.t).slice(0,50)};
 function saveRemote(){if(db&&fbAuth&&fbAuth.currentUser)db.collection('digilabRoutes').doc(fbAuth.currentUser.uid).set({routes:ROUTES,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>console.error('저장 실패(Firestore 규칙 확인 필요)',e))}
-function persist(){saveLocal();saveRemote()}
-function routeSummary(r){return `${r.start!=null?D[r.start].ko:'?'} → ${r.end!=null?D[r.end].ko:'스킬만'}${r.skills.length?' · 스킬 '+r.skills.length:''}`}
+function persist(){saveRemote()}
+function routeSummary(r){return r.end!=null?`${D[r.start].ko} → ${D[r.end].ko}`:D[r.start].ko}
 function askSaveRoute(){
   if(!LAST)return;const def=routeSummary(LAST);
-  const b=openModal('루트 저장',`<div style="font-size:12.5px;color:var(--sub);font-weight:600;margin-bottom:8px">계정에 저장됩니다.</div><input class="inp" id="rname" maxlength="40" value="${esc(def)}"><div class="btnrow" style="margin-top:12px"><button class="btn pri" id="rok" type="button">저장</button></div>`,{dense:true});
+  const b=openModal('루트 저장',`<input class="inp" id="rname" maxlength="40" value="${esc(def)}"><div class="btnrow" style="margin-top:12px"><button class="btn pri" id="rok" type="button">저장</button></div>`,{dense:true});
   const inp=$('#rname');inp.focus();inp.select();
   const go=()=>{ROUTES=mergeRoutes([{id:Date.now().toString(36),name:inp.value.trim()||def,t:Date.now(),...LAST}],ROUTES);persist();closeModal()};
   $('#rok').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()}}
@@ -835,27 +800,27 @@ const myCache=new Map();let myTok=0;
 function drawMy(){
   const host=$('#myview');const tok=++myTok;
   if(!ROUTES.length){host.innerHTML='<div class="empty" style="padding:30px 0">저장한 루트가 없습니다.</div>';return}
-  host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div style="flex:1;min-width:0"><div class="nm">${esc(r.name)}</div></div><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"><div class="hintx" style="margin:0">불러오는 중…</div></div></div>`).join('')}</div>`;
+  host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div style="flex:1;min-width:0"><div class="nm">${esc(r.name)}</div></div><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"></div></div>`).join('')}</div>`;
   host.querySelectorAll('.mycard').forEach(row=>{const id=row.dataset.id;
     row.querySelector('[data-a=del]').onclick=()=>shrinkOut(row,()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();if(ROUTES.length){row.remove()}else drawMy()})});
   const todo=[...host.querySelectorAll('.mycard')];
   const next=()=>{if(tok!==myTok)return;const row=todo.shift();if(!row)return;const r=ROUTES.find(x=>x.id===row.dataset.id);const el=row.querySelector('.mys');
-    try{let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],r.mode||'easy',{F:!!r.avF,T:!!r.avT,...initOf(r)});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}
+    try{let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],{F:!!r.avF,T:!!r.avT,...initOf(r)});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}
       el.innerHTML=p.length?routeNeeds(p,st)+routeFlow(p,got,st,'h'):'';
       el.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i))}catch(e){console.error(e);el.innerHTML=''}
     setTimeout(next,0)};
   setTimeout(next,0)}
 $('#mSaved').onclick=$('#savedBtn').onclick=openSaved;
-function authGate(){const on=!!CUR_USER;['#vt-my','#mSaved','#savedBtn','#saveRoute'].forEach(q=>{const e=$(q);if(e)e.disabled=!on})}
+function authGate(){const on=!!CUR_USER;document.body.classList.toggle('authed',on);['#vt-my','#mSaved','#savedBtn','#saveRoute'].forEach(q=>{const e=$(q);if(e)e.disabled=!on})}
 function updateAuthUI(){if(CUR==='my'){if(CUR_USER)drawMy();else view('route')}authGate();$('#loginBtn').textContent=CUR_USER?'로그아웃':'로그인';$('#mgreet').textContent=CUR_USER?CUR_NAME+'님, 안녕하세요.':'로그인하면 검색한 루트를 저장해 둘 수 있습니다.'}
 $('#loginBtn').onclick=()=>{
   if(CUR_USER){fbAuth&&fbAuth.signOut();return}
   if(!fbAuth){closeMenu();return}
   fbAuth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(()=>closeMenu()).catch(err=>{if(err&&err.code==='auth/popup-closed-by-user')return;console.error('구글 로그인 실패(Firebase 콘솔에서 Google 로그인 방식 활성화 확인)',err)})};
 if(fbAuth){fbAuth.onAuthStateChanged(user=>{
-  if(user){const guest=loadLocal();CUR_USER=user.uid;CUR_NAME=user.displayName||user.email||'사용자';
-    db.collection('digilabRoutes').doc(user.uid).get().then(doc=>{const remote=doc.exists?(doc.data().routes||[]):[];ROUTES=mergeRoutes(remote,mergeRoutes(guest,loadLocal()));persist();updateAuthUI()}).catch(e=>{console.error('불러오기 실패(Firestore 규칙 확인 필요)',e);ROUTES=mergeRoutes(guest,loadLocal());updateAuthUI()})}
-  else{CUR_USER=null;CUR_NAME=null;ROUTES=loadLocal();updateAuthUI()}})}
+  if(user){CUR_USER=user.uid;CUR_NAME=user.displayName||user.email||'사용자';
+    db.collection('digilabRoutes').doc(user.uid).get().then(doc=>{const remote=doc.exists?(doc.data().routes||[]):[];ROUTES=remote;updateAuthUI()}).catch(e=>{console.error('불러오기 실패(Firestore 규칙 확인 필요)',e);updateAuthUI()})}
+  else{CUR_USER=null;CUR_NAME=null;ROUTES=[];updateAuthUI()}})}
 // ---------- 스크롤바 (스크롤할 때만 표시) ----------
 function hookScroll(t,el){let h;t.addEventListener('scroll',()=>{el.classList.add('scrolling');clearTimeout(h);h=setTimeout(()=>el.classList.remove('scrolling'),650)},{passive:true})}
 (()=>{const b=$('#treebox');let d=null;
@@ -864,7 +829,7 @@ window.addEventListener('mousemove',e=>{if(!d)return;b.scrollLeft=d.l-(e.clientX
 window.addEventListener('mouseup',()=>{d=null;b.classList.remove('grabbing')})})();
 hookScroll(window,document.documentElement);['#mpanel','#mbody','#treebox'].forEach(s=>hookScroll($(s),$(s)));
 // ---------- 시작 ----------
-ROUTES=loadLocal();drawSel();drawModes();drawFilters();updateAuthUI();view('route');
+drawSel();drawModes();drawFilters();updateAuthUI();view('route');
 
 </script>
 </body>
