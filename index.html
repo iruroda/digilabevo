@@ -257,15 +257,17 @@ input[type=range]{accent-color:var(--accent)}
 .myh button[data-a=del]{color:var(--sub)}
 .mys{margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
 .needs{margin:8px 0 12px}.mys .needs{margin:0 0 10px;position:sticky;left:0;width:100%}
-.flow{display:flex}.flow.h{align-items:flex-start;width:max-content}.flow.v{flex-direction:column;align-items:flex-start}
-.fn{display:flex;align-items:center;cursor:pointer}.fn img{width:52px;height:52px;flex:0 0 auto}.fnm{font-size:12.5px;font-weight:800;word-break:keep-all;line-height:1.25}
-.fa{font-size:11px;font-weight:600;color:var(--txt);line-height:1.35}.fa b{color:var(--accent);font-weight:800}
-.flow.h .fn{flex-direction:column;gap:3px;width:84px;text-align:center}.flow.h .fe{width:132px;flex:0 0 auto;padding-top:0;display:flex;flex-direction:column;align-items:center}
-.flow.h .fl{width:100%;height:2px;background:var(--accent);margin-top:25px;position:relative;border-radius:1px}.flow.h .fl::after{content:'';position:absolute;right:-1px;top:-4px;border-left:7px solid var(--accent);border-top:5px solid transparent;border-bottom:5px solid transparent}
-.flow.h .fa{margin-top:6px;text-align:center;padding:0 4px}.flow.h .fa div+div{margin-top:2px}
-.flow.v .fn{gap:12px;padding:2px 0}.flow.v .fe{display:flex;gap:12px;margin-left:25px}
-.flow.v .fl{width:2px;background:var(--accent);flex:0 0 auto;border-radius:1px;margin:2px 0}.flow.v .fa{padding:8px 0}.flow.v .fa div+div{margin-top:2px}
-.sv{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--border)}
+.flow{display:flex}.flow.h{align-items:center;width:max-content}.flow.v{flex-direction:column;align-items:flex-start}
+.bx{box-sizing:border-box;border-radius:10px;padding:8px;display:flex;gap:8px;flex:0 0 auto;font-size:11px;font-weight:600;line-height:14px;color:var(--txt)}
+.bd{background:#e9e9e9}.be{background:#ffe79a;flex-direction:column;gap:0}.bv{background:#c9d5ee;flex-direction:column;justify-content:center;gap:0}
+.bi{width:70px;display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto;cursor:pointer}.bi img{width:44px;height:44px;display:block}
+.bnm{font-size:11px;font-weight:800;text-align:center;line-height:13px;overflow-wrap:anywhere}
+.bact{display:grid;grid-auto-flow:column;align-content:start}.bact div{overflow:hidden;white-space:nowrap}.bact div.w{white-space:normal}
+.bt{font-size:11.5px;font-weight:800;line-height:14px;white-space:nowrap}
+.ar{position:relative;background:var(--accent);flex:0 0 auto;border-radius:1px}
+.ar::after{content:'';position:absolute}
+.flow.v .ar{width:2px;height:20px;margin:0 0 6px 42px}.flow.v .ar::after{left:-4px;bottom:-6px;border-top:7px solid var(--accent);border-left:5px solid transparent;border-right:5px solid transparent}
+.flow.h .ar{height:2px;width:22px;margin:0 6px 0 0}.flow.h .ar::after{right:-6px;top:-4px;border-left:7px solid var(--accent);border-top:5px solid transparent;border-bottom:5px solid transparent}
 .sv:first-child{border-top:none}
 .sv .tt{flex:1;min-width:0}.sv .tt b{display:block;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sv .tt span{font-size:11px;color:var(--sub);font-weight:600}
 .sv button{height:28px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-size:11.5px;font-weight:700;cursor:pointer;color:var(--txt)}
@@ -608,20 +610,6 @@ function costArr(f){const a=[];if(!f)return a;
 function costPills(f){const a=costArr(f);return a.length?`<div class="facts" style="margin-top:4px">${a.join('')}</div>`:''}
 // 루트 흐름도: 디지몬(아이콘+이름) → 해야 할 일 → 다음 디지몬. dir 'h' 가로 / 'v' 세로
 const ro=n=>{const t=n.replace(/\)$/,''),c=t[t.length-1]?.charCodeAt(0);if(c>=0xAC00&&c<=0xD7A3){const f=(c-0xAC00)%28;return n+(f===0||f===8?'로':'으로')}return n+'(으)로'};
-function stepActs(p,k,got,steps){const m=D[p[k]],a=[];
-  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 스킬을 습득한다${mv?` (Lv.${mv[1]})`:''}`)});
-  if(k>=p.length-1)return a;
-  const to=p[k+1],c=D[to].cond,f=steps&&steps[k],evo=m.next.includes(to);
-  if(isMC(p[k],to)){a.push(`<b>${esc(ro(D[to].ko))} 모드 체인지한다</b>`);return a}
-  if(!evo){a.push(`<b>${esc(ro(D[to].ko))} 퇴화한다</b>`);return a}
-  if(c.LVL)a.push(`Lv.${c.LVL}에 도달한다`);
-  if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`특훈 ${CL[SK[j]]}를 ${f.T?f.T[j]:d}까지 올린다`)});
-  if(c.ABI)a.push(`${CL.ABI} ${c.ABI}에 도달한다`);
-  if(c.Fus){const pt=partner(p[k],to);a.push(`조그레스 진화: 우정 ${c.CAM||100}%의 ${pt!=null?esc(D[pt].ko):'다른 디지몬'} 필요 (사라짐)`)}
-  else if(f&&f.fr>0)a.push(`우정을 ${f.F!=null?f.F:f.fr}%까지 올린다`);
-  if(c.Item)a.push(`${c.Item} 필요`);
-  if(c.Clear)a.push('해커스 메모리 클리어 필요');
-  a.push(`<b>${esc(ro(D[to].ko))} ${evo?'진화':'퇴화'}한다</b>`);return a}
 // 전체 루트에서 꼭 필요한 정보 (특훈 → 재능 → 우정 → 추가 조건)
 function routeNeeds(p,steps){const tr=[0,0,0,0,0,0],trT=[0,0,0,0,0,0];let abi=0,cam=0;const items=[],par=[];let clr=false;
   p.forEach((i,k)=>{if(!k)return;const c=D[i].cond,f=steps&&steps[k-1];if(isMC(p[k-1],i)||!D[p[k-1]].next.includes(i))return;
@@ -635,11 +623,41 @@ function routeNeeds(p,steps){const tr=[0,0,0,0,0,0],trT=[0,0,0,0,0,0];let abi=0,
   items.forEach(t=>a.push(tp('',`${esc(t)} 필요`)));if(clr)a.push(tp('','해커스 메모리 클리어 필요'));
   par.forEach(t=>a.push(tp('',`${esc(t)} 필요`)));
   return a.length?`<div class="facts needs">${a.join('')}</div>`:''}
+// 루트 박스 흐름도 상수 (px)
+const BH=88,BIC=70,BCOL=88,BR=5,BRE=4;
+const twb=(t,hg,ot)=>[...String(t).replace(/<[^>]*>/g,'')].reduce((w,c)=>w+(c.charCodeAt(0)>255?hg:c===' '?3.4:/[()]/.test(c)?4.2:ot),0);
+let _WE=0;const boxWE=()=>_WE||(_WE=Math.ceil(Math.max(...D.map(m=>twb(ro(m.ko)+' 진화',11.8,6.9))))+16+4);
+function packCols(items,rows,colW,perChar){let col=1,used=0;const sp=items.map(t=>Math.min(rows,Math.max(1,Math.ceil((twb(t,perChar[0],perChar[1])+2)/colW))));sp.forEach(s=>{if(used+s>rows){col++;used=0}used+=s});return {cols:col,sp}}
+const gridHtml=(items,rows,colW,perChar,minCols)=>{const {cols,sp}=packCols(items,rows,colW,perChar);const c=Math.max(cols,minCols||1);
+  return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},14px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
+// 디지몬 박스에 쓰는 행동 (명사형): 스킬 습득 · Lv · 특훈 · 재능 · 우정
+function boxActs(p,k,got,steps){const m=D[p[k]],a=[];
+  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 습득${mv?` (Lv. ${mv[1]})`:''}`)});
+  if(k>=p.length-1)return a;
+  const to=p[k+1],c=D[to].cond,f=steps&&steps[k];
+  if(isMC(p[k],to)||!m.next.includes(to))return a;
+  if(c.LVL)a.push(`Lv. ${c.LVL} 이상`);
+  if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`특훈 ${CL[SK[j]]} +${f.T?f.T[j]:d}`)});
+  if(c.ABI)a.push(`${CL.ABI} ${c.ABI} 이상`);
+  if(!c.Fus&&f&&f.fr>0)a.push(`우정 ${f.F!=null?f.F:f.fr}% 이상`);
+  return a}
+// 진화 박스에 쓰는 조건: 조그레스 진화 · 다른 디지몬 · 아이템 · 클리어
+function evoConds(from,to){const c=D[to].cond,a=[];
+  if(c.Fus){const pt=partner(from,to);a.push(`우정 ${c.CAM||100}% ${pt!=null?esc(D[pt].ko):'다른 디지몬'}`)}
+  if(c.Item)a.push(esc(c.Item));if(c.Clear)a.push('해커스 메모리 클리어');
+  return a}
 function routeFlow(p,got,steps,dir){
-  return `<div class="flow ${dir}">`+p.map((i,k)=>{const m=D[i];
-    const acts=stepActs(p,k,got,steps),last=k===p.length-1;
-    return `<div class="fn" data-i="${i}"><img src="${img(i)}"><div class="fnm">${esc(m.ko)}</div></div>`+
-      (last?(acts.length?`<div class="fe"><div class="fa">${acts.map(t=>`<div>${t}</div>`).join('')}</div></div>`:''):`<div class="fe"><div class="fl"></div><div class="fa">${acts.map(t=>`<div>${t}</div>`).join('')}</div></div>`)}).join('')+'</div>'}
+  const WE=boxWE();let h='';
+  p.forEach((i,k)=>{const m=D[i],acts=boxActs(p,k,got,steps),g=gridHtml(acts,BR,BCOL,[11,6.5],1);
+    h+=`<div class="bx bd" data-i="${i}" style="width:${8+BIC+8+g.cols*BCOL+8}px;height:${BH}px"><div class="bi"><img src="${img(i)}"><div class="bnm">${esc(m.ko)}</div></div>${g.html}</div>`;
+    if(k>=p.length-1)return;
+    const to=p[k+1],evo=m.next.includes(to);h+='<div class="ar"></div>';
+    if(isMC(i,to))h+=`<div class="bx bv" style="width:${WE}px;height:46px"><div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">모드 체인지</div></div>`;
+    else if(!evo)h+=`<div class="bx bv" style="width:${WE}px;height:30px"><div class="bt">${esc(ro(D[to].ko))} 퇴화</div></div>`;
+    else{const fu=!!D[to].cond.Fus,cg=gridHtml(evoConds(i,to),fu?BRE-1:BRE,WE-16,[11,6.5],1);
+      h+=`<div class="bx be" style="width:${8+cg.cols*(WE-16)+8}px;height:${BH}px">${fu?`<div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">조그레스 진화</div>`:`<div class="bt">${esc(ro(D[to].ko))} 진화</div>`}${cg.html}</div>`}
+    h+='<div class="ar"></div>'});
+  return `<div class="flow ${dir}">${h}</div>`}
 let LAST=null;
 function runRoute(){
   const r=$('#result');
