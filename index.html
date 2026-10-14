@@ -848,7 +848,7 @@ try{if(window.firebase&&window.FIREBASE_CONFIG&&window.FIREBASE_CONFIG.apiKey){f
 const mergeRoutes=(a,b)=>{const m=new Map();[...a,...b].forEach(r=>m.set(r.id,r));return [...m.values()].sort((x,y)=>y.t-x.t).slice(0,50)};
 function saveRemote(){if(db&&fbAuth&&fbAuth.currentUser)db.collection('digilabRoutes').doc(fbAuth.currentUser.uid).set({routes:ROUTES,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(e=>console.error('저장 실패(Firestore 규칙 확인 필요)',e))}
 function persist(){saveRemote()}
-function routeSummary(r){return r.end!=null?`${D[r.start].ko} → ${D[r.end].ko}`:D[r.start].ko}
+function routeSummary(r){return r.end!=null?`${D[r.start].ko}-${D[r.end].ko}`:D[r.start].ko}
 // 이름 바꾸기: 이름 자리에서 입력칸으로 바뀌고, 엔터·바깥 클릭으로 확정, Esc로 취소
 function editName(nameEl,cur,onDone){if(nameEl.dataset.editing)return;nameEl.dataset.editing=1;
   const inp=document.createElement('input');inp.className='rnin';inp.maxLength=40;inp.value=cur;nameEl.style.display='none';nameEl.parentNode.insertBefore(inp,nameEl);inp.focus();inp.select();
