@@ -289,6 +289,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sset .accp{padding-top:0}
 body.sdo{padding-bottom:170px}
 .mys.grabbing{cursor:grabbing;user-select:none}.mys .bi{cursor:pointer}
+.bi{position:relative}.bi .fl{position:absolute;left:-2px;top:-2px;width:15px;height:15px;color:var(--accent)}
 </style>
 </head>
 <body data-view="route">
@@ -642,10 +643,11 @@ function evoConds(from,to){const c=D[to].cond,a=[];
   if(c.Fus&&c.CAM==null){const pt=partner(from,to);a.push(`우정 100% ${pt!=null?esc(D[pt].ko):'다른 디지몬'}`)}
   return a}
 let _mc=null;const mtw=t=>{_mc=_mc||document.createElement('canvas').getContext('2d');_mc.font='800 11.5px '+getComputedStyle(document.body).fontFamily;return _mc.measureText(t).width};
+const FLAG='<svg class="fl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22V3"/><path d="M5 4L19 9.5L5 15Z" fill="currentColor"/></svg>';
 function routeFlow(p,got,steps,dir){
   const WE=boxWE();let h='';
   p.forEach((i,k)=>{const m=D[i],acts0=boxActs(p,k,got,steps),acts=acts0.length?acts0:['<span style="color:var(--sub)">없음</span>'],g=gridHtml(acts,BR,BCOL,[11,6.5],1);
-    h+=`<div class="bx bd" data-i="${i}" style="width:${8+BIC+8+g.cols*BCOL+8+8}px;height:${BH}px"><div class="bi"><img src="${img(i)}"><div class="bnm">${esc(m.ko)}</div></div>${g.html}</div>`;
+    h+=`<div class="bx bd" data-i="${i}" style="width:${8+BIC+8+g.cols*BCOL+8+8}px;height:${BH}px"><div class="bi">${dir==='h'&&k>0?FLAG:''}<img src="${img(i)}"><div class="bnm">${esc(m.ko)}</div></div>${g.html}</div>`;
     if(k>=p.length-1)return;
     const to=p[k+1],evo=m.next.includes(to);h+='<div class="ar ln"></div>';
     if(isMC(i,to))h+=`<div class="bx bv" style="width:${WE}px;height:46px"><div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">모드 체인지</div></div>`;
