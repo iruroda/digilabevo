@@ -746,6 +746,9 @@ function buildTree(){
   const nb=i=>[...D[i].next,...D[i].prev].filter(t=>seen.has(t));
   for(let it=0;it<24;it++){const seq=it%2?[...cols.keys()].reverse():[...cols.keys()];
     seq.forEach(c=>{const a=cols[c];const bc=new Map(a.map(i=>{const ns=nb(i).filter(t=>gx[colIdx.get(t)]!==gx[c]&&(it%2?gx[colIdx.get(t)]>gx[c]:gx[colIdx.get(t)]<gx[c]));return[i,ns.length?ns.reduce((s,t)=>s+pos.get(t)/Math.max(1,cols[colIdx.get(t)].length)*a.length,0)/ns.length:pos.get(i)]}));a.sort((x,y)=>bc.get(x)-bc.get(y));a.forEach((i,j)=>pos.set(i,j))})}
+  // 모드 체인지 쌍: 같은 칸이면 바로 붙이고 도감번호가 빠른 쪽을 위로
+  DIGI_MC.forEach(([x,y])=>{if(!seen.has(x)||!seen.has(y))return;const c=colIdx.get(x);if(c!==colIdx.get(y))return;const a=cols[c],ia=a.indexOf(x),ib=a.indexOf(y),top=Math.min(ia,ib);
+    const pr=[x,y].sort((p,q)=>D[p].no-D[q].no);a.splice(Math.max(ia,ib),1);a.splice(Math.min(ia,ib),1);a.splice(top,0,...pr);a.forEach((i,j)=>pos.set(i,j))});
   const box=$('#treebox');box.innerHTML='';const svg=mk('svg',{},box);
   const STEP=17,CW=190,PADX=60,PADY=30,BP=8,LH=20,GAP=12;
   const gh=g=>cols[g].length*STEP+BP*2;const colG=xs.map((_,x)=>cols.map((_,g)=>g).filter(g=>gx[g]===x));
