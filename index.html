@@ -249,7 +249,7 @@ input[type=range]{accent-color:var(--accent)}
 .mycard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:10px 12px}
 .myh{display:flex;align-items:center;gap:6px}.myh .nm{font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.myh .mt{font-size:11.5px;color:var(--sub);font-weight:600}
 .myh button{width:30px;height:30px;border:0;border-radius:8px;background:var(--bg);color:var(--accent);cursor:pointer;padding:5px;display:flex;flex:0 0 auto}.myh button svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
-.myh button[data-a=del]{color:var(--sub);background:none}
+.myh button[data-a=del]{color:var(--sub);background:none}.myh button[data-a=undo]{background:none}
 .myn{flex:1;min-width:0;display:flex;align-items:center}.myn .nm{min-width:0}
 .mys{cursor:grab;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
 .needs{margin:8px 0 12px}.mys .needs{margin:0 0 10px;position:sticky;left:0;width:100%}
@@ -290,6 +290,7 @@ body:not(.authed) .tn .rb{display:none!important}
 body.sdo{padding-bottom:170px}
 .mys.grabbing{cursor:grabbing;user-select:none}.mys .bi{cursor:pointer}
 .bi{position:relative}.bi .fl{position:absolute;left:-2px;top:-2px;width:15px;height:15px;color:var(--accent)}
+.fl{cursor:pointer}
 </style>
 </head>
 <body data-view="route">
@@ -643,11 +644,11 @@ function evoConds(from,to){const c=D[to].cond,a=[];
   if(c.Fus&&c.CAM==null){const pt=partner(from,to);a.push(`우정 100% ${pt!=null?esc(D[pt].ko):'다른 디지몬'}`)}
   return a}
 let _mc=null;const mtw=t=>{_mc=_mc||document.createElement('canvas').getContext('2d');_mc.font='800 11.5px '+getComputedStyle(document.body).fontFamily;return _mc.measureText(t).width};
-const FLAG='<svg class="fl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22V3"/><path d="M5 4L19 9.5L5 15Z" fill="currentColor"/></svg>';
+const FLAG=k=>'<svg class="fl" data-k="'+k+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22V3"/><path d="M5 4L19 9.5L5 15Z" fill="currentColor"/></svg>';
 function routeFlow(p,got,steps,dir){
   const WE=boxWE();let h='';
   p.forEach((i,k)=>{const m=D[i],acts0=boxActs(p,k,got,steps),acts=acts0.length?acts0:['<span style="color:var(--sub)">없음</span>'],g=gridHtml(acts,BR,BCOL,[11,6.5],1);
-    h+=`<div class="bx bd" data-i="${i}" style="width:${8+BIC+8+g.cols*BCOL+8+8}px;height:${BH}px"><div class="bi">${dir==='h'&&k>0?FLAG:''}<img src="${img(i)}"><div class="bnm">${esc(m.ko)}</div></div>${g.html}</div>`;
+    h+=`<div class="bx bd" data-i="${i}" style="width:${8+BIC+8+g.cols*BCOL+8+8}px;height:${BH}px"><div class="bi">${dir==='h'&&k>0?FLAG(k):''}<img src="${img(i)}"><div class="bnm">${esc(m.ko)}</div></div>${g.html}</div>`;
     if(k>=p.length-1)return;
     const to=p[k+1],evo=m.next.includes(to);h+='<div class="ar ln"></div>';
     if(isMC(i,to))h+=`<div class="bx bv" style="width:${WE}px;height:46px"><div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">모드 체인지</div></div>`;
@@ -857,18 +858,29 @@ let CURNAME='',SAVEDID=null;
 function saveRoute(){if(!LAST||SAVEDID)return;SAVEDID=Date.now().toString(36);ROUTES=mergeRoutes([{id:SAVEDID,name:CURNAME,t:Date.now(),...LAST}],ROUTES);persist();const b=$('#saveRoute');if(b)b.disabled=true}
 function openSaved(){closeMenu();view('my')}
 const myCache=new Map();let myTok=0;
+function routeData(r){let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],{F:!!r.avF,T:!!r.avT,...initOf(r)});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}return {p,got,st}}
+function renderMys(row,r){const el=row.querySelector('.mys');
+  try{const {p,got,st}=routeData(r);
+    el.innerHTML=p.length?routeNeeds(p,st)+routeFlow(p,got,st,'h'):'';
+    el.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
+    el.querySelectorAll('.fl').forEach(f=>{f.onmousedown=e=>e.stopPropagation();f.onclick=e=>{e.stopPropagation();cutRoute(r,+f.dataset.k);renderMys(row,r);el.scrollLeft=0}})}catch(e){console.error(e);el.innerHTML=''}
+  row.querySelector('[data-a=undo]').style.display=r.hist&&r.hist.length?'':'none'}
+const cleanSt=st=>JSON.parse(JSON.stringify((st||[]).map(s=>s?{fus:s.fus,n:s.n,tr:s.tr,fr:s.fr,T:s.T,F:s.F,visit:s.visit}:null)));
+function cutRoute(r,k){const d=routeData(r);if(k<1||k>=d.p.length)return;
+  (r.hist=r.hist||[]).push({start:r.start,len:r.len,path:[...d.p],got:[...d.got],st:cleanSt(d.st)});if(r.hist.length>10)r.hist.shift();
+  const st=cleanSt(d.st);r.path=d.p.slice(k);r.got=d.got.slice(k);r.st=st.slice(k);r.start=r.path[0];r.len=r.path.length-1;persist()}
+function undoRoute(r){const s=r.hist&&r.hist.pop();if(!s)return;r.start=s.start;r.len=s.len;r.path=s.path;r.got=s.got;r.st=s.st;persist()}
 function drawMy(){
   const host=$('#myview');const tok=++myTok;
   if(!ROUTES.length){host.innerHTML='<div class="empty" style="padding:30px 0">저장한 루트가 없습니다.</div>';return}
-  host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div class="myn"><div class="nm">${esc(r.name)}</div><button class="ed" data-a="ren" type="button" aria-label="이름 변경">${PEN}</button></div><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"></div></div>`).join('')}</div>`;
+  host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div class="myn"><div class="nm">${esc(r.name)}</div><button class="ed" data-a="ren" type="button" aria-label="이름 변경">${PEN}</button></div><button data-a="undo" type="button" aria-label="되돌리기" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h9.5a6 6 0 0 1 0 12H10"/></svg></button><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"></div></div>`).join('')}</div>`;
   host.querySelectorAll('.mycard').forEach(row=>{const id=row.dataset.id;
     row.querySelector('[data-a=ren]').onclick=()=>editName(row.querySelector('.nm'),row.querySelector('.nm').textContent,v=>{const r=ROUTES.find(x=>x.id===id);if(r){r.name=v;persist()}});
+    row.querySelector('[data-a=undo]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(!r)return;undoRoute(r);renderMys(row,r);row.querySelector('.mys').scrollLeft=0};
     row.querySelector('[data-a=del]').onclick=()=>shrinkOut(row,()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();if(ROUTES.length){row.remove()}else drawMy()})});
   const todo=[...host.querySelectorAll('.mycard')];
-  const next=()=>{if(tok!==myTok)return;const row=todo.shift();if(!row)return;const r=ROUTES.find(x=>x.id===row.dataset.id);const el=row.querySelector('.mys');
-    try{let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],{F:!!r.avF,T:!!r.avT,...initOf(r)});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}
-      el.innerHTML=p.length?routeNeeds(p,st)+routeFlow(p,got,st,'h'):'';
-      el.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i))}catch(e){console.error(e);el.innerHTML=''}
+  const next=()=>{if(tok!==myTok)return;const row=todo.shift();if(!row)return;const r=ROUTES.find(x=>x.id===row.dataset.id);
+    renderMys(row,r);
     setTimeout(next,0)};
   setTimeout(next,0)}
 $('#mSaved').onclick=$('#savedBtn').onclick=openSaved;
