@@ -251,7 +251,7 @@ input[type=range]{accent-color:var(--accent)}
 .myh button{width:30px;height:30px;border:0;border-radius:8px;background:var(--bg);color:var(--accent);cursor:pointer;padding:5px;display:flex;flex:0 0 auto}.myh button svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 .myh button[data-a=del]{color:var(--sub);background:none}
 .myn{flex:1;min-width:0;display:flex;align-items:center}.myn .nm{min-width:0}
-.mys{margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
+.mys{cursor:grab;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.mys::-webkit-scrollbar{display:none}
 .needs{margin:8px 0 12px}.mys .needs{margin:0 0 10px;position:sticky;left:0;width:100%}
 .flow{display:flex}.flow.h{align-items:center;width:max-content}.flow.v{flex-direction:column;align-items:flex-start}
 .bx{box-sizing:border-box;border-radius:10px;padding:8px;display:flex;gap:8px;flex:0 0 auto;font-size:11px;font-weight:600;line-height:14px;color:var(--txt)}
@@ -288,6 +288,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sdrow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;font-weight:700}.sdrow+.sdrow{border-top:1px solid var(--border)}
 .sset .accp{padding-top:0}
 body.sdo{padding-bottom:170px}
+.mys.grabbing{cursor:grabbing;user-select:none}.mys .bi{cursor:pointer}
 </style>
 </head>
 <body data-view="route">
@@ -885,6 +886,11 @@ function hookScroll(t,el){let h;t.addEventListener('scroll',()=>{el.classList.ad
 b.addEventListener('mousedown',e=>{if(e.button||e.target.closest('.tn'))return;d={x:e.clientX,y:e.clientY,l:b.scrollLeft,t:b.scrollTop};b.classList.add('grabbing');e.preventDefault()});
 window.addEventListener('mousemove',e=>{if(!d)return;b.scrollLeft=d.l-(e.clientX-d.x);b.scrollTop=d.t-(e.clientY-d.y)});
 window.addEventListener('mouseup',()=>{d=null;b.classList.remove('grabbing')})})();
+(()=>{let d=null,mv=false;
+document.addEventListener('mousedown',e=>{const b=e.target.closest&&e.target.closest('.mys');if(e.button||!b)return;d={b,x:e.clientX,l:b.scrollLeft};mv=false;b.classList.add('grabbing');e.preventDefault()});
+window.addEventListener('mousemove',e=>{if(!d)return;const dx=e.clientX-d.x;if(Math.abs(dx)>4)mv=true;d.b.scrollLeft=d.l-dx});
+window.addEventListener('mouseup',()=>{if(d){d.b.classList.remove('grabbing');d=null}});
+document.addEventListener('click',e=>{if(mv){e.stopPropagation();e.preventDefault();mv=false}},true)})();
 hookScroll(window,document.documentElement);['#mpanel','#mbody','#treebox'].forEach(s=>hookScroll($(s),$(s)));
 // ---------- 시작 ----------
 drawSel();drawModes();drawFilters();updateAuthUI();view('route');
