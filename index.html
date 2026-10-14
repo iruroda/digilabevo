@@ -8,7 +8,9 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='27.5' fill='none' stroke='%23ffc401' stroke-width='9'/%3E%3Ccircle cx='32' cy='32' r='10.8' fill='none' stroke='%23ffc401' stroke-width='7'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#325ab1">
 <style>
-:root{--bg:#efefef;--card:#ffffff;--txt:#1a1a1a;--sub-rgb:118,118,118;--sub:#767676;--accent:#325ab1;--accent-rgb:50,90,177;--border:rgba(var(--sub-rgb),.35);--yellow:#ffc401;--warm:#1a1a1a;--warm-bg:rgba(255,196,1,.32);--ov:rgba(0,0,0,.45)}
+:root{--bg:#efefef;--card:#ffffff;--txt:#1a1a1a;--sub-rgb:118,118,118;--sub:#767676;--accent:#325ab1;--accent-rgb:50,90,177;--border:rgba(var(--sub-rgb),.35);--yellow:#ffc401;--warm:#1a1a1a;--warm-bg:rgba(255,196,1,.32);--ov:rgba(0,0,0,.45);
+  /* 간격 기준값: 헤더 하단 여백 / 헤더 끝→첫 컨텐츠. 탭별로 다르게 하려면 아래 [data-view] 규칙에서 변수만 바꾼다 */
+  --hpb:8px;--cpt:6px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 img{-webkit-user-drag:none;user-drag:none;-webkit-touch-callout:none}
 html{overflow-y:scroll;overflow-x:hidden;scrollbar-gutter:stable}
@@ -27,7 +29,7 @@ input,textarea{-webkit-user-select:text;user-select:text;font-family:inherit}
 button{font-family:inherit}
 html.lock{overflow:hidden}
 .wrap{max-width:520px;margin:0 auto;min-height:100vh}
-header{position:sticky;top:0;z-index:15;background:linear-gradient(180deg,#ffffff,var(--bg) 55%);padding:12px 12px 8px}
+header{position:sticky;top:0;z-index:15;background:linear-gradient(180deg,#ffffff,var(--bg) 55%);padding:12px 12px var(--hpb)}
 .title{display:flex;align-items:center;gap:9px;margin:0 0 9px;padding-right:43px;min-height:34px}
 .title svg.logo{flex:0 0 auto;cursor:pointer}
 .title svg.logo{width:16px;height:16px}
@@ -60,7 +62,7 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 .tsearch{position:absolute;right:101px;bottom:12px;width:min(210px,calc(100% - 125px))}
 .tsearch input{width:100%;height:32px;padding:0 12px 0 34px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px;outline:none;color:var(--txt)}
 .tsearch input:focus{border-color:var(--accent)}.tsearch .qicon{left:11px}
-body[data-view=route] header,body[data-view=my] header{padding-bottom:4px}
+body[data-view=route],body[data-view=my]{--hpb:4px}
 #menubtnWrap{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:33;display:flex;justify-content:flex-end;pointer-events:none}
 #menubtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:0;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;pointer-events:auto;flex-shrink:0}
 #menubtn span{display:block;width:19px;height:3px;border-radius:2px;background:var(--accent);transform-origin:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s ease}
@@ -84,7 +86,7 @@ body[data-view=route] header,body[data-view=my] header{padding-bottom:4px}
 .chip.on .x{color:#fff}
 .chip.tag{background:#fff;border:1px solid var(--border);padding:0 9px}
 .chip.ban{background:var(--warm-bg);color:var(--warm);border-color:transparent}
-.content{padding:6px 12px 0}
+.content{padding:var(--cpt) 12px 0}
 .rcard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:8px}
 .lab{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
 .lab small{font-weight:600;font-size:11px}
