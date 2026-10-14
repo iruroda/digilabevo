@@ -102,7 +102,7 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 .fin{overflow:hidden;min-height:0}.fin>.fsec:first-child{margin-top:8px}body[data-view=dex].fopen .hdwrap{position:relative}
 .fsec{background:#fff;border:1px solid var(--border);border-radius:13px;padding:10px 12px;margin-bottom:6px}.fsec:last-child{margin-bottom:0}
 .fl{font-size:12px;color:var(--sub);font-weight:700}.fsec .chips{padding:8px 0 0}
-img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec 100%);border:2px solid #3086c8;border-radius:8px;padding:1px;box-sizing:border-box;object-fit:contain}
+img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec 100%);border:2px solid #3086c8;border-radius:8px;padding:0;box-sizing:border-box;object-fit:cover}
 @media(max-width:430px){.title h1 .evo{display:none}.viewtoggle button:not(.active){padding:6px 5px}.viewtoggle button.active{padding:6px 8px}.viewtoggle{gap:2px}}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.two .field{min-width:0;margin:0!important}
 .tg{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:13px;font-weight:700;cursor:pointer}
@@ -117,15 +117,15 @@ img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec
 .pick input{width:100%;padding:0 12px;height:34px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;outline:none;color:var(--txt)}
 .pick input:focus{border-color:var(--accent)}
 .pick input::placeholder{color:rgba(var(--sub-rgb),.7)}
-.drop{position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:260px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:20;display:none}
-.drop.open{display:block}
+.drop{position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:260px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:20;opacity:0;visibility:hidden;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s,visibility 0s .18s}
+.drop.open{opacity:1;visibility:visible;transform:none;pointer-events:auto;transition:opacity .18s,transform .18s,visibility 0s}
 .drop div{padding:7px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600}
 .drop div.hl{background:var(--bg)}
 .drop small{color:var(--sub);margin-left:auto;font-weight:600;font-size:11px}
 .drop img{width:28px;height:28px;border-width:1.5px!important}
 .rrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:13px;padding:10px 12px}
 .rrow.sm{margin-top:8px;padding:7px 10px;background:var(--bg);border-color:transparent;gap:10px}
-.rrow img{width:44px;height:44px;object-fit:contain;flex:0 0 auto}
+.rrow img{width:44px;height:44px;object-fit:cover;flex:0 0 auto}
 .rrow.sm img{width:36px;height:36px;border-width:1.5px!important}
 .rrow .nm{font-size:13.5px;font-weight:800;word-break:keep-all}
 .rrow .mt{font-size:11.5px;color:var(--sub);font-weight:600}
@@ -201,12 +201,14 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .mgrouptitle::after{content:'';flex:1;height:1px;background:var(--border)}
 .msec h3{font-size:12px;color:var(--sub);margin:12px 0 8px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
 .msec h3 .car{font-size:10px;transition:transform .2s}
-.msec.collapsed h3{margin-bottom:0}.msec.collapsed .car{transform:rotate(-90deg)}.msec.collapsed .chips{display:none}
+.msec.collapsed h3{margin-bottom:0}.msec.collapsed .car{transform:rotate(-90deg)}.msec .chips{overflow:hidden}
 #mpanel .chips{padding:0}
 .mgreet{font-size:12.5px;font-weight:600;color:var(--sub);margin-top:auto;padding-top:36px}
 .mfooter{padding-top:8px;display:flex;gap:8px}
-.modal{position:fixed;inset:var(--hh,0px) 0 0 0;background:var(--ov);z-index:14;display:none;align-items:center;justify-content:center;padding:24px}
-.modal.open{display:flex}
+.modal{position:fixed;inset:var(--hh,0px) 0 0 0;background:var(--ov);z-index:14;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility 0s .2s}
+.modal.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .2s,visibility 0s}
+.modal .box{transform:translateY(12px) scale(.96);transition:transform .22s cubic-bezier(.33,0,.2,1)}
+.modal.open .box{transform:none}
 .modal .box{position:relative;background:#fff;border-radius:16px;padding:18px 24px 20px;max-width:320px;width:100%;max-height:calc(100vh - var(--hh,0px) - 48px);display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .modal.wide .box{max-width:440px}
 .modal h2{font-size:17px;font-weight:800;color:var(--accent);margin:0 0 14px;padding-right:20px}
@@ -474,7 +476,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeM
 function closeMenu(){$('#menubtn').classList.remove('open');$('#mpanel').classList.remove('open');$('#menuOverlay').classList.remove('open')}
 $('#menubtn').onclick=()=>{const o=!$('#mpanel').classList.contains('open');$('#menubtn').classList.toggle('open',o);$('#mpanel').classList.toggle('open',o);$('#menuOverlay').classList.toggle('open',o)};
 $('#menuOverlay').onclick=closeMenu;
-document.querySelectorAll('.msec h3').forEach(h=>h.onclick=()=>h.parentNode.classList.toggle('collapsed'));
+document.querySelectorAll('.msec h3').forEach(h=>h.onclick=()=>{const p=h.parentNode,c=p.querySelector('.chips'),col=p.classList.contains('collapsed');
+  if(RM||!c.animate){p.classList.toggle('collapsed');c.style.display=col?'':'none';return}
+  if(col){p.classList.remove('collapsed');c.style.display='';const hh=c.offsetHeight;c.animate([{height:'0px',opacity:0},{height:hh+'px',opacity:1}],{duration:240,easing:EASE})}
+  else{const hh=c.offsetHeight;p.classList.add('collapsed');c.animate([{height:hh+'px',opacity:1},{height:'0px',opacity:0}],{duration:240,easing:EASE}).onfinish=()=>{c.style.display='none'}}});
 $('#infoBtn').onclick=()=>{closeMenu();openModal('디지랩 EVO',['디지몬 스토리 사이버 슬루스 / 해커즈 메모리의 진화 루트 탐색 도우미입니다.','출발·도착 디지몬 사이에 배우고 싶은 스킬을 넣으면, 그 스킬을 모두 배우는 진화·퇴화 루트를 찾아줍니다.','로그인하면 찾은 루트를 내 루트에 저장할 수 있습니다.'].map(t=>`<div class="ibrow"><span class="idash">-</span><span>${t}</span></div>`).join(''))};
 // ---------- 보기 전환 ----------
 const VIEWS=['route','dex','skill','tree','my'];let CUR='route';const QS={dex:'',skill:'',tree:''};
@@ -509,6 +514,16 @@ $('#hlogo').onclick=$('#htitle').onclick=()=>view('route');
 $('#q').addEventListener('input',()=>{QS[CUR]=$('#q').value;if(CUR==='dex')drawDex();else if(CUR==='skill')drawSkillView();else if(CUR==='tree')treeSearch()});
 $('#tq').addEventListener('input',()=>{QS.tree=$('#tq').value;treeSearch()});
 $('#qclear').onclick=()=>{$('#q').value='';QS[CUR]='';$('#q').dispatchEvent(new Event('input'))};
+// ---------- 늘어남/줄어듦 애니메이션 ----------
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EASE='cubic-bezier(.4,0,.2,1)';
+function growIn(el){if(!el||RM||!el.animate)return;const cs=getComputedStyle(el),h=el.offsetHeight;
+  const k=[{height:'0px',opacity:0,marginTop:'0px',marginBottom:'0px',paddingTop:'0px',paddingBottom:'0px'},{height:h+'px',opacity:1,marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom}];
+  el.style.overflow='hidden';const a=el.animate(k,{duration:260,easing:EASE});a.onfinish=a.oncancel=()=>{el.style.overflow=''}}
+function shrinkOut(el,cb){if(!el||RM||!el.animate){cb();return}if(el._gone)return;el._gone=1;const cs=getComputedStyle(el),h=el.offsetHeight;
+  el.style.overflow='hidden';const a=el.animate([{height:h+'px',opacity:1,marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom},{height:'0px',opacity:0,marginTop:'0px',marginBottom:'0px',paddingTop:'0px',paddingBottom:'0px'}],{duration:220,easing:EASE,fill:'forwards'});
+  a.onfinish=()=>cb()}
+function popIn(el){if(!el||RM||!el.animate)return;el.animate([{opacity:0,transform:'scale(.7)'},{opacity:1,transform:'scale(1)'}],{duration:200,easing:EASE})}
+function popOut(el,cb){if(!el||RM||!el.animate){cb();return}if(el._gone)return;el._gone=1;el.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.7)'}],{duration:160,easing:EASE,fill:'forwards'}).onfinish=cb}
 // ---------- 선택기 ----------
 function picker(root,items,onPick,ph){
   root.innerHTML=`<div class="pick"><input placeholder="${ph}" autocomplete="off"><div class="drop"></div></div>`;
@@ -525,13 +540,17 @@ const monItems=D.map((m,i)=>({label:m.ko,sub:`No.${String(m.no).padStart(3,'0')}
 const skillItems=skillIds.map(id=>({label:M[id].n,sub:sigH[id]?'필살기':'계승기',value:id}));
 // ---------- 루트 입력 상태 ----------
 let S={start:null,end:null,skills:[],bans:[],mode:'easy',avF:false,avT:false};
+let selShown={start:null,end:null},skShown=[];
 function drawSel(){
   for(const [k,box] of [['start','#pk-start'],['end','#pk-end']]){
     const host=$(box);host.querySelector('.rrow')?.remove();
     if(S[k]!=null){const m=D[S[k]];host.insertAdjacentHTML('beforeend',`<div class="rrow sm"><img src="${img(S[k])}"><div style="flex:1"><div class="nm">${esc(m.ko)}</div></div><button class="xb" data-k="${k}" aria-label="지우기">×</button></div>`);
-      host.querySelector('.xb').onclick=()=>{S[k]=null;drawSel()}}}
-  $('#skills').innerHTML=S.skills.map((id,k)=>`<span class="chip tag">${esc(M[id].n)}<span class="x" data-k="${k}">×</span></span>`).join('');
-  $('#skills').querySelectorAll('.x').forEach(b=>b.onclick=()=>{S.skills.splice(+b.dataset.k,1);drawSel()});
+      const card=host.querySelector('.rrow');if(selShown[k]!==S[k])growIn(card);
+      host.querySelector('.xb').onclick=()=>shrinkOut(card,()=>{S[k]=null;selShown[k]=null;drawSel()})}
+    selShown[k]=S[k]}
+  const sk=$('#skills');sk.innerHTML=S.skills.map((id,k)=>`<span class="chip tag">${esc(M[id].n)}<span class="x" data-k="${k}">×</span></span>`).join('');
+  sk.querySelectorAll('.chip').forEach((c,k)=>{if(!skShown.includes(S.skills[k]))popIn(c);c.querySelector('.x').onclick=()=>popOut(c,()=>{S.skills.splice(k,1);drawSel()})});
+  skShown=S.skills.slice();
   $('#wc').textContent=`${S.skills.length}/8`;
 }
 picker($('#pk-start'),monItems,v=>{S.start=v;drawSel()},'디지몬 이름 검색');
@@ -607,7 +626,7 @@ function runRoute(){
   if(res.approx)html+=`<div class="hintx">계산량이 많아서 근사 탐색으로 찾았어요. 최적 루트와 몇 % 안쪽으로 차이 날 수 있어요.</div>`;
   if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 스킬: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
   html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 루트 저장</button></div></div>`;
-  r.innerHTML=html;LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,visit:f.visit}:null)))};
+  r.innerHTML=html;growIn(r.querySelector('.rcard'));LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,visit:f.visit}:null)))};
   r.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
   $('#saveRoute').onclick=askSaveRoute;
 }
@@ -764,7 +783,7 @@ function drawMy(){
   if(!ROUTES.length){host.innerHTML='<div class="empty" style="padding:30px 0">저장한 루트가 없어요.<br>루트를 찾은 뒤 ‘이 루트 저장’을 눌러보세요.</div>';return}
   host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div style="flex:1;min-width:0"><div class="nm">${esc(r.name)}</div></div><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"><div class="hintx" style="margin:0">불러오는 중…</div></div></div>`).join('')}</div>`;
   host.querySelectorAll('.mycard').forEach(row=>{const id=row.dataset.id;
-    row.querySelector('[data-a=del]').onclick=()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();drawMy()}});
+    row.querySelector('[data-a=del]').onclick=()=>shrinkOut(row,()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();if(ROUTES.length){row.remove()}else drawMy()})});
   const todo=[...host.querySelectorAll('.mycard')];
   const next=()=>{if(tok!==myTok)return;const row=todo.shift();if(!row)return;const r=ROUTES.find(x=>x.id===row.dataset.id);const el=row.querySelector('.mys');
     try{let p=r.path,got=r.got,st=r.st;if(!p){let c=myCache.get(r.id);if(!c){const res=r.start==null?{err:1}:findRoute(r.start,r.end,r.skills,r.bans||[],r.mode||'easy',{F:!!r.avF,T:!!r.avT});c=res.err?{p:[]}:{p:res.path,got:res.path.map((i,k)=>res.learn?r.skills.filter((id,q)=>res.learn[k]>>q&1).join(','):''),st:res.steps};myCache.set(r.id,c)}p=c.p;got=c.got;st=c.st}
