@@ -90,7 +90,7 @@ body[data-view=route] header,body[data-view=my] header{padding-bottom:4px}
 .lab small{font-weight:600;font-size:11px}
 #ftogwrap{display:none;justify-content:center;margin-top:2px}body[data-view=dex] #ftogwrap{display:flex}
 #ftog{position:relative;width:64px;height:20px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}
-#ftog svg{width:22px;height:22px;fill:currentColor;transition:transform .3s;display:block;margin:-1px auto 0}
+#ftog svg{width:22px;height:22px;fill:currentColor;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round;transition:transform .3s;display:block;margin:-1px auto 0}
 #ftog.open svg{transform:rotate(180deg)}#ftog.has::after{content:'';position:absolute;top:3px;right:12px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
 body[data-view=dex] header{padding-bottom:3px}body[data-view=dex] .content{padding-top:0}.fpanel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
 .fin{overflow:hidden;min-height:0}.fpanel.open .fin{padding-bottom:10px}
@@ -264,7 +264,7 @@ input[type=range]{accent-color:var(--accent)}
     <button id="qclear" class="qclear" type="button" aria-label="검색어 지우기"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button>
   </div></div>
   <div class="searchwrap" id="pkwrap"><span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><div id="pk-root"></div></div>
-  <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M5 9 L12 17 L19 9 Z"/></svg></button></div>
+  <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
 </header>
 <div class="content">
  <section id="v-route">
