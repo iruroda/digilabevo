@@ -291,6 +291,7 @@ body.sdo{padding-bottom:170px}
 .mys.grabbing{cursor:grabbing;user-select:none}.mys .bi{cursor:pointer}
 .bi{position:relative}.bi .fl{position:absolute;left:-2px;top:-2px;width:15px;height:15px;color:var(--accent)}
 .fl{cursor:pointer}
+.sum b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sum .rsave{flex:0 0 auto;height:28px;padding:0 10px;margin-left:auto;font-size:11.5px;border-radius:999px}.sum .rx{width:30px;height:30px;margin-left:4px;border:0;background:none;color:var(--sub);padding:5px;display:flex;flex:0 0 auto;cursor:pointer}.sum .rx svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 </style>
 </head>
 <body data-view="route">
@@ -669,13 +670,13 @@ function runRoute(){
     const got=res.learn?S.skills.filter((id,q)=>res.learn[k]>>q&1):S.skills.filter(id=>!seen.has(id)&&m.moves.some(x=>x[0]===id));got.forEach(id=>seen.add(id));gotAll.push(got.join(','));
     if(k>0){if(D[p[k-1]].next.includes(i))nE++;else nD++}});
   body=routeFlow(p,gotAll,res.steps,'v');
-  let html=`<div class="rcard"><div class="sum"><b id="rname">${esc(routeSummary({start:S.start,end:S.end}))}</b><button class="ed" id="rnedit" type="button" aria-label="이름 변경">${PEN}</button></div>${routeNeeds(p,res.steps)}${body}`;
-  html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">내 루트에 저장</button></div></div>`;
+  let html=`<div class="rcard"><div class="sum"><b id="rname">${esc(routeSummary({start:S.start,end:S.end}))}</b><button class="ed" id="rnedit" type="button" aria-label="이름 변경">${PEN}</button><button class="btn rsave" id="saveRoute" type="button">내 루트에 저장</button><button class="rx" id="rclose" type="button" aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div>${routeNeeds(p,res.steps)}${body}`;
+  html+=`</div>`;
   r.innerHTML=html;growIn(r.querySelector('.rcard'));LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],avF:S.avF,avT:S.avT,P:{...S.P},cam0:S.cam0,pers:S.pers,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,T:f.T,F:f.F,visit:f.visit}:null)))};
   r.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
   CURNAME=routeSummary(LAST);SAVEDID=null;
   $('#rnedit').onclick=()=>editName($('#rname'),CURNAME,v=>{CURNAME=v;if(SAVEDID){const r=ROUTES.find(x=>x.id===SAVEDID);if(r){r.name=v;persist()}}});
-  $('#saveRoute').onclick=saveRoute;authGate();
+  $('#saveRoute').onclick=saveRoute;$('#rclose').onclick=()=>shrinkOut(r.querySelector('.rcard'),()=>{r.innerHTML='';LAST=null;SAVEDID=null});authGate();
 }
 $('#go').onclick=runRoute;
 // ---------- 도감 ----------
