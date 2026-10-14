@@ -863,20 +863,38 @@ function renderMys(row,r){const el=row.querySelector('.mys');
   try{const {p,got,st}=routeData(r);
     el.innerHTML=p.length?routeNeeds(p,st)+routeFlow(p,got,st,'h'):'';
     el.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
-    el.querySelectorAll('.fl').forEach(f=>{f.onmousedown=e=>e.stopPropagation();f.onclick=e=>{e.stopPropagation();cutRoute(r,+f.dataset.k);renderMys(row,r);el.scrollLeft=0}})}catch(e){console.error(e);el.innerHTML=''}
+    el.querySelectorAll('.fl').forEach(f=>{f.onmousedown=e=>e.stopPropagation();f.onclick=e=>{e.stopPropagation();cutAnim(row,r,+f.dataset.k)}})}catch(e){console.error(e);el.innerHTML=''}
   row.querySelector('[data-a=undo]').style.display=r.hist&&r.hist.length?'':'none'}
 const cleanSt=st=>JSON.parse(JSON.stringify((st||[]).map(s=>s?{fus:s.fus,n:s.n,tr:s.tr,fr:s.fr,T:s.T,F:s.F,visit:s.visit}:null)));
 function cutRoute(r,k){const d=routeData(r);if(k<1||k>=d.p.length)return;
   (r.hist=r.hist||[]).push({start:r.start,len:r.len,path:[...d.p],got:[...d.got],st:cleanSt(d.st)});if(r.hist.length>10)r.hist.shift();
   const st=cleanSt(d.st);r.path=d.p.slice(k);r.got=d.got.slice(k);r.st=st.slice(k);r.start=r.path[0];r.len=r.path.length-1;persist()}
 function undoRoute(r){const s=r.hist&&r.hist.pop();if(!s)return;r.start=s.start;r.len=s.len;r.path=s.path;r.got=s.got;r.st=s.st;persist()}
+const chipTexts=el=>[...el.querySelectorAll('.needs .tagp')].map(e=>e.textContent);
+function needsOf(r){const d=routeData(r),t=document.createElement('div');t.innerHTML=d.p.length?routeNeeds(d.p,d.st):'';return [...t.querySelectorAll('.tagp')].map(e=>e.textContent)}
+function needsOut(el,newT){const n=el.querySelector('.needs');if(!n)return;if(!newT.length)shrinkOut(n,()=>{});else [...n.querySelectorAll('.tagp')].filter(c=>!newT.includes(c.textContent)).forEach(c=>popOut(c,()=>{}))}
+function needsIn(el,oldT){const n=el.querySelector('.needs');if(!n)return;if(!oldT.length)growIn(n);else [...n.querySelectorAll('.tagp')].filter(c=>!oldT.includes(c.textContent)).forEach(popIn)}
+function cutAnim(row,r,k){const el=row.querySelector('.mys'),fl=el.querySelector('.flow');if(row._busy)return;
+  if(!fl||RM||!fl.animate){cutRoute(r,k);renderMys(row,r);el.scrollLeft=0;return}
+  row._busy=1;const ch=[...fl.children],off=ch[4*k].offsetLeft-ch[0].offsetLeft,oldT=chipTexts(el);
+  cutRoute(r,k);needsOut(el,needsOf(r));
+  ch.forEach((c,i)=>c.animate([{transform:'none',opacity:1},{transform:`translateX(${-off}px)`,opacity:i<4*k?0:1}],{duration:340,easing:EASE,fill:'forwards'}));
+  el.scrollTo({left:0,behavior:'smooth'});
+  setTimeout(()=>{renderMys(row,r);el.scrollLeft=0;needsIn(el,oldT);row._busy=0},360)}
+function undoAnim(row,r){const el=row.querySelector('.mys');if(row._busy||!r.hist||!r.hist.length)return;row._busy=1;
+  const oldLen=routeData(r).p.length,oldT=chipTexts(el);undoRoute(r);
+  const fin=()=>{renderMys(row,r);el.scrollLeft=0;const fl=el.querySelector('.flow');
+    if(fl&&!RM&&fl.animate){const ch=[...fl.children],n=routeData(r).p.length-oldLen,off=ch[4*n].offsetLeft-ch[0].offsetLeft;
+      ch.forEach((c,i)=>c.animate([{transform:`translateX(${-off}px)`,opacity:i<4*n?0:1},{transform:'none',opacity:1}],{duration:340,easing:EASE}))}
+    needsIn(el,oldT);row._busy=0};
+  if(RM)fin();else{needsOut(el,needsOf(r));setTimeout(fin,170)}}
 function drawMy(){
   const host=$('#myview');const tok=++myTok;
   if(!ROUTES.length){host.innerHTML='<div class="empty" style="padding:30px 0">저장한 루트가 없습니다.</div>';return}
   host.innerHTML=`<div class="rlist">${ROUTES.map(r=>`<div class="mycard" data-id="${r.id}"><div class="myh"><div class="myn"><div class="nm">${esc(r.name)}</div><button class="ed" data-a="ren" type="button" aria-label="이름 변경">${PEN}</button></div><button data-a="undo" type="button" aria-label="되돌리기" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 19.5H14.5a5.5 5.5 0 0 0 0-11H8" fill="none"/><path d="M9.5 4.8L4 8.5L9.5 12.2Z" fill="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button><button data-a="del" type="button" aria-label="삭제"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="mys"></div></div>`).join('')}</div>`;
   host.querySelectorAll('.mycard').forEach(row=>{const id=row.dataset.id;
     row.querySelector('[data-a=ren]').onclick=()=>editName(row.querySelector('.nm'),row.querySelector('.nm').textContent,v=>{const r=ROUTES.find(x=>x.id===id);if(r){r.name=v;persist()}});
-    row.querySelector('[data-a=undo]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(!r)return;undoRoute(r);renderMys(row,r);row.querySelector('.mys').scrollLeft=0};
+    row.querySelector('[data-a=undo]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(r)undoAnim(row,r)};
     row.querySelector('[data-a=del]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(!r)return;
       const b=openModal('내 루트 삭제',`<div style="word-break:keep-all"><b>${esc(r.name)}</b> 루트를 삭제합니다.</div><div class="btnrow" style="margin-top:16px"><button class="btn pri" id="delok" type="button">확인</button><button class="btn" id="delno" type="button">취소</button></div>`);
       b.querySelector('#delno').onclick=closeModal;
