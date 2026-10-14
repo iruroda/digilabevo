@@ -52,7 +52,8 @@ body[data-view=route] .subhd,body[data-view=my] .subhd{display:none}
 .viewtoggle button.active .bl{grid-template-columns:1fr;margin-left:4px}
 .treebox{scrollbar-width:none}.treebox::-webkit-scrollbar{display:none;width:0;height:0}
 .zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:3px}
-.zoom button{width:38px;height:32px;border:0;background:#767676;color:#fff;font-size:18px;font-weight:700;cursor:pointer;line-height:1}
+.zoom button{width:38px;height:32px;border:0;background:#767676;color:#fff;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.zoom svg{display:block;fill:none;stroke:currentColor;stroke-width:3.6;stroke-linecap:round}
 .zoom button:first-child{border-radius:999px 0 0 999px}.zoom button:last-child{border-radius:0 999px 999px 0}
 .zoom button:disabled{background:#c4c4c4;cursor:default}
 
@@ -61,10 +62,9 @@ body[data-view=route] .subhd,body[data-view=my] .subhd{display:none}
 .viewtoggle button{border-radius:8px;padding:6px 9px;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--bg);color:var(--txt);cursor:pointer;white-space:nowrap}
 .viewtoggle button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pkwrap,body[data-view=tree] #qwrap,body:not([data-view=tree]) #pkwrap{display:none}
-#pkwrap .pick input{padding:0 12px 0 38px}
 .tsearch{position:absolute;right:101px;bottom:12px;width:min(210px,calc(100% - 125px))}
-.tsearch input{width:100%;height:32px;padding:0 12px 0 34px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px;outline:none;color:var(--txt)}
-.tsearch input:focus{border-color:var(--accent)}.tsearch .qicon{left:11px}
+.tsearch input{width:100%;height:32px;padding:0 34px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px;outline:none;color:var(--txt)}
+.tsearch input:focus{border-color:var(--accent)}.tsearch .qicon{left:11px}.tsearch .qclear{right:6px}
 #menubtnWrap{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:33;display:flex;justify-content:flex-end;pointer-events:none}
 #menubtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:0;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;pointer-events:auto;flex-shrink:0}
 #menubtn span{display:block;width:19px;height:3px;border-radius:2px;background:var(--accent);transform-origin:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s ease}
@@ -76,6 +76,7 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 .search{width:100%;padding:9px 38px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--txt);font-size:14px;outline:none;height:34px}
 .search:focus{border-color:var(--accent)}
 .search::placeholder{color:rgba(var(--sub-rgb),.7)}
+.qicon svg{display:block}
 .qicon{z-index:2;position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;pointer-events:none}
 .qicon circle,.qicon path{stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;fill:none}
 .qclear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:22px;height:22px;padding:0;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -119,7 +120,7 @@ select.dn{-webkit-appearance:none;appearance:none;padding:0 14px 0 4px;text-alig
 .btn .ic16{margin-right:6px}
 .field+.field{margin-top:14px}
 .pick{position:relative}
-.pick input{width:100%;padding:0 12px;height:34px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;outline:none;color:var(--txt)}
+.pick input{width:100%;padding:0 34px 0 38px;height:34px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px;outline:none;color:var(--txt)}
 .pick input:focus{border-color:var(--accent)}
 .pick input::placeholder{color:rgba(var(--sub-rgb),.7)}
 .drop{position:absolute;left:0;right:0;top:calc(100% + 4px);max-height:260px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:20;opacity:0;visibility:hidden;transform:translateY(-6px);pointer-events:none;transition:opacity .18s,transform .18s,visibility 0s .18s}
@@ -186,6 +187,7 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .tr-e{fill:none;stroke:#c4c4c4;stroke-width:1;opacity:.6}
 .tr-e.on{stroke:var(--accent);stroke-width:2;opacity:1}.tr-e.up{stroke:var(--sub);stroke-width:2;opacity:1}
 .treebox svg.focus .tr-e:not(.on):not(.up){opacity:.08}
+.tn .rb{display:none;cursor:pointer}.tn.pk .rb{display:block}.tn .rbg{fill:var(--accent)}.tn .rbi{fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}.tn .rbi .rbf{fill:#fff}
 .tn .sh{fill:#8a8a8a;cursor:pointer}.tn .hit{fill:transparent;cursor:pointer}
 .tn text{font-size:11px;fill:var(--txt);font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:3px;pointer-events:none}
 .treebox svg.focus .tn:not(.on){opacity:.18}
@@ -276,10 +278,10 @@ input[type=range]{accent-color:var(--accent)}
 </header>
 <div class="subhd" id="subhd">
   <div class="qline"><div class="chips" id="chips-sk"></div><div class="searchwrap" id="qwrap">
-    <span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="q" class="search" type="text" placeholder="" autocomplete="off" aria-label="검색">
+    <span class="qicon"><svg viewBox="0.5 0.5 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="q" class="search" type="text" placeholder="" autocomplete="off" aria-label="검색">
     <button id="qclear" class="qclear" type="button" aria-label="검색어 지우기"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button>
   </div></div>
-  <div class="searchwrap" id="pkwrap"><span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><div id="pk-root"></div></div>
+  <div class="searchwrap" id="pkwrap"><div id="pk-root"></div></div>
   <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
   <div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl">세대</div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div>
 </div>
@@ -317,7 +319,7 @@ input[type=range]{accent-color:var(--accent)}
  <section id="v-my" hidden><div id="myview"></div></section>
  <section id="v-skill" hidden><div id="skview"></div></section>
  <section id="v-tree" hidden>
-  <div class="tbwrap"><div class="treebox sb" id="treebox"></div><div class="tsearch"><span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="tq" type="text" placeholder="그래프에서 이름 찾기" autocomplete="off" aria-label="그래프에서 이름 찾기"></div><div class="zoom"><button id="zout" type="button" aria-label="축소" title="축소">−</button><button id="zin" type="button" aria-label="확대" title="확대">+</button></div></div>
+  <div class="tbwrap"><div class="treebox sb" id="treebox"></div><div class="tsearch"><span class="qicon"><svg viewBox="0.5 0.5 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><input id="tq" type="text" autocomplete="off" aria-label="그래프에서 이름 찾기"><button id="tqclear" class="qclear" type="button" aria-label="검색어 지우기"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button></div><div class="zoom"><button id="zout" type="button" aria-label="축소" title="축소"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 12h16"/></svg></button><button id="zin" type="button" aria-label="확대" title="확대"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 12h16M12 4v16"/></svg></button></div></div>
  </section>
 </div>
 <div class="sitefooter">본 사이트는 팬이 만든 비공식 사이트로, 반다이남코, Toei Animation 등 디지몬 관련 권리자와는 어떠한 관계도 없습니다. 디지몬은 각 권리자의 상표이며, 모든 게임 콘텐츠와 이미지는 각 권리자에게 귀속됩니다.</div>
@@ -520,13 +522,14 @@ function slideViews(o,n,snap,H0){const so=$('#v-'+o),sn=$('#v-'+n),c=document.qu
   slideDone=fin;sn.addEventListener('transitionend',e=>{if(e.target===sn&&e.propertyName==='transform')fin()},{once:true});t=setTimeout(fin,360)}
 function view(v){closeModal();if(slideDone)slideDone();const old=VIEWS.find(k=>!$('#v-'+k).hidden),mo=old&&old!==v&&!matchMedia('(prefers-reduced-motion:reduce)').matches,snap=mo?subSnap():null,H0=$('#hdwrap').offsetHeight;
   CUR=v;document.body.dataset.view=v;VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
-  const q=$('#q');q.placeholder=PH[v]||'';q.value=QS[v]||'';window.scrollTo(0,0);
+  const q=$('#q');q.value=QS[v]||'';window.scrollTo(0,0);
   if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree();if(v==='my')drawMy();
   if(mo)slideViews(old,v,snap,H0)}
 VIEWS.forEach(k=>$('#vt-'+k).onclick=()=>view(k));
 $('#hlogo').onclick=$('#htitle').onclick=()=>view('route');
 $('#q').addEventListener('input',()=>{QS[CUR]=$('#q').value;if(CUR==='dex')drawDex();else if(CUR==='skill')drawSkillView();else if(CUR==='tree')treeSearch()});
 $('#tq').addEventListener('input',()=>{QS.tree=$('#tq').value;treeSearch()});
+$('#tqclear').onclick=()=>{$('#tq').value='';QS.tree='';treeSearch();$('#tq').focus()};
 $('#qclear').onclick=()=>{$('#q').value='';QS[CUR]='';$('#q').dispatchEvent(new Event('input'))};
 // ---------- 늘어남/줄어듦 애니메이션 ----------
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EASE='cubic-bezier(.4,0,.2,1)';
@@ -539,12 +542,14 @@ function shrinkOut(el,cb){if(!el||RM||!el.animate){cb();return}if(el._gone)retur
 function popIn(el){if(!el||RM||!el.animate)return;el.animate([{opacity:0,transform:'scale(.7)'},{opacity:1,transform:'scale(1)'}],{duration:200,easing:EASE})}
 function popOut(el,cb){if(!el||RM||!el.animate){cb();return}if(el._gone)return;el._gone=1;el.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(.7)'}],{duration:160,easing:EASE,fill:'forwards'}).onfinish=cb}
 // ---------- 선택기 ----------
+const SIC='<svg viewBox="0.5 0.5 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',XIC='<svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg>';
 function picker(root,items,onPick,ph){
-  root.innerHTML=`<div class="pick"><input placeholder="${ph}" autocomplete="off"><div class="drop"></div></div>`;
+  root.innerHTML=`<div class="pick"><span class="qicon">${SIC}</span><input aria-label="${ph}" autocomplete="off"><button class="qclear" type="button" aria-label="검색어 지우기">${XIC}</button><div class="drop"></div></div>`;
   const inp=root.querySelector('input'),drop=root.querySelector('.drop');let list=[],hl=0;
   const render=()=>{const q=inp.value;list=items.filter(it=>match(it.label,q)).slice(0,60);hl=0;
     drop.innerHTML=list.map((it,k)=>`<div data-k="${k}" class="${k==hl?'hl':''}">${it.icon?`<img src="${it.icon}">`:''}${esc(it.label)}<small>${esc(it.sub||'')}</small></div>`).join('')||'<div style="color:var(--sub)">결과 없음</div>';drop.classList.add('open')};
   const pick=k=>{if(!list[k])return;onPick(list[k].value);inp.value='';drop.classList.remove('open');inp.blur()};
+  root.querySelector('.qclear').addEventListener('mousedown',e=>{e.preventDefault();inp.value='';inp.focus();render()});
   inp.addEventListener('focus',render);inp.addEventListener('input',render);
   inp.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){hl=Math.max(0,Math.min(list.length-1,hl+(e.key==='ArrowDown'?1:-1)));[...drop.children].forEach((c,k)=>c.classList.toggle('hl',k==hl));drop.children[hl]?.scrollIntoView({block:'nearest'});e.preventDefault()}else if(e.key==='Enter'){pick(hl);e.preventDefault()}else if(e.key==='Escape')drop.classList.remove('open')});
   drop.addEventListener('mousedown',e=>{const t=e.target.closest('[data-k]');if(t){e.preventDefault();pick(+t.dataset.k)}});
@@ -723,7 +728,7 @@ const NS='http://www.w3.org/2000/svg',mk=(t,a,p)=>{const e=document.createElemen
 picker($('#pk-root'),monItems.filter((_,i)=>D[i].next.length||D[i].prev.length),v=>{TROOT=v;buildTree()},'시작 디지몬 고르기 (현재: 쿠라몬)');
 
 function buildTree(){
-  const r=TROOT;$('#pk-root input').placeholder=`시작 디지몬 고르기 (현재: ${D[r].ko})`;
+  const r=TROOT;
   const seen=new Set([r]),q=[r];while(q.length){const x=q.pop();D[x].next.forEach(t=>{if(!seen.has(t)){seen.add(t);q.push(t)}})}
   const nDown=seen.size-1;const up=new Set([r]);q.push(r);while(q.length){const x=q.pop();D[x].prev.forEach(t=>{if(!up.has(t)){up.add(t);q.push(t)}})}
   up.forEach(i=>seen.add(i));const nUp=up.size-1;const nodes=[...seen];
@@ -771,8 +776,12 @@ function buildTree(){
   nodes.forEach(i=>{const end=!D[i].next.length||SQ.has(i);const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
     if(D[i].stage==='유년기 I')mk('polygon',{points:'-2.87,-4.97 -2.87,4.97 5.73,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.3,class:'sh'},g);
     mk('text',{x:9,y:4},g).textContent=nm;N.set(i,g);
+    if(i!==r){const rb=mk('g',{class:'rb',transform:`translate(${9+tw(nm)+3},-15)`},g);mk('rect',{width:14,height:14,rx:3.5,class:'rbg'},rb);
+      const sv=mk('svg',{x:1.5,y:1.5,width:11,height:11,viewBox:'0 0 24 24',class:'rbi'},rb);
+      mk('rect',{x:2.2,y:2.2,width:7.6,height:7.6},sv);mk('rect',{x:14.4,y:14.4,width:7.6,height:7.6},sv);mk('path',{d:'M9.8 6 H15.5 Q18.5 6 16.7 8.4 L7.5 15.8 Q5.5 18.2 8.5 18.2 H10.3'},sv);mk('path',{d:'M9.9 16.2 L12.4 18.2 L9.9 20.2 Z',class:'rbf'},sv);
+      rb.onclick=e=>{e.stopPropagation();S.start=r;S.end=i;drawSel();view('route')};rb.onmousedown=e=>e.stopPropagation()}
     g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
-    g.onclick=()=>{if(sel===i){sel=null;unfocus()}else{sel=i;N.forEach((n,j)=>n.classList.toggle('sel',j===r||j===i));focus(i)}};});
+    g.onclick=()=>{if(sel===i){sel=null;N.forEach(n=>n.classList.remove('pk'));unfocus()}else{sel=i;N.forEach((n,j)=>{n.classList.toggle('sel',j===r||j===i);n.classList.toggle('pk',j===i)});focus(i)}};});
   TG_={N,nodes};info();treeSearch();
   const rt=N.get(r).getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);box.scrollTo({left:Math.max(0,+rt[1]*TZ-40),top:Math.max(0,+rt[2]*TZ-box.clientHeight/2)})}
 let TZ=1,TW_=[0,0];
