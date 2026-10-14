@@ -382,9 +382,9 @@ const tie=(v,n,tc,fr,fu)=>(fu?1e-3:0)+fr*5e-6+tc*2e-9+n*5e-12+(v?1e-13:0);
 const nBattles=(i,L)=>Math.ceil(EXPT[D[i].ec][Math.max(1,Math.min(99,L))-1]/BATTLE_EXP);
 function lvAfter(i,n){const t=EXPT[D[i].ec],e=n*BATTLE_EXP;let L=1;while(L<99&&t[L]<=e)L++;return L}
 const _ec=new Map();
-function edgeCurve(from,to){const key=from*1000+to;let o=_ec.get(key);if(o)return o;
+function edgeCurve(from,to,pi=-1){const key=from*1000+to+(pi+1)*1e6;let o=_ec.get(key);if(o)return o;
   const c=D[to].cond,nl=nBattles(from,c.LVL||1),nmax=Math.max(nl,nBattles(from,99)),rq=SK.map(k=>c[k]||0);o=[];let last=null;
-  for(let n=nl;n<=nmax;n++){const L=lvAfter(from,n);const tau=SK.map((k,j)=>rq[j]?Math.max(0,rq[j]-statAt(from,k,L)):0);
+  for(let n=nl;n<=nmax;n++){const L=lvAfter(from,n);const tau=SK.map((k,j)=>{if(!rq[j])return 0;const b=statAt(from,k,L);if(j!==pi)return Math.max(0,rq[j]-b);let t=Math.max(0,Math.ceil(rq[j]*100/105)-b);return j===0?Math.ceil(t/10)*10:t});
     if(last&&tau.every((v,j)=>v===last[j]))continue;o.push({n,tau});last=tau;if(tau.every(v=>v===0))break}
   _ec.set(key,o);return o}
 function findRouteHard(start,end,skills,ban,av){
@@ -393,13 +393,13 @@ function findRouteHard(start,end,skills,ban,av){
 }
 function solveHard(start,end,skills,ban,w,budget,av){
   const WF=av&&av.F?1000:1,WT=av&&av.T?1000:1;
-  const K=skills.length,FULL=(1<<K)-1,W=1<<K,seen=new Map(),heap=[],Z=[0,0,0,0,0,0],P0=av&&av.P?av.P.slice():Z,C0=(av&&av.C)||0;
+  const K=skills.length,FULL=(1<<K)-1,W=1<<K,seen=new Map(),heap=[],Z=[0,0,0,0,0,0],P0=av&&av.P?av.P.slice():Z,C0=(av&&av.C)||0,PI=av&&av.pi!=null?av.pi:-1;
   // 노드별 스킬 습득에 필요한 전투 횟수
   const sn=new Map();const need=x=>{let r=sn.get(x);if(!r){r=[];skills.forEach((id,k)=>{const mv=D[x].moves.find(q=>q[0]===id);if(mv)r.push([k,nBattles(x,mv[1])])});sn.set(x,r)}return r};
   const gain=(x,n)=>{let g=0;for(const [k,nb] of need(x))if(nb<=n)g|=1<<k;return g};
   const _eo=new Map();
   const opts=(x,nb,evo)=>{const key=x*1000+nb+(evo?0:1e7);let o=_eo.get(key);if(o)return o;
-    const cur=evo?edgeCurve(x,nb):[{n:0,tau:Z}],nl=cur[0].n,ns=new Set(cur.map(q=>q.n));
+    const cur=evo?edgeCurve(x,nb,PI):[{n:0,tau:Z}],nl=cur[0].n,ns=new Set(cur.map(q=>q.n));
     for(const [,b] of need(x))if(b>=nl)ns.add(b);
     const list=[...ns].sort((p,q)=>p-q);o=[];let lp=null,lg=-1;
     for(const n of list){let st=cur[0];for(const q of cur)if(q.n<=n)st=q;const g=gain(x,n);
@@ -444,7 +444,7 @@ function solveHard(start,end,skills,ban,w,budget,av){
         if(pT&&pm===mask2&&T2.every((t,j)=>t===pT[j]))continue;pT=T2;pm=mask2;
         let tc=0;const tr=T2.map((t,j)=>{const d=t-s.T[j];if(d>0)tc+=j===0?Math.ceil(d/10):d;return d});
         const F2=Math.max(s.F,cam),fr=F2-s.F,v=(s.b===0||o.n>0)?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n+v+tc*WT+fr*WF+fu+tie(v,o.n,tc,fr,fu),r:s.r+o.n+v+tc+fr+fu,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,g:mask2&~s.mask}})}}
+        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n+v+tc*WT+fr*WF+fu+tie(v,o.n,tc,fr,fu),r:s.r+o.n+v+tc+fr+fu,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,T:T2,F:F2,g:mask2&~s.mask}})}}
   }
   return {err:'이 조건으로는 갈 수 있는 루트가 없어요.'};
 }
@@ -554,7 +554,8 @@ const monItems=D.map((m,i)=>({label:m.ko,sub:`No.${String(m.no).padStart(3,'0')}
 const skillItems=skillIds.map(id=>({label:M[id].n,sub:sigH[id]?'필살기':'계승기',value:id}));
 // ---------- 루트 입력 상태 ----------
 let S={start:null,end:null,skills:[],bans:[],mode:'easy',avF:false,avT:false,P:{HP:0,SP:0,ATK:0,DEF:0,INT:0,SPD:0},cam0:0,pers:''};
-const initOf=o=>({P:SK.map(k=>(o.P&&o.P[k])||0),C:o.cam0||0});
+const PERS=['내구형','활력형','공격형','방어형','지력형','민첩형'];
+const initOf=o=>({P:SK.map(k=>(o.P&&o.P[k])||0),C:o.cam0||0,pi:PERS.indexOf(o.pers)});
 let selShown={start:null,end:null},skShown=[];
 function drawSel(){
   for(const [k,box] of [['start','#pk-start'],['end','#pk-end']]){
@@ -607,21 +608,21 @@ function stepActs(p,k,got,steps){const m=D[p[k]],a=[];
   if(isMC(p[k],to)){a.push(`<b>${esc(ro(D[to].ko))} 모드 체인지한다</b>`);return a}
   if(!evo){a.push(`<b>${esc(ro(D[to].ko))} 퇴화한다</b>`);return a}
   if(c.LVL)a.push(`Lv.${c.LVL}에 도달한다`);
-  if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`${CL[SK[j]]}를 ${d} 올린다`)});
+  if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`특훈 ${CL[SK[j]]}를 ${f.T?f.T[j]:d}까지 올린다`)});
   if(c.ABI)a.push(`${CL.ABI} ${c.ABI}에 도달한다`);
   if(c.Fus){const pt=partner(p[k],to);a.push(`조그레스 진화: 우정 ${c.CAM||100}%의 ${pt!=null?esc(D[pt].ko):'다른 디지몬'} 필요 (사라짐)`)}
-  else if(f&&f.fr>0)a.push(`우정을 ${f.fr} 올린다`);
+  else if(f&&f.fr>0)a.push(`우정을 ${f.F!=null?f.F:f.fr}%까지 올린다`);
   if(c.Item)a.push(`${c.Item} 필요`);
   if(c.Clear)a.push('해커스 메모리 클리어 필요');
   a.push(`<b>${esc(ro(D[to].ko))} ${evo?'진화':'퇴화'}한다</b>`);return a}
 // 전체 루트에서 꼭 필요한 정보 (특훈 → 재능 → 우정 → 추가 조건)
-function routeNeeds(p,steps){const tr=[0,0,0,0,0,0];let abi=0,cam=0;const items=[],par=[];let clr=false;
+function routeNeeds(p,steps){const tr=[0,0,0,0,0,0],trT=[0,0,0,0,0,0];let abi=0,cam=0;const items=[],par=[];let clr=false;
   p.forEach((i,k)=>{if(!k)return;const c=D[i].cond,f=steps&&steps[k-1];if(isMC(p[k-1],i)||!D[p[k-1]].next.includes(i))return;
-    if(f&&f.tr)f.tr.forEach((d,j)=>{tr[j]+=d||0});
+    if(f&&f.tr)f.tr.forEach((d,j)=>{tr[j]+=d||0;if(f.T)trT[j]=Math.max(trT[j],f.T[j])});
     if(c.ABI)abi=Math.max(abi,c.ABI);
     if(c.Fus){const pt=partner(p[k-1],i);par.push(`우정 ${c.CAM||100}%의 ${pt!=null?D[pt].ko:'다른 디지몬'}`)}else if(f&&f.fr>0&&c.CAM)cam=Math.max(cam,c.CAM);
     if(c.Item&&!items.includes(c.Item))items.push(c.Item);if(c.Clear)clr=true});
-  const a=[];tr.forEach((d,j)=>{if(d>0)a.push(tp('',`특훈 ${CL[SK[j]]} ${d} 필요`))});
+  const a=[];tr.forEach((d,j)=>{if(d>0)a.push(tp('',`특훈 ${CL[SK[j]]} ${trT[j]||d} 필요`))});
   if(abi)a.push(tp('',`재능 ${abi} 필요`));
   if(cam)a.push(tp('',`우정 ${cam}% 필요`));
   items.forEach(t=>a.push(tp('',`${esc(t)} 필요`)));if(clr)a.push(tp('','해커스 메모리 클리어 필요'));
@@ -648,7 +649,7 @@ function runRoute(){
   if(res.approx)html+=`<div class="hintx">계산량이 많아서 근사 탐색으로 찾았어요. 최적 루트와 몇 % 안쪽으로 차이 날 수 있어요.</div>`;
   if(S.skills.length){const miss=S.skills.filter(id=>!seen.has(id));if(miss.length)html+=`<div class="hintx" style="color:var(--warm)">아직 못 모은 스킬: ${miss.map(id=>esc(M[id].n)).join(', ')}</div>`}
   html+=`<div class="btnrow" style="margin-top:12px"><button class="btn" id="saveRoute" type="button">이 루트 저장</button></div></div>`;
-  r.innerHTML=html;growIn(r.querySelector('.rcard'));LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,P:{...S.P},cam0:S.cam0,pers:S.pers,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,visit:f.visit}:null)))};
+  r.innerHTML=html;growIn(r.querySelector('.rcard'));LAST={start:S.start,end:S.end,skills:[...S.skills],bans:[...S.bans],mode:S.mode,avF:S.avF,avT:S.avT,P:{...S.P},cam0:S.cam0,pers:S.pers,len:p.length-1,path:[...p],got:gotAll,st:JSON.parse(JSON.stringify((res.steps||[]).map(f=>f?{fus:f.fus,n:f.n,tr:f.tr,fr:f.fr,T:f.T,F:f.F,visit:f.visit}:null)))};
   r.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
   $('#saveRoute').onclick=askSaveRoute;
 }
