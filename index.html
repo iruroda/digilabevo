@@ -479,9 +479,31 @@ $('#infoBtn').onclick=()=>{closeMenu();openModal('디지랩 EVO',['디지몬 스
 // ---------- 보기 전환 ----------
 const VIEWS=['route','dex','skill','tree','my'];let CUR='route';const QS={dex:'',skill:'',tree:''};
 const PH={dex:'디지몬 이름 검색 (초성 가능)',skill:'스킬 이름 검색',tree:'그래프에서 이름 찾기'};
-function view(v){closeModal();CUR=v;document.body.dataset.view=v;VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
+// 탭 전환: 최상단 헤더는 그대로, 서브헤더+본문이 한 장처럼 책장 넘기듯 좌우로 밀려 나가고 들어온다
+let slideDone=null;
+function subSnap(){const sh=$('#subhd');if(getComputedStyle(sh).display==='none')return null;
+  const c=sh.cloneNode(true),src=[sh,...sh.querySelectorAll('*')],dst=[c,...c.querySelectorAll('*')];
+  src.forEach((e,i)=>{dst[i].style.display=getComputedStyle(e).display;dst[i].removeAttribute('id')});
+  c.querySelectorAll('input').forEach((e,i)=>{e.value=sh.querySelectorAll('input')[i].value});
+  c.style.cssText+=';position:absolute;left:0;top:'+$('header').offsetHeight+'px;width:100%;pointer-events:none';return c}
+function slideViews(o,n,snap,H0){const so=$('#v-'+o),sn=$('#v-'+n),c=document.querySelector('.content'),hw=$('#hdwrap'),sh=$('#subhd');
+  if(slideDone)slideDone();
+  const dir=VIEWS.indexOf(n)>VIEWS.indexOf(o)?1:-1,cs=getComputedStyle(c),pad=parseFloat(cs.paddingLeft)||0,top=parseFloat(cs.paddingTop)||0,W=c.clientWidth,dH=H0-hw.offsetHeight;
+  const tr='transform .26s cubic-bezier(.33,0,.2,1)';
+  c.style.position='relative';c.style.overflowX='clip';hw.style.overflowX='clip';
+  so.hidden=false;so.style.cssText=`position:absolute;top:${top+dH}px;left:${pad}px;width:${W-pad*2}px;transform:translateX(0)`;
+  sn.style.transform=`translateX(${dir*W}px)`;sh.style.transform=`translateX(${dir*W}px)`;
+  if(snap){snap.style.transform='translateX(0)';hw.appendChild(snap)}
+  void c.offsetWidth;
+  [so,sn,sh,snap].forEach(e=>e&&(e.style.transition=tr));
+  requestAnimationFrame(()=>{so.style.transform=`translateX(${-dir*W}px)`;sn.style.transform='translateX(0)';sh.style.transform='translateX(0)';if(snap)snap.style.transform=`translateX(${-dir*W}px)`});
+  let done=false,t;const fin=()=>{if(done)return;done=true;clearTimeout(t);slideDone=null;so.hidden=true;so.style.cssText='';sn.style.transform='';sn.style.transition='';sh.style.transform='';sh.style.transition='';snap&&snap.remove();c.style.position='';c.style.overflowX='';hw.style.overflowX=''};
+  slideDone=fin;sn.addEventListener('transitionend',e=>{if(e.target===sn&&e.propertyName==='transform')fin()},{once:true});t=setTimeout(fin,360)}
+function view(v){closeModal();if(slideDone)slideDone();const old=VIEWS.find(k=>!$('#v-'+k).hidden),mo=old&&old!==v&&!matchMedia('(prefers-reduced-motion:reduce)').matches,snap=mo?subSnap():null,H0=$('#hdwrap').offsetHeight;
+  CUR=v;document.body.dataset.view=v;VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
   const q=$('#q');q.placeholder=PH[v]||'';q.value=QS[v]||'';window.scrollTo(0,0);
-  if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree();if(v==='my')drawMy()}
+  if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree();if(v==='my')drawMy();
+  if(mo)slideViews(old,v,snap,H0)}
 VIEWS.forEach(k=>$('#vt-'+k).onclick=()=>view(k));
 $('#hlogo').onclick=$('#htitle').onclick=()=>view('route');
 $('#q').addEventListener('input',()=>{QS[CUR]=$('#q').value;if(CUR==='dex')drawDex();else if(CUR==='skill')drawSkillView();else if(CUR==='tree')treeSearch()});
