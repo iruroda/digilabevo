@@ -773,18 +773,19 @@ function buildTree(){
   nodes.forEach(i=>{const end=!D[i].next.length||SQ.has(i);const g=mk('g',{class:'tn'+(end?' end':'')+(i===r?' sel root':''),transform:`translate(${X(i)},${Y(i)})`},ng);const nm=D[i].ko;mk('rect',{x:-9,y:-9,width:14+tw(nm),height:18,class:'hit',rx:4},g);
     if(D[i].stage==='유년기 I')mk('polygon',{points:'-2.87,-4.97 -2.87,4.97 5.73,0',class:'sh'},g);else if(end)mk('rect',{x:-4.3,y:-4.3,width:8.6,height:8.6,class:'sh'},g);else mk('circle',{r:4.3,class:'sh'},g);
     mk('text',{x:9,y:4},g).textContent=nm;N.set(i,g);
-    if(i!==r){const rb=mk('g',{class:'rb',transform:`translate(${9+tw(nm)+3},-15)`},g);mk('rect',{width:14,height:14,rx:3.5,class:'rbg'},rb);
-      const sv=mk('svg',{x:1.5,y:1.5,width:11,height:11,viewBox:'0 0 24 24',class:'rbi'},rb);
+    if(i!==r){const rb=mk('g',{class:'rb','data-x':9+tw(nm)+3,transform:`translate(${9+tw(nm)+3},-1) scale(${1/TZ}) translate(0,-18)`},g);mk('rect',{width:18,height:18,rx:4.5,class:'rbg'},rb);
+      const sv=mk('svg',{x:2,y:2,width:14,height:14,viewBox:'0 0 24 24',class:'rbi'},rb);
       mk('rect',{x:2.2,y:2.2,width:7.6,height:7.6},sv);mk('rect',{x:14.4,y:14.4,width:7.6,height:7.6},sv);mk('path',{d:'M9.8 6 H15.5 Q18.5 6 16.7 8.4 L7.5 15.8 Q5.5 18.2 8.5 18.2 H10.3'},sv);mk('path',{d:'M9.9 16.2 L12.4 18.2 L9.9 20.2 Z',class:'rbf'},sv);
       rb.onclick=e=>{e.stopPropagation();S.start=r;S.end=i;drawSel();view('route')};rb.onmousedown=e=>e.stopPropagation()}
     g.onmouseenter=()=>focus(i);g.onmouseleave=()=>{sel==null?unfocus():focus(sel)};
     g.onclick=()=>{if(sel===i){sel=null;N.forEach(n=>n.classList.remove('pk'));unfocus()}else{sel=i;N.forEach((n,j)=>{n.classList.toggle('sel',j===r||j===i);n.classList.toggle('pk',j===i)});focus(i)}};});
-  TG_={N,nodes};info();treeSearch();
+  TG_={N,nodes};rbScale();info();treeSearch();
   const rt=N.get(r).getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);box.scrollTo({left:Math.max(0,+rt[1]*TZ-40),top:Math.max(0,+rt[2]*TZ-box.clientHeight/2)})}
 let TZ=1,TW_=[0,0];
 function setZoom(z,cx,cy){const b=$('#treebox'),sv=b.querySelector('svg');z=Math.min(2,Math.max(.5,Math.round(z*1000)/1000));if(!sv||z===TZ){return}
   if(cx==null){cx=b.clientWidth/2;cy=b.clientHeight/2}const ux=(b.scrollLeft+cx)/TZ,uy=(b.scrollTop+cy)/TZ;TZ=z;
-  sv.setAttribute('width',TW_[0]*z);sv.setAttribute('height',TW_[1]*z);b.scrollLeft=ux*z-cx;b.scrollTop=uy*z-cy;zoomBtns()}
+  sv.setAttribute('width',TW_[0]*z);sv.setAttribute('height',TW_[1]*z);b.scrollLeft=ux*z-cx;b.scrollTop=uy*z-cy;rbScale();zoomBtns()}
+function rbScale(){const s=1/TZ;document.querySelectorAll('#treebox .rb').forEach(e=>e.setAttribute('transform',`translate(${e.dataset.x},-1) scale(${s}) translate(0,-18)`))}
 function zoomBtns(){$('#zout').disabled=TZ<=.5;$('#zin').disabled=TZ>=2}
 (()=>{const b=$('#treebox');
 b.addEventListener('wheel',e=>{e.preventDefault();const r=b.getBoundingClientRect();setZoom(TZ*Math.exp(-Math.sign(e.deltaY)*Math.min(Math.abs(e.deltaY),100)*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
