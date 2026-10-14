@@ -632,7 +632,7 @@ const gridHtml=(items,rows,colW,perChar,minCols)=>{const {cols,sp}=packCols(item
   return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},14px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
 // 디지몬 박스에 쓰는 행동 (명사형): 스킬 습득 · Lv · 특훈 · 재능 · 우정
 function boxActs(p,k,got,steps){const m=D[p[k]],a=[];
-  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 습득${mv?` (Lv. ${mv[1]})`:''}`)});
+  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);a.push(`${esc(M[id].n)} 배움${mv?` (Lv. ${mv[1]})`:''}`)});
   if(k>=p.length-1)return a;
   const to=p[k+1],c=D[to].cond,f=steps&&steps[k];
   if(isMC(p[k],to)||!m.next.includes(to))return a;
@@ -704,7 +704,7 @@ function openDetail(i){
   const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
   <div class="btnrow"><button class="btn" id="as" type="button">${ICS}여기서 출발</button><button class="btn" id="ae" type="button">${ICE}여기로 도착</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
-  <div class="sec"><h3>스킬</h3><table class="mv"><tr><th></th><th style="text-align:left">스킬</th><th>습득</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
+  <div class="sec"><h3>스킬</h3><table class="mv"><tr><th></th><th style="text-align:left">스킬</th><th>배움</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
   <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
   <div class="sec"><h3>퇴화</h3>${evo(m.prev,'prev')}</div>
   <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>${MCP[i].length?`<div class="sec"><h3>모드 체인지</h3>${evo(MCP[i],'mc')}</div>`:''}
