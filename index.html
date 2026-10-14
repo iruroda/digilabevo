@@ -92,7 +92,7 @@ body[data-view=route] header,body[data-view=my] header{padding-bottom:4px}
 #ftog{position:relative;width:64px;height:20px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}
 #ftog svg{width:22px;height:22px;fill:currentColor;transition:transform .3s;display:block;margin:-1px auto 0}
 #ftog.open svg{transform:rotate(180deg)}#ftog.has::after{content:'';position:absolute;top:3px;right:12px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
-.fpanel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
+body[data-view=dex] header{padding-bottom:3px}.fpanel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
 .fin{overflow:hidden;min-height:0}.fpanel.open .fin{padding-bottom:10px}
 .fsec{background:#fff;border:1px solid var(--border);border-radius:13px;padding:10px 12px;margin-bottom:6px}.fsec:last-child{margin-bottom:0}
 .fl{font-size:12px;color:var(--sub);font-weight:700}.fsec .chips{padding:8px 0 0}
@@ -286,7 +286,7 @@ input[type=range]{accent-color:var(--accent)}
   <div class="btnrow" style="margin-bottom:12px"><button class="btn pri" id="go" type="button">루트 찾기</button></div>
   <div id="result"></div>
  </section>
- <section id="v-dex" hidden><div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl">세대</div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div><div class="count" id="cnt"></div><div class="grid" id="cards"></div></section>
+ <section id="v-dex" hidden><div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl">세대</div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div><div class="grid" id="cards"></div></section>
  <section id="v-my" hidden><div id="myview"></div></section>
  <section id="v-skill" hidden><div id="skview"></div></section>
  <section id="v-tree" hidden>
@@ -580,16 +580,16 @@ function runRoute(){
 }
 $('#go').onclick=runRoute;
 // ---------- 도감 ----------
-const F={stage:null,type:null,attr:null};
+const F={stage:new Set(),type:new Set(),attr:new Set()};
 const stages=[...new Set(D.map(m=>m.stage))];
-function chipset(id,pairs,key){const host=$(id);host.innerHTML=pairs.map(([v,l])=>`<button class="chip${F[key]===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
-  host.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{F[key]=F[key]===b.dataset.v?null:b.dataset.v;chipset(id,pairs,key);if(CUR!=='dex')view('dex');else drawDex();filterMark()})}
-function filterMark(){$('#ftog').classList.toggle('has',!!(F.stage||F.type||F.attr))}
+function chipset(id,pairs,key){const host=$(id),set=F[key];
+  host.innerHTML=[['',`전체`],...pairs].map(([v,l])=>`<button class="chip${v===''?(set.size?'':' active'):(set.has(v)?' active':'')}" data-v="${v}" type="button">${l}</button>`).join('');
+  host.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='')set.clear();else if(set.has(v))set.delete(v);else set.add(v);chipset(id,pairs,key);if(CUR!=='dex')view('dex');else drawDex();filterMark()})}
+function filterMark(){$('#ftog').classList.toggle('has',!!(F.stage.size||F.type.size||F.attr.size))}
 $('#ftog').onclick=()=>{const o=!$('#fpanel').classList.contains('open');$('#fpanel').classList.toggle('open',o);$('#ftog').classList.toggle('open',o);$('#ftog').setAttribute('aria-expanded',o)};
 function drawFilters(){chipset('#chips-stage',stages.map(s=>[s,s]),'stage');chipset('#chips-type',Object.entries(TYPE),'type');chipset('#chips-attr',Object.entries(ATTR),'attr')}
 function drawDex(){const q=QS.dex;
-  const list=D.map((m,i)=>i).filter(i=>{const m=D[i];return match(m.ko,q)&&(!F.stage||m.stage===F.stage)&&(!F.type||m.type===F.type)&&(!F.attr||m.attr===F.attr)});
-  $('#cnt').textContent=`${list.length}마리`;
+  const list=D.map((m,i)=>i).filter(i=>{const m=D[i];return match(m.ko,q)&&(!F.stage.size||F.stage.has(m.stage))&&(!F.type.size||F.type.has(m.type))&&(!F.attr.size||F.attr.has(m.attr))});
   $('#cards').innerHTML=list.map(i=>`<div class="card" data-i="${i}">${taI(D[i])}<span class="stg">${D[i].stage}</span><img loading="lazy" src="${img(i)}"><div class="nm"><span class="no">No.${String(D[i].no).padStart(3,'0')}</span>${esc(D[i].ko)}</div></div>`).join('')||'<div class="empty">조건에 맞는 디지몬이 없어요.</div>';
   $('#cards').querySelectorAll('.card').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i))}
 // ---------- 상세 팝업 ----------
