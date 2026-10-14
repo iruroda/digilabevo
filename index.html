@@ -117,6 +117,7 @@ select.dn{-webkit-appearance:none;appearance:none;padding:0 14px 0 4px;text-alig
 .tg i::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
 .tg input:checked+i{background:var(--accent)}.tg input:checked+i::after{transform:translateX(18px)}
 .ic16{width:19px;height:19px;vertical-align:-3px;margin-right:5px;flex:0 0 auto}
+.lab>span{display:inline-flex;align-items:center}.lab>span .ic16{vertical-align:0}
 .btn .ic16{margin-right:6px}
 .field+.field{margin-top:14px}
 .pick{position:relative}
@@ -676,7 +677,7 @@ function drawDex(){const q=QS.dex;
 // ---------- 상세 팝업 ----------
 function openDetail(i){
   const m=D[i];const want=new Set(S.skills);
-  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td style="width:22px">${skI(x,18)}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${lv||'-'}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${sig?'필살기':'계승기'}</td></tr>`};
+  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td style="width:22px">${skI(x,18)}</td><td><b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${sig?1:(lv||'-')}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td>${sig?'필살기':'계승기'}</td></tr>`};
   const evo=(arr,dir)=>arr.filter(j=>dir==='mc'||!isMC(i,j)).map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div class="nm">${esc(D[j].ko)}</div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">야생 출현 정보 없음</div>';
   const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['INT','INT'],['DEF','DEF'],['SPD','SPD']];
@@ -707,7 +708,7 @@ function openDetail(i){
 let SKSEL=null;
 function skBody(id){const x=M[id];const sg=!!sigH[id];const hs=sg?sigH[id].map(i=>[i,0]).sort((a,b)=>D[a[0]].no-D[b[0]].no):holders[id].map(i=>[i,D[i].moves.find(m=>m[0]===id)[1]]).sort((a,b)=>a[1]-b[1]||D[a[0]].no-D[b[0]].no);
   return `<div class="accp"><div class="skd"><div class="hintx" style="flex:1;margin:0">${esc(x.d||'')}</div><div class="sks"><span>SP ${x.sp??'-'}</span>${sg?'':`<button class="addsk" type="button" aria-label="이 스킬로 루트 찾기">${$('#vt-route svg').outerHTML}</button>`}</div></div>
-   <div style="margin-top:10px">${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div></div>${sg?'':tp('','Lv.'+lv)}</div>`).join('')}</div></div>`}
+   <div style="margin-top:10px">${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div></div>${tp('','Lv.'+(sg?1:lv))}</div>`).join('')}</div></div>`}
 function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.querySelector('.accin').innerHTML=skBody(id);a.dataset.built=1;
     a.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
     const ab=a.querySelector('.addsk');if(ab)ab.onclick=()=>{if(!S.skills.includes(id)&&S.skills.length<8)S.skills.push(id);drawSel();view('route')}}
