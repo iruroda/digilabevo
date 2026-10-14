@@ -63,7 +63,6 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 .tsearch input{width:100%;height:32px;padding:0 12px 0 34px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px;outline:none;color:var(--txt)}
 .tsearch input:focus{border-color:var(--accent)}.tsearch .qicon{left:11px}
 body[data-view=route],body[data-view=my]{--hpb:4px}
-body[data-view=dex]{--hpb:3px;--cpt:0px} /* 도감: 삼각형 모양 아래 8px(버튼 칸 안 여백 5px + 3px) 뒤에 바로 서랍/카드 */
 #menubtnWrap{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:33;display:flex;justify-content:flex-end;pointer-events:none}
 #menubtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:0;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;pointer-events:auto;flex-shrink:0}
 #menubtn span{display:block;width:19px;height:3px;border-radius:2px;background:var(--accent);transform-origin:center;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .2s ease}
@@ -91,12 +90,13 @@ body[data-view=dex]{--hpb:3px;--cpt:0px} /* 도감: 삼각형 모양 아래 8px(
 .rcard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:8px}
 .lab{font-size:12px;color:var(--sub);font-weight:700;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
 .lab small{font-weight:600;font-size:11px}
-#ftogwrap{display:none;justify-content:center;margin-top:2px}body[data-view=dex] #ftogwrap{display:flex}
-#ftog{position:relative;width:64px;height:20px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}
-#ftog svg{width:22px;height:22px;fill:currentColor;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round;transition:transform .3s;display:block;margin:-1px auto 0}
-#ftog.open svg{transform:rotate(180deg)}#ftog.has::after{content:'';position:absolute;top:3px;right:12px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
-.fpanel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
-.fin{overflow:hidden;min-height:0}.fpanel.open .fin{padding-bottom:10px}
+#ftogwrap{display:none;justify-content:center;margin-top:8px}body[data-view=dex] #ftogwrap{display:flex}
+#ftog{position:relative;width:14.3px;height:10.1px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0;display:block}
+#ftog::before{content:'';position:absolute;inset:-8px -26px}
+#ftog svg{width:100%;height:100%;fill:currentColor;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round;transition:transform .3s;display:block}
+#ftog.open svg{transform:rotate(180deg)}#ftog.has::after{content:'';position:absolute;top:-2px;right:-9px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
+.fpanel{display:none}body[data-view=dex] .fpanel{display:grid}.fpanel{grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
+.fin{overflow:hidden;min-height:0}.fin>.fsec:first-child{margin-top:8px}body[data-view=dex].fopen header{position:relative}
 .fsec{background:#fff;border:1px solid var(--border);border-radius:13px;padding:10px 12px;margin-bottom:6px}.fsec:last-child{margin-bottom:0}
 .fl{font-size:12px;color:var(--sub);font-weight:700}.fsec .chips{padding:8px 0 0}
 img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec 100%);border:2px solid #3086c8;border-radius:8px;padding:1px;box-sizing:border-box;object-fit:contain}
@@ -267,7 +267,8 @@ input[type=range]{accent-color:var(--accent)}
     <button id="qclear" class="qclear" type="button" aria-label="검색어 지우기"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button>
   </div></div>
   <div class="searchwrap" id="pkwrap"><span class="qicon"><svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><div id="pk-root"></div></div>
-  <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
+  <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
+  <div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl">세대</div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div>
 </header>
 <div class="content">
  <section id="v-route">
@@ -289,7 +290,7 @@ input[type=range]{accent-color:var(--accent)}
   <div class="btnrow" style="margin-bottom:12px"><button class="btn pri" id="go" type="button">루트 찾기</button></div>
   <div id="result"></div>
  </section>
- <section id="v-dex" hidden><div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl">세대</div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div><div class="grid" id="cards"></div></section>
+ <section id="v-dex" hidden><div class="grid" id="cards"></div></section>
  <section id="v-my" hidden><div id="myview"></div></section>
  <section id="v-skill" hidden><div id="skview"></div></section>
  <section id="v-tree" hidden>
@@ -589,7 +590,7 @@ function chipset(id,pairs,key){const host=$(id),set=F[key];
   host.innerHTML=[['',`전체`],...pairs].map(([v,l])=>`<button class="chip${v===''?(set.size?'':' active'):(set.has(v)?' active':'')}" data-v="${v}" type="button">${l}</button>`).join('');
   host.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='')set.clear();else if(set.has(v))set.delete(v);else set.add(v);chipset(id,pairs,key);if(CUR!=='dex')view('dex');else drawDex();filterMark()})}
 function filterMark(){$('#ftog').classList.toggle('has',!!(F.stage.size||F.type.size||F.attr.size))}
-$('#ftog').onclick=()=>{const o=!$('#fpanel').classList.contains('open');$('#fpanel').classList.toggle('open',o);$('#ftog').classList.toggle('open',o);$('#ftog').setAttribute('aria-expanded',o)};
+$('#ftog').onclick=()=>{const o=!$('#fpanel').classList.contains('open');document.body.classList.toggle('fopen',o);if(o)window.scrollTo(0,0);$('#fpanel').classList.toggle('open',o);$('#ftog').classList.toggle('open',o);$('#ftog').setAttribute('aria-expanded',o)};
 function drawFilters(){chipset('#chips-stage',stages.map(s=>[s,s]),'stage');chipset('#chips-type',Object.entries(TYPE),'type');chipset('#chips-attr',Object.entries(ATTR),'attr')}
 function drawDex(){const q=QS.dex;
   const list=D.map((m,i)=>i).filter(i=>{const m=D[i];return match(m.ko,q)&&(!F.stage.size||F.stage.has(m.stage))&&(!F.type.size||F.type.has(m.type))&&(!F.attr.size||F.attr.has(m.attr))});
