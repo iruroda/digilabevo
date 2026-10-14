@@ -181,7 +181,7 @@ tr+tr td{border-top:1px solid var(--border)}
 tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .treebox{background:#fff;border:1px solid var(--border);border-radius:13px;overflow:auto;height:calc(100vh - 250px);min-height:300px}
 .treebox svg{display:block}
-.treebox{cursor:grab}.treebox.grabbing{cursor:grabbing;user-select:none}.treebox .tn{cursor:pointer}
+.treebox{touch-action:pan-x pan-y;cursor:grab}.treebox.grabbing{cursor:grabbing;user-select:none}.treebox .tn{cursor:pointer}
 .tr-e{fill:none;stroke:#c4c4c4;stroke-width:1;opacity:.6}
 .tr-e.on{stroke:var(--accent);stroke-width:2;opacity:1}.tr-e.up{stroke:var(--sub);stroke-width:2;opacity:1}
 .treebox svg.focus .tr-e:not(.on):not(.up){opacity:.08}
@@ -788,6 +788,11 @@ function setZoom(z,cx,cy){const b=$('#treebox'),sv=b.querySelector('svg');z=Math
 function zoomBtns(){$('#zout').disabled=TZ<=.5;$('#zin').disabled=TZ>=2}
 (()=>{const b=$('#treebox');
 b.addEventListener('wheel',e=>{e.preventDefault();const r=b.getBoundingClientRect();setZoom(TZ*Math.exp(-Math.sign(e.deltaY)*Math.min(Math.abs(e.deltaY),100)*.0015),e.clientX-r.left,e.clientY-r.top)},{passive:false});
+let pd=0,pz=1;const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+b.addEventListener('touchstart',e=>{if(e.touches.length===2){pd=dist(e.touches);pz=TZ;e.preventDefault()}},{passive:false});
+b.addEventListener('touchmove',e=>{if(e.touches.length===2&&pd){e.preventDefault();const r=b.getBoundingClientRect(),t=e.touches;setZoom(pz*dist(t)/pd,(t[0].clientX+t[1].clientX)/2-r.left,(t[0].clientY+t[1].clientY)/2-r.top)}},{passive:false});
+b.addEventListener('touchend',e=>{if(e.touches.length<2)pd=0});
+['gesturestart','gesturechange'].forEach(n=>b.addEventListener(n,e=>e.preventDefault()));
 $('#zin').onclick=()=>setZoom(TZ*1.25);$('#zout').onclick=()=>setZoom(TZ/1.25);zoomBtns()})();
 function treeSearch(){if(!TG_)return;const v=QS.tree.trim();TG_.N.forEach((n,i)=>n.classList.toggle('hl',!!v&&D[i].ko.includes(v)));
   if(v){const f=[...TG_.N].find(([i])=>D[i].ko.includes(v));if(f){const t=f[1].getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);$('#treebox').scrollTo({left:+t[1]*TZ-120,top:+t[2]*TZ-150,behavior:'smooth'})}}}
