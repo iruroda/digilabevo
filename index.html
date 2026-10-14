@@ -648,8 +648,8 @@ function routeFlow(p,got,steps,dir){
     const to=p[k+1],evo=m.next.includes(to);h+='<div class="ar ln"></div>';
     if(isMC(i,to))h+=`<div class="bx bv" style="width:${WE}px;height:46px"><div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">모드 체인지</div></div>`;
     else if(!evo)h+=`<div class="bx bv" style="width:${WE}px;height:30px"><div class="bt">${esc(ro(D[to].ko))} 퇴화</div></div>`;
-    else{const fu=!!D[to].cond.Fus,cw=Math.floor((WE-16)/2),cg=gridHtml(evoConds(i,to),fu?BRE-1:BRE,cw,[11,6.5],2);
-      h+=`<div class="bx be" style="width:${Math.max(WE,16+cg.cols*cw)}px;height:${BH}px">${fu?`<div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">조그레스 진화</div>`:`<div class="bt">${esc(ro(D[to].ko))} 진화</div>`}${cg.html}</div>`}
+    else{const fu=!!D[to].cond.Fus,one1=`${ro(D[to].ko)} 조그레스 진화`,two=fu&&twb(one1,11.8,6.9)+16>WE,cw=Math.floor((WE-16)/2),cg=gridHtml(evoConds(i,to),two?BRE-1:BRE,cw,[11,6.5],2);
+      h+=`<div class="bx be" style="width:${Math.max(WE,16+cg.cols*cw)}px;height:${BH}px">${two?`<div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">조그레스 진화</div>`:`<div class="bt">${esc(fu?one1:ro(D[to].ko)+' 진화')}</div>`}${cg.html}</div>`}
     h+='<div class="ar"></div>'});
   return `<div class="flow ${dir}">${h}</div>`}
 let LAST=null;
