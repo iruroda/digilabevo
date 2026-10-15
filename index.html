@@ -257,9 +257,9 @@ body:not(.authed) .tn .rb{display:none!important}
 .acctype{font-size:11px;font-weight:700;color:var(--sub);margin-right:2px;flex:0 0 auto}
 .addsk:disabled{opacity:.4;cursor:default}
 .loadset{height:22px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--bg);color:var(--accent);font-weight:700}
-#sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.18);padding:14px 16px calc(14px + env(safe-area-inset-bottom));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
+#sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
 #sdrawer.open{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s}
-.sdh{display:flex;align-items:center;margin-bottom:10px}.sdh b{font-size:13.5px;font-weight:800}.sdh .ed{font-size:13.5px}.sdh .rnin{font-size:13.5px;font-weight:800;flex:1;min-width:0}
+.sdh{display:inline-flex;align-items:center;background:#fff;border-radius:12px 12px 0 0;padding:9px 8px 6px 14px;margin:0;vertical-align:bottom}.sdbody{background:#fff;border-radius:0 14px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}.sdh b{font-size:13.5px;font-weight:800}.sdh .ed{font-size:13.5px}.sdh .rnin{font-size:13.5px;font-weight:800;flex:1;min-width:0}
 .sdsk{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.sdsk .chip{height:26px;padding:0 9px;gap:5px}
 .sdbtn{display:flex;gap:8px}
 .sdrow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;font-weight:700}.sdrow+.sdrow{border-top:1px solid var(--border)}
@@ -696,12 +696,12 @@ function skBody(id){const x=M[id];const sg=!!sigH[id];const hs=sg?sigH[id].map(i
    <div style="margin-top:10px">${hs.map(([i,lv])=>`<div class="rrow sm" data-i="${i}" style="cursor:pointer"><img src="${img(i)}"><div style="flex:1"><div class="nm">${esc(D[i].ko)}</div></div>${tp('','Lv.'+(sg?1:lv))}</div>`).join('')}</div></div>`}
 // ---------- 스킬 세트 ----------
 const PEN='<svg viewBox="0 0 24 24"><path d="M5 19.2 L6 14.6 L15.6 5 Q16.6 4 17.6 5 L19 6.4 Q20 7.4 19 8.4 L9.4 18 Z"/><path d="M14 6.6 L17.4 10"/></svg>';
-const BSK=`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5V18.5Q4 20.5 6 20.5H18Q20 20.5 20 18.5V12.5"/><path d="M12 3V9.5"/><path d="M8 9 L12 13.5 L16 9 Z" fill="currentColor" stroke-width="1.8"/></svg>`;
+const BSK=`<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h4.5l2 2.5H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5Z"/><path d="M12 11.5v5M9.5 14h5"/></svg>`;
 let SETS=[];try{SETS=JSON.parse(localStorage.getItem('digilab.sets')||'[]')}catch(e){}
 const saveSets=()=>{try{localStorage.setItem('digilab.sets',JSON.stringify(SETS))}catch(e){}};
 let DRAFT=[],DRAFTNAME='';
 const defSetName=()=>{const ns=SETS.map(s=>(/^스킬 세트 (\d+)$/.exec(s.name)||[])[1]).filter(Boolean).map(Number);return ns.includes(1)?`스킬 세트 ${Math.max(...ns)+1}`:'스킬 세트 1'};
-document.body.insertAdjacentHTML('beforeend',`<div id="sdrawer"><div class="sdh"><b id="sdn"></b><button class="ed" id="sdedit" type="button" aria-label="이름 변경">${PEN}</button></div><div class="sdsk" id="sdsk"></div><div class="sdbtn"><button class="btn" id="sdclr" type="button">모두 지우기</button><button class="btn pri" id="sdsave" type="button">저장</button></div></div>`);
+document.body.insertAdjacentHTML('beforeend',`<div id="sdrawer"><div class="sdh"><b id="sdn"></b><button class="ed" id="sdedit" type="button" aria-label="이름 변경">${PEN}</button></div><div class="sdbody"><div class="sdsk" id="sdsk"></div><div class="sdbtn"><button class="btn" id="sdclr" type="button">모두 지우기</button><button class="btn pri" id="sdsave" type="button">저장</button></div></div></div>`);
 function refreshAdd(){document.querySelectorAll('.addsk').forEach(b=>{const id=b.closest('.acc').dataset.id;b.disabled=DRAFT.length>=8||DRAFT.includes(id)})}
 function drawDrawer(){$('#sdn').textContent=DRAFTNAME;$('#sdsk').innerHTML=DRAFT.map(id=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}</span>`).join('');$('#sdrawer').classList.toggle('open',DRAFT.length>0);document.body.classList.toggle('sdo',DRAFT.length>0);refreshAdd()}
 function addToDraft(id){if(DRAFT.length>=8||DRAFT.includes(id))return;if(!DRAFT.length)DRAFTNAME=defSetName();DRAFT.push(id);drawDrawer()}
