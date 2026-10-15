@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='27.5' fill='none' stroke='%23ffc401' stroke-width='9'/%3E%3Ccircle cx='32' cy='32' r='10.8' fill='none' stroke='%23ffc401' stroke-width='7'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#325ab1">
 <style>
-:root{--bg:#efefef;--card:#ffffff;--txt:#1a1a1a;--sub-rgb:118,118,118;--sub:#767676;--accent:#325ab1;--accent-rgb:50,90,177;--border:rgba(var(--sub-rgb),.35);--yellow:#ffc401;--warm:#1a1a1a;--warm-bg:rgba(255,196,1,.32);--ov:rgba(0,0,0,.45);
+:root{--sky:#c9d5ee;--lemon:#ffe79a;--bg:#efefef;--card:#ffffff;--txt:#1a1a1a;--sub-rgb:118,118,118;--sub:#767676;--accent:#325ab1;--accent-rgb:50,90,177;--border:rgba(var(--sub-rgb),.35);--yellow:#ffc401;--warm:#1a1a1a;--warm-bg:rgba(255,196,1,.32);--ov:rgba(0,0,0,.45);
   /* 간격 기준값: 헤더 하단 여백 / 헤더 끝→첫 컨텐츠. 탭별로 다르게 하려면 아래 [data-view] 규칙에서 변수만 바꾼다 */
   --hpb:8px;--cpt:6px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -232,7 +232,7 @@ input[type=range]{accent-color:var(--accent)}
 .needs{margin:8px 0 12px}.mys .needs{margin:0 0 10px;position:sticky;left:0;width:100%}
 .flow{display:flex}.flow.h{align-items:center;width:max-content}.flow.v{flex-direction:column;align-items:flex-start}
 .bx{box-sizing:border-box;border-radius:10px;padding:8px;display:flex;gap:8px;flex:0 0 auto;font-size:11px;font-weight:600;line-height:14px;color:var(--txt)}
-.bd{background:#e9e9e9}.be{background:#ffe79a;flex-direction:column;gap:0}.bv{background:#c9d5ee;flex-direction:column;justify-content:center;gap:0}
+.bd{background:#e9e9e9}.be{background:var(--lemon);flex-direction:column;gap:0}.bv{background:var(--sky);flex-direction:column;justify-content:center;gap:0}
 .bi{width:70px;display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto;cursor:pointer}.bi img{width:44px;height:44px;display:block}
 .bnm{font-size:11px;font-weight:800;text-align:center;line-height:13px;overflow-wrap:anywhere}
 .bact{display:grid;grid-auto-flow:column;align-content:start}.bact div{overflow:hidden;white-space:nowrap}.bact div.w{white-space:normal;word-break:keep-all}
@@ -256,7 +256,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sum .rnin{font-size:13.5px;width:auto;flex:1}.myn .rnin{font-size:13.5px}
 .acctype{font-size:12px;font-weight:900;color:#8fe03a;paint-order:stroke fill;-webkit-text-stroke:2px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sg{color:var(--yellow)}
 .addsk:disabled{opacity:.4;cursor:default}
-.loadset{height:22px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--bg);color:var(--accent);font-weight:700}
+.loadset{height:22px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
 #sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
 #sdrawer.open{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s}
 .sdh{display:inline-flex;align-items:center;background:#fff;border-radius:12px 12px 0 0;padding:9px 8px 6px 14px;margin:0;vertical-align:bottom}.sdbody{background:#fff;border-radius:0 14px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}.sdh b{font-size:13.5px;font-weight:800}.sdh .ed{font-size:13.5px}.sdh .rnin{font-size:13.5px;font-weight:800;flex:none;width:10em;min-width:0}
