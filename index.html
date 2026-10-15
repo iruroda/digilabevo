@@ -56,14 +56,14 @@ body[data-view=route] .subhd,body[data-view=my] .subhd{display:none}
 
 .title h1{font-size:16px;font-weight:800;margin:0;letter-spacing:-.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .viewtoggle{display:flex;gap:5px;flex:0 0 auto}
-.viewtoggle button{border-radius:8px;padding:6px 9px;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--bg);color:var(--txt);cursor:pointer;white-space:nowrap}
+.viewtoggle button{border-radius:8px;padding:6px 9px;font-size:11px;font-weight:700;border:1px solid var(--border);background:#fff;color:var(--accent);cursor:pointer;white-space:nowrap}
 .viewtoggle button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pkwrap,body[data-view=tree] #qwrap,body:not([data-view=tree]) #pkwrap{display:none}
 .tsearch{position:absolute;right:101px;bottom:12px;width:min(210px,calc(100% - 125px))}
 .tsearch input{width:100%;height:32px;padding:0 34px;border-radius:999px;border:1px solid var(--border);background:#fff;font-size:13px;outline:none;color:var(--txt)}
 .tsearch input:focus{border-color:var(--accent)}.tsearch .qicon{left:11px}.tsearch .qclear{right:6px}
 #menubtnWrap{position:fixed;top:0;left:0;right:0;max-width:520px;margin:0 auto;z-index:33;display:flex;justify-content:flex-end;pointer-events:none}
-#loginBtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:5px;border:none;background:none;color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;flex-shrink:0}#loginBtn svg{width:100%;height:100%}
+#loginBtn{position:relative;margin-top:12px;margin-right:14px;width:34px;height:34px;padding:5px;border:none;background:none;color:var(--txt);display:flex;align-items:center;justify-content:center;cursor:pointer;pointer-events:auto;flex-shrink:0}#loginBtn svg{width:100%;height:100%}
 .searchwrap{position:relative;margin:0}
 .qline{display:flex;gap:6px;align-items:center}.qline .searchwrap{flex:1;min-width:0}.qline .chips{display:none;flex-wrap:nowrap;gap:5px;padding:0}.qline .chip{padding:0 9px}body[data-view=skill] .qline .chips{display:flex}
 .search{width:100%;padding:9px 38px;border-radius:12px;border:1px solid var(--border);background:#fff;color:var(--txt);font-size:14px;outline:none;height:34px}
@@ -80,7 +80,7 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 .chip.on{background:var(--accent);color:#fff;border-color:transparent}
 .chip .x{font-size:13px;line-height:1;color:var(--sub);margin-left:1px}
 .chip.on .x{color:#fff}
-.chip.tag{background:#fff;border:1px solid var(--border);padding:0 9px}
+.chip.tag{background:#fff;border:1px solid var(--accent);padding:0 9px}
 .chip.ban{background:var(--warm-bg);color:var(--warm);border-color:transparent}
 .content{padding:var(--cpt) 12px 0}
 .rcard{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:8px}
@@ -129,7 +129,7 @@ select.dn{-webkit-appearance:none;appearance:none;padding:0 14px 0 4px;text-alig
 .rrow .xb.sw{color:var(--accent);display:flex;align-items:center;padding:4px 2px}.rrow .xb.x2{margin-left:0}.rrow .xb{margin-left:auto;border:none;background:none;color:var(--sub);font-size:18px;line-height:1;cursor:pointer;padding:4px}
 .hintx{font-size:11.5px;color:var(--sub);margin-top:8px;line-height:1.5}.skd .hintx{color:var(--txt)}
 .btn{display:flex;align-items:center;justify-content:center;height:36px;padding:0 10px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--txt);font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;flex:1}
-.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.act,.btn.rsave{background:var(--sky);border-color:var(--sky);color:var(--txt)}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
 .btnrow{display:flex;gap:8px}
 .tagp{display:inline-flex;align-items:center;gap:3px;background:var(--bg);border-radius:7px;padding:2px 7px;font-size:11.5px;font-weight:600;color:var(--txt)}
 .tagp.evo{background:var(--accent);color:#fff;font-weight:700}
@@ -673,7 +673,7 @@ function openDetail(i){
   const cells=LS.map(([k,l])=>`<div class="sc"><b>${l}</b><span class="cv" data-k="${k}">${statAt(i,k,1)}</span></div>`).join('');
   const title=`${taI(m,22)}<span class="tno">No.${String(m.no).padStart(3,'0')}</span> <span class="tnm">${esc(m.ko)}</span> <span class="stgt">${m.stage}</span>`;
   const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
-  <div class="btnrow"><button class="btn" id="as" type="button">${ICS}출발 디지몬</button><button class="btn" id="ae" type="button">${ICE}도착 디지몬</button></div>
+  <div class="btnrow"><button class="btn act" id="as" type="button">${ICS}출발 디지몬</button><button class="btn act" id="ae" type="button">${ICE}도착 디지몬</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
   <div class="sec"><h3>스킬</h3><table class="mv"><tr><th>배운 스킬</th><th>습득</th><th>SP</th><th>위력</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
   <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:12.5px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
@@ -705,7 +705,7 @@ let SETS=[];try{SETS=JSON.parse(localStorage.getItem('digilab.sets')||'[]')}catc
 const saveSets=()=>{try{localStorage.setItem('digilab.sets',JSON.stringify(SETS))}catch(e){}};
 let DRAFT=[],DRAFTNAME='';
 const defSetName=()=>{const ns=SETS.map(s=>(/^스킬 세트 (\d+)$/.exec(s.name)||[])[1]).filter(Boolean).map(Number);return ns.includes(1)?`스킬 세트 ${Math.max(...ns)+1}`:'스킬 세트 1'};
-document.body.insertAdjacentHTML('beforeend',`<div id="sdrawer"><div class="sdh"><b id="sdn"></b><button class="ed" id="sdedit" type="button" aria-label="이름 변경">${PEN}</button></div><div class="sdbody"><div class="sdsk" id="sdsk"></div><div class="sdbtn"><button class="btn" id="sdclr" type="button">모두 지우기</button><button class="btn pri" id="sdsave" type="button">저장</button></div></div></div>`);
+document.body.insertAdjacentHTML('beforeend',`<div id="sdrawer"><div class="sdh"><b id="sdn"></b><button class="ed" id="sdedit" type="button" aria-label="이름 변경">${PEN}</button></div><div class="sdbody"><div class="sdsk" id="sdsk"></div><div class="sdbtn"><button class="btn act" id="sdclr" type="button">모두 지우기</button><button class="btn pri" id="sdsave" type="button">저장</button></div></div></div>`);
 function refreshAdd(){document.querySelectorAll('.addsk').forEach(b=>{const id=b.closest('.acc').dataset.id;b.disabled=DRAFT.length>=8||DRAFT.includes(id)})}
 let dShown=[];
 function animH(el,h0,h1,prop){if(RM||!el.animate||h0===h1)return;el.style.overflow='hidden';el.animate([{[prop]:h0+'px'},{[prop]:h1+'px'}],{duration:240,easing:EASE}).onfinish=()=>{el.style.overflow=''}}
