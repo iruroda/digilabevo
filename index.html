@@ -263,7 +263,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sdsk{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.sdsk .chip{height:26px;padding:0 9px;gap:5px}
 .sdbtn{display:flex;gap:8px}
 .sdrow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;font-weight:700}.sdrow+.sdrow{border-top:1px solid var(--border)}
-.sset .accp{padding-top:0}
+.sdd{position:relative}.sdd .drop{position:static;max-height:0;margin-top:0;border-width:0;box-shadow:none;transform:none;overflow:hidden;transition:max-height .28s,margin .28s,opacity .18s,visibility 0s .28s}.sdd .drop.open{max-height:170px;margin-top:4px;border-width:1px;overflow:auto;transition:max-height .28s,margin .28s,opacity .18s,visibility 0s}.ddb{width:100%;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:14px;color:rgba(var(--sub-rgb),.9);cursor:pointer}.ddb.set{color:var(--txt);font-weight:700}.ddb.open{border-color:var(--accent)}.ddb .chev{width:18px;height:18px;fill:none;stroke:var(--sub);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}.ddb.open .chev{transform:rotate(180deg)}.setprev{margin-top:8px}.setprev .accp{padding:2px 4px 0}
 body.sdo{padding-bottom:170px}
 .mys.grabbing{cursor:grabbing;user-select:none}.mys .bi{cursor:pointer}
 .bi{position:relative}.bi .fl{position:absolute;left:-2px;top:-2px;width:15px;height:15px;color:var(--accent)}
@@ -718,10 +718,12 @@ $('#sdclr').onclick=()=>{DRAFT=[];drawDrawer()};
 $('#sdsave').onclick=()=>{if(!DRAFT.length)return;SETS.push({id:Date.now().toString(36),name:DRAFTNAME||defSetName(),skills:DRAFT.slice(),t:Date.now()});saveSets();DRAFT=[];drawDrawer();drawLoadBtn()};
 function drawLoadBtn(){$('#loadset').style.display=SETS.length?'':'none'}
 $('#loadset').onclick=()=>{
-  const b=openModal('스킬 세트 불러오기',`<div class="rlist" id="setlist">${SETS.map(s=>`<div class="acc sset" data-id="${s.id}"><div class="rrow acch"><div style="flex:1"><div class="nm">${esc(s.name)}</div></div><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"><div class="accp">${s.skills.filter(id=>M[id]).map(id=>`<div class="sdrow">${skI(M[id],22)}<span>${esc(M[id].n)}</span></div>`).join('')}</div></div></div></div>`).join('')}</div><div style="margin-top:12px;display:flex"><button class="btn pri" id="setok" type="button" disabled>확인</button></div>`);
-  const ok=b.querySelector('#setok');
-  b.querySelectorAll('.sset').forEach(a=>a.querySelector('.acch').onclick=()=>{const o=!a.classList.contains('open');b.querySelectorAll('.sset.open').forEach(x=>x.classList.remove('open'));a.classList.toggle('open',o);ok.disabled=!o});
-  ok.onclick=()=>{const a=b.querySelector('.sset.open');if(!a)return;const s=SETS.find(x=>x.id===a.dataset.id);if(!s)return;S.skills=s.skills.filter(id=>M[id]).slice(0,8);drawSel();closeModal()}};
+  const b=openModal('스킬 세트 불러오기',`<div class="pick sdd"><button class="ddb" id="setsel" type="button"><span class="ddt">스킬 세트 선택</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div class="drop" id="setdrop">${SETS.map(s=>`<div data-id="${s.id}">${esc(s.name)}<small>${s.skills.filter(id=>M[id]).length}개</small></div>`).join('')}</div></div><div class="setprev" id="setprev"></div><div style="margin-top:12px;display:flex"><button class="btn pri" id="setok" type="button" disabled>확인</button></div>`);
+  const ok=b.querySelector('#setok'),dd=b.querySelector('#setdrop'),btn=b.querySelector('#setsel'),prev=b.querySelector('#setprev');let cur=null;
+  btn.onclick=()=>{const o=!dd.classList.contains('open');dd.classList.toggle('open',o);btn.classList.toggle('open',o)};
+  dd.onclick=e=>{const t=e.target.closest('[data-id]');if(!t)return;cur=SETS.find(x=>x.id===t.dataset.id);dd.classList.remove('open');btn.classList.remove('open');btn.querySelector('.ddt').textContent=cur.name;btn.classList.add('set');
+    prev.innerHTML=`<div class="accp">${cur.skills.filter(id=>M[id]).map(id=>`<div class="sdrow">${skI(M[id],22)}<span>${esc(M[id].n)}</span></div>`).join('')}</div>`;growIn(prev.firstChild);ok.disabled=false};
+  ok.onclick=()=>{if(!cur)return;S.skills=cur.skills.filter(id=>M[id]).slice(0,8);drawSel();closeModal()}};
 drawLoadBtn();
 function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.querySelector('.accin').innerHTML=skBody(id);a.dataset.built=1;
     a.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
