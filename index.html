@@ -703,7 +703,10 @@ let DRAFT=[],DRAFTNAME='';
 const defSetName=()=>{const ns=SETS.map(s=>(/^스킬 세트 (\d+)$/.exec(s.name)||[])[1]).filter(Boolean).map(Number);return ns.includes(1)?`스킬 세트 ${Math.max(...ns)+1}`:'스킬 세트 1'};
 document.body.insertAdjacentHTML('beforeend',`<div id="sdrawer"><div class="sdh"><b id="sdn"></b><button class="ed" id="sdedit" type="button" aria-label="이름 변경">${PEN}</button></div><div class="sdbody"><div class="sdsk" id="sdsk"></div><div class="sdbtn"><button class="btn" id="sdclr" type="button">모두 지우기</button><button class="btn pri" id="sdsave" type="button">저장</button></div></div></div>`);
 function refreshAdd(){document.querySelectorAll('.addsk').forEach(b=>{const id=b.closest('.acc').dataset.id;b.disabled=DRAFT.length>=8||DRAFT.includes(id)})}
-function drawDrawer(){$('#sdn').textContent=DRAFTNAME;$('#sdsk').innerHTML=DRAFT.map(id=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}</span>`).join('');$('#sdrawer').classList.toggle('open',DRAFT.length>0);document.body.classList.toggle('sdo',DRAFT.length>0);refreshAdd()}
+let dShown=[];
+function drawDrawer(){$('#sdn').textContent=DRAFTNAME;const sk=$('#sdsk');sk.innerHTML=DRAFT.map((id,k)=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}<span class="x" data-k="${k}">×</span></span>`).join('');
+  sk.querySelectorAll('.chip').forEach((c,k)=>{if(!dShown.includes(DRAFT[k]))popIn(c);c.querySelector('.x').onclick=()=>popOut(c,()=>{DRAFT.splice(k,1);drawDrawer()})});dShown=DRAFT.slice();
+$('#sdrawer').classList.toggle('open',DRAFT.length>0);document.body.classList.toggle('sdo',DRAFT.length>0);refreshAdd()}
 function addToDraft(id){if(DRAFT.length>=8||DRAFT.includes(id))return;if(!DRAFT.length)DRAFTNAME=defSetName();DRAFT.push(id);drawDrawer()}
 $('#sdedit').onclick=()=>editName($('#sdn'),DRAFTNAME,v=>{DRAFTNAME=v});
 $('#sdclr').onclick=()=>{DRAFT=[];drawDrawer()};
