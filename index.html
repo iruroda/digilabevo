@@ -50,10 +50,10 @@ body[data-view=route] .subhd,body[data-view=my] .subhd{display:none}
 .viewtoggle button.active .bl{grid-template-columns:1fr;margin-left:4px}
 .treebox{scrollbar-width:none}.treebox::-webkit-scrollbar{display:none;width:0;height:0}
 .zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:3px}
-.zoom button{width:38px;height:32px;border:0;background:#767676;color:#fff;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.zoom button{width:38px;height:32px;border:0;background:var(--sky);color:var(--accent);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
 .zoom svg{display:block;fill:none;stroke:currentColor;stroke-width:3.6;stroke-linecap:round}
 .zoom button:first-child{border-radius:999px 0 0 999px}.zoom button:last-child{border-radius:0 999px 999px 0}
-.zoom button:disabled{background:#c4c4c4;cursor:default}
+.zoom button:disabled{opacity:.4;cursor:default}
 
 .title h1{font-size:16px;font-weight:800;margin:0;letter-spacing:-.3px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .viewtoggle{display:flex;gap:5px;flex:0 0 auto}
