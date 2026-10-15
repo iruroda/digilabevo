@@ -259,7 +259,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .loadset{height:22px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--bg);color:var(--accent);font-weight:700}
 #sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
 #sdrawer.open{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s}
-.sdh{display:inline-flex;align-items:center;background:#fff;border-radius:12px 12px 0 0;padding:9px 8px 6px 14px;margin:0;vertical-align:bottom}.sdbody{background:#fff;border-radius:0 14px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}.sdh b{font-size:13.5px;font-weight:800}.sdh .ed{font-size:13.5px}.sdh .rnin{font-size:13.5px;font-weight:800;flex:1;min-width:0}
+.sdh{display:inline-flex;align-items:center;background:#fff;border-radius:12px 12px 0 0;padding:9px 8px 6px 14px;margin:0;vertical-align:bottom}.sdbody{background:#fff;border-radius:0 14px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}.sdh b{font-size:13.5px;font-weight:800}.sdh .ed{font-size:13.5px}.sdh .rnin{font-size:13.5px;font-weight:800;flex:none;width:10em;min-width:0}
 .sdsk{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.sdsk .chip{height:26px;padding:0 9px;gap:5px}
 .sdbtn{display:flex;gap:8px}
 .sdrow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;font-weight:700}.sdrow+.sdrow{border-top:1px solid var(--border)}
@@ -704,11 +704,12 @@ const defSetName=()=>{const ns=SETS.map(s=>(/^스킬 세트 (\d+)$/.exec(s.name)
 document.body.insertAdjacentHTML('beforeend',`<div id="sdrawer"><div class="sdh"><b id="sdn"></b><button class="ed" id="sdedit" type="button" aria-label="이름 변경">${PEN}</button></div><div class="sdbody"><div class="sdsk" id="sdsk"></div><div class="sdbtn"><button class="btn" id="sdclr" type="button">모두 지우기</button><button class="btn pri" id="sdsave" type="button">저장</button></div></div></div>`);
 function refreshAdd(){document.querySelectorAll('.addsk').forEach(b=>{const id=b.closest('.acc').dataset.id;b.disabled=DRAFT.length>=8||DRAFT.includes(id)})}
 let dShown=[];
-function drawDrawer(){$('#sdn').textContent=DRAFTNAME;const sk=$('#sdsk');sk.innerHTML=DRAFT.map((id,k)=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}<span class="x" data-k="${k}">×</span></span>`).join('');
+function animH(el,h0,h1,prop){if(RM||!el.animate||h0===h1)return;el.style.overflow='hidden';el.animate([{[prop]:h0+'px'},{[prop]:h1+'px'}],{duration:240,easing:EASE}).onfinish=()=>{el.style.overflow=''}}
+function drawDrawer(){const bd=document.querySelector('.sdbody'),wasOpen=$('#sdrawer').classList.contains('open'),h0=bd.offsetHeight;$('#sdn').textContent=DRAFTNAME;const sk=$('#sdsk');sk.innerHTML=DRAFT.map((id,k)=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}<span class="x" data-k="${k}">×</span></span>`).join('');
   sk.querySelectorAll('.chip').forEach((c,k)=>{if(!dShown.includes(DRAFT[k]))popIn(c);c.querySelector('.x').onclick=()=>popOut(c,()=>{DRAFT.splice(k,1);drawDrawer()})});dShown=DRAFT.slice();
-$('#sdrawer').classList.toggle('open',DRAFT.length>0);document.body.classList.toggle('sdo',DRAFT.length>0);refreshAdd()}
+$('#sdrawer').classList.toggle('open',DRAFT.length>0);document.body.classList.toggle('sdo',DRAFT.length>0);refreshAdd();if(wasOpen&&DRAFT.length)animH(bd,h0,bd.offsetHeight,'height')}
 function addToDraft(id){if(DRAFT.length>=8||DRAFT.includes(id))return;if(!DRAFT.length)DRAFTNAME=defSetName();DRAFT.push(id);drawDrawer()}
-$('#sdedit').onclick=()=>editName($('#sdn'),DRAFTNAME,v=>{DRAFTNAME=v});
+$('#sdedit').onclick=()=>{const t=document.querySelector('.sdh'),w0=t.offsetWidth;editName($('#sdn'),DRAFTNAME,v=>{DRAFTNAME=v},()=>animH(t,wE,t.offsetWidth,'width'));var wE=t.offsetWidth;animH(t,w0,wE,'width')};
 $('#sdclr').onclick=()=>{DRAFT=[];drawDrawer()};
 $('#sdsave').onclick=()=>{if(!DRAFT.length)return;SETS.push({id:Date.now().toString(36),name:DRAFTNAME||defSetName(),skills:DRAFT.slice(),t:Date.now()});saveSets();DRAFT=[];drawDrawer();drawLoadBtn()};
 function drawLoadBtn(){$('#loadset').style.display=SETS.length?'':'none'}
@@ -821,9 +822,9 @@ function saveRemote(){if(db&&fbAuth&&fbAuth.currentUser)db.collection('digilabRo
 function persist(){saveRemote()}
 function routeSummary(r){return r.end!=null?`${D[r.start].ko}-${D[r.end].ko}`:D[r.start].ko}
 // 이름 바꾸기: 이름 자리에서 입력칸으로 바뀌고, 엔터·바깥 클릭으로 확정, Esc로 취소
-function editName(nameEl,cur,onDone){if(nameEl.dataset.editing)return;nameEl.dataset.editing=1;
+function editName(nameEl,cur,onDone,onEnd){if(nameEl.dataset.editing)return;nameEl.dataset.editing=1;
   const inp=document.createElement('input');inp.className='rnin';inp.maxLength=40;inp.value=cur;nameEl.style.display='none';nameEl.parentNode.insertBefore(inp,nameEl);inp.focus();inp.select();
-  let fin=false;const end=ok=>{if(fin)return;fin=true;const v=inp.value.trim();inp.remove();nameEl.style.display='';delete nameEl.dataset.editing;if(ok&&v&&v!==cur){nameEl.textContent=v;onDone(v)}};
+  let fin=false;const end=ok=>{if(fin)return;fin=true;const v=inp.value.trim();inp.remove();nameEl.style.display='';delete nameEl.dataset.editing;if(ok&&v&&v!==cur){nameEl.textContent=v;onDone(v)}onEnd&&onEnd()};
   inp.onkeydown=e=>{if(e.key==='Enter')end(true);else if(e.key==='Escape')end(false)};inp.onblur=()=>end(true)}
 let CURNAME='',SAVEDID=null;
 function saveRoute(){if(!LAST||SAVEDID)return;SAVEDID=Date.now().toString(36);ROUTES=mergeRoutes([{id:SAVEDID,name:CURNAME,t:Date.now(),...LAST}],ROUTES);persist();const b=$('#saveRoute');if(b)b.disabled=true}
