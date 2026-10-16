@@ -87,13 +87,13 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 .rcard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px}
 .lab{font-size:13px;color:var(--accent);font-weight:700;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
 .lab small{font-weight:500;font-size:11px;color:var(--sub)}
-#ftogwrap{display:none;justify-content:center;margin-top:8px}body[data-view=dex] #ftogwrap{display:flex}
-#ftog{position:relative;width:14.3px;height:10.1px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0;display:block}
-#ftog::before{content:'';position:absolute;inset:-8px -26px}
-#ftog svg{width:100%;height:100%;fill:currentColor;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round;transition:transform .3s;display:block}
-#ftog.open svg{transform:rotate(180deg)}#ftog.has::after{content:'';position:absolute;top:-2px;right:-9px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
-.fpanel{display:none}body[data-view=dex] .fpanel{display:grid}.fpanel{grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
-.fin{overflow:hidden;min-height:0}.fin>.fsec:first-child{margin-top:8px}body[data-view=dex].fopen .hdwrap{position:relative}
+#ftogwrap,#stogwrap{display:none;justify-content:center;margin-top:8px}body[data-view=dex] #ftogwrap,body[data-view=skill] #stogwrap{display:flex}
+#ftog,#stog{position:relative;width:14.3px;height:10.1px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0;display:block}
+#ftog::before,#stog::before{content:'';position:absolute;inset:-8px -26px}
+#ftog svg,#stog svg{width:100%;height:100%;fill:currentColor;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round;transition:transform .3s;display:block}
+#ftog.open svg,#stog.open svg{transform:rotate(180deg)}#ftog.has::after,#stog.has::after{content:'';position:absolute;top:-2px;right:-9px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
+.fpanel{display:none}body[data-view=dex] #fpanel,body[data-view=skill] #spanel{display:grid}.fpanel{grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
+.fin{overflow:hidden;min-height:0}.fin>.fsec:first-child{margin-top:8px}body[data-view=dex].fopen .hdwrap,body[data-view=skill].fopen .hdwrap{position:relative}
 .fsec{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:6px}.fsec:last-child{margin-bottom:0}
 .fl{font-size:13px;color:var(--accent);font-weight:700}.fl.fh{display:flex;align-items:center;gap:8px;cursor:default}.gt{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--txt);margin:14px 2px 6px}.gt::after{content:'';flex:1;height:1px;background:var(--border)}.gt:first-child{margin-top:2px}#cards.grp{display:block}.fsec .chips{padding:8px 0 0}
 img[src^="icons/"]{background:linear-gradient(180deg,#fff 0%,#bff6ff 40%,#68d3ec 100%);border:2px solid #3086c8;border-radius:8px;padding:0;box-sizing:border-box;object-fit:cover}
@@ -258,7 +258,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sum .rnin{font-size:13px;width:auto;flex:1;font-weight:800}.myn .rnin{font-size:13px;font-weight:800}
 .acctype{font-size:11px;font-weight:700;color:#88f890;paint-order:stroke fill;-webkit-text-stroke:3px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sig{color:#f8f050}
 .addsk:disabled{opacity:.4;cursor:default}
-.loadset{height:24px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
+.grpchip{height:24px;padding:0 9px;border-width:0;background:var(--sky);color:var(--txt)}.grpchip.active{background:var(--accent);color:#fff}.loadset{height:24px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
 #sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
 #sdrawer.open{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s}
 .sdh{display:inline-flex;align-items:center;background:#fff;border-radius:12px 12px 0 0;padding:9px 8px 6px 14px;margin:0;vertical-align:bottom}.sdbody{background:#fff;border-radius:0 14px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}.sdh b{font-size:13px;font-weight:800}.sdh .ed{font-size:13px}.sdh .rnin{font-size:13px;font-weight:800;flex:none;width:10em;min-width:0}
@@ -288,7 +288,9 @@ body.sdo{padding-bottom:170px}
   </div></div>
   <div class="searchwrap" id="pkwrap"><div id="pk-root"></div></div>
   <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
-  <div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl fh">세대<button class="chip" id="grpchip" type="button">세대 구분</button></div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div>
+  <div id="stogwrap"><button id="stog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
+  <div class="fpanel" id="spanel"><div class="fin"><div class="fsec"><div class="fl">타입</div><div class="chips" id="chips-stype"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-sattr"></div></div></div></div>
+  <div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl fh">세대<button class="chip grpchip" id="grpchip" type="button">세대 구분</button></div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div>
 </div>
 </div>
 <div class="content">
@@ -340,8 +342,8 @@ body.sdo{padding-bottom:170px}
 const D=window.DIGI, M=window.MOVES;
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const TYPE={free:'프리',virus:'바이러스',vaccine:'백신',data:'데이터'};
-const ATTR={neutral:'무',fire:'불',water:'물',plant:'풀',electric:'전기',earth:'땅',wind:'바람',dark:'어둠',light:'빛'};
+const TYPE={vaccine:'백신',data:'데이터',virus:'바이러스',free:'프리'};
+const ATTR={neutral:'무',fire:'불',water:'물',plant:'풀',electric:'전기',wind:'바람',earth:'땅',light:'빛',dark:'어둠'};
 const EL=['무','불','물','풀','전기','땅','바람','빛','어둠'];
 const ELC=['#8a93a3','#e5533d','#2f7fe0','#34a853','#d9a800','#a0713a','#4cb8b0','#c9a400','#7d4fc4'];
 const DT={0:'보조',1:'물리',2:'마법',8:'회복'};
@@ -360,7 +362,10 @@ const holders={};D.forEach((m,i)=>m.moves.forEach(([id])=>{(holders[id]=holders[
 const sigH={};D.forEach((m,i)=>m.sig.forEach(([id])=>{(sigH[id]=sigH[id]||[]).push(i)}));
 const skillIds=Object.keys(holders).sort((a,b)=>M[a].n.localeCompare(M[b].n,'ko'));
 const allSkillIds=Object.keys(M).filter(id=>holders[id]||sigH[id]).sort((a,b)=>M[a].n.localeCompare(M[b].n,'ko'));
-let SKF='all';
+let SKF='all';const FS={type:new Set(),el:new Set()};
+// 스킬 타입: dt 1·3 물리, 2·4 마법, 0 보조, 8·14 회복 (5 HP 감소·7 고정 대미지는 어느 타입에도 넣지 않음)
+const skType=m=>({1:'phy',3:'phy',2:'mag',4:'mag',0:'sup',8:'heal',14:'heal'})[m.dt]||'';
+const SKTYPE=[['phy','물리'],['mag','마법'],['sup','보조'],['heal','회복']],SKEL=[['0','무'],['1','불'],['2','물'],['3','풀'],['4','전기'],['6','바람'],['5','땅'],['7','빛'],['8','어둠']];
 
 
 // ---------- 루트 탐색: (디지몬, 모은 스킬 비트마스크) 상태 다익스트라 ----------
@@ -739,13 +744,19 @@ function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.qu
     const ab=a.querySelector('.addsk');if(ab){ab.onclick=()=>addToDraft(id);refreshAdd()}}
   a.classList.toggle('open',open)}
 function drawSkillView(){const host=$('#skview');const openId=SKSEL;SKSEL=null;
-  const q=QS.skill;chipsSk();const list=allSkillIds.filter(id=>(SKF==='all'||(SKF==='sig')===!!sigH[id])&&match(M[id].n,q));
+  const q=QS.skill;chipsSk();chipsSkF();const list=allSkillIds.filter(id=>(SKF==='all'||(SKF==='sig')===!!sigH[id])&&(!FS.type.size||FS.type.has(skType(M[id])))&&(!FS.el.size||FS.el.has(String(M[id].el)))&&match(M[id].n,q));
+  if(!list.length){host.innerHTML='<div class="empty">검색 결과가 없습니다.</div>';return}
   host.innerHTML=`<div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div></div><span class="acctype${sigH[id]?' sig':''}">${sigH[id]?'필살기':'계승기'}</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없습니다.</div>'}</div>`;
   host.querySelectorAll('.acc').forEach(a=>a.querySelector('.acch').onclick=()=>{const o=!a.classList.contains('open');if(o)host.querySelectorAll('.acc.open').forEach(b=>toggleAcc(b,false));toggleAcc(a,o)});
   if(openId!=null){const a=host.querySelector(`.acc[data-id="${openId}"]`);if(a){toggleAcc(a,true);setTimeout(()=>a.scrollIntoView({block:'nearest',behavior:'smooth'}),50)}}}
+function chipsetS(id,pairs,key){const host=$(id),set=FS[key];
+  host.innerHTML=[['','전체'],...pairs].map(([v,l])=>`<button class="chip${v===''?(set.size?'':' active'):(set.has(v)?' active':'')}" data-v="${v}" type="button">${l}</button>`).join('');
+  host.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='')set.clear();else if(set.has(v))set.delete(v);else set.add(v);drawSkillView()})}
+function chipsSkF(){chipsetS('#chips-stype',SKTYPE,'type');chipsetS('#chips-sattr',SKEL,'el');$('#stog').classList.toggle('has',!!(FS.type.size||FS.el.size))}
+$('#stog').onclick=()=>{const o=!$('#spanel').classList.contains('open');document.body.classList.toggle('fopen',o);if(o)window.scrollTo(0,0);$('#spanel').classList.toggle('open',o);$('#stog').classList.toggle('open',o);$('#stog').setAttribute('aria-expanded',o)};
 function chipsSk(){const h=$('#chips-sk');h.innerHTML=[['all','전체'],['sig','필살기'],['inh','계승기']].map(([v,l])=>`<button class="chip${SKF===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
   h.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{SKF=b.dataset.v;drawSkillView()})}
-function showSkill(id){SKSEL=id;SKF='all';QS.skill=M[id].n;if(CUR!=='skill')view('skill');else{$('#q').value=QS.skill;drawSkillView()}}
+function showSkill(id){SKSEL=id;SKF='all';FS.type.clear();FS.el.clear();QS.skill=M[id].n;if(CUR!=='skill')view('skill');else{$('#q').value=QS.skill;drawSkillView()}}
 // ---------- 진화 트리 ----------
 const TST=[];D.forEach(m=>{if(!TST.includes(m.stage))TST.push(m.stage)});
 const ORD=['유년기 I','유년기 II','성장기','성숙기','완전체','궁극체','초궁극체'];TST.sort((a,b)=>{const x=ORD.indexOf(a),y=ORD.indexOf(b);return(x<0?99:x)-(y<0?99:y)});
