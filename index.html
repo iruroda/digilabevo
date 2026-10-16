@@ -459,7 +459,7 @@ function findRoute(start,end,skills,bans,av){
 
 const TAR={water:0,fire:1,plant:2,earth:3,electric:4,wind:5,light:6,dark:7,neutral:8},TAC={vaccine:0,virus:1,data:2,free:3};
 const taI=(m,s)=>`<i class="ta" style="--c:${TAC[m.type]??3};--r:${TAR[m.attr]??8}${s?`;--s:${s}px`:''}"></i>`;
-const skI=(x,s)=>`<i class="sk" style="--c:${x.dt===8?9:x.dt===0?10:(x.el??0)}${s?`;--s:${s}px`:''}"></i>`;
+const skI=(x,s)=>`<i class="sk" style="--c:${x.dt===8||x.dt===14?9:x.dt===0?10:(x.el??0)}${s?`;--s:${s}px`:''}"></i>`;
 const ICS=`<svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M11.8 12 H17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16.6 8.6 L21.8 12 L16.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`,ICE=`<svg class="ic16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="12.2" y="7.2" width="9.6" height="9.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M2.4 12 H7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M6.6 8.6 L11.8 12 L6.6 15.4 Z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
 const tp=(cls,t)=>`<span class="tagp ${cls||''}">${t}</span>`;
 let SCROLLER=[];
