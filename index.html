@@ -133,7 +133,7 @@ select.dn{-webkit-appearance:none;appearance:none;padding:0 14px 0 4px;text-alig
 .btn.act,.btn.rsave{background:var(--sky);border-color:var(--sky);color:var(--txt)}.btn.act{height:24px;padding:0 10px;font-size:11px;border-radius:999px}#wreset,#sdclr{height:36px;padding:0 10px;font-size:13px;border-radius:12px}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
 .btnrow{display:flex;gap:8px}.gearb{flex:0 0 36px;width:36px;height:36px;border:0;background:none;color:var(--accent);padding:5px;cursor:pointer;display:flex}.gearb svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.wtx{font-size:13px;font-weight:500;line-height:1.5;margin-bottom:12px}.wr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;font-size:13px;font-weight:500}.wr .inp{width:64px;flex:0 0 64px;text-align:center;padding:0 6px}.wbt{margin-top:14px}.wbt .btn{white-space:nowrap}.wbt .act{flex:1.5}
 .tagp{display:inline-flex;align-items:center;gap:3px;background:var(--bg);border-radius:8px;padding:2px 7px;font-size:11px;font-weight:500;color:var(--txt)}
-.needs .tagp{background:#fff;border:1px solid var(--border)}
+.needs .tagp{background:#fff;border:1px solid var(--border);padding:3px 7px 1px}
 .tagp.evo{background:var(--accent);color:#fff;font-weight:700}
 .tagp.dev{background:#fff;border:1px solid var(--border);color:var(--sub)}
 .tagp.hard{background:var(--yellow);color:#1a1a1a;font-weight:700}
@@ -238,7 +238,7 @@ input[type=range]{accent-color:var(--accent)}
 .bx{box-sizing:border-box;border-radius:8px;padding:8px;display:flex;gap:8px;flex:0 0 auto;font-size:11px;font-weight:500;line-height:14px;color:var(--txt)}
 .bd{background:#e9e9e9}.be{background:var(--lemon);flex-direction:column;gap:0}.bv{background:var(--sky);flex-direction:column;justify-content:center;gap:0}
 .bi{width:70px;display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto;cursor:pointer}.bi img{width:44px;height:44px;display:block}
-.bnm{font-size:11px;font-weight:800;text-align:center;line-height:13px;overflow-wrap:anywhere}
+.bnm{font-size:11px;font-weight:800;text-align:center;line-height:13px;overflow-wrap:anywhere;min-height:26px;display:flex;align-items:center;justify-content:center;width:100%}
 .bact{display:grid;grid-auto-flow:column;align-content:start}.bact div{overflow:hidden;white-space:nowrap}.bact div.w{white-space:normal;word-break:keep-all}
 .bt{font-size:11px;font-weight:800;line-height:14px;white-space:nowrap}
 .ar{position:relative;background:var(--txt);flex:0 0 auto;border-radius:1px}
@@ -695,7 +695,7 @@ function openDetail(i){
   const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
   <div class="btnrow"><button class="btn act" id="as" type="button">${ICS}출발 디지몬</button><button class="btn act" id="ae" type="button">${ICE}도착 디지몬</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
-  <div class="sec"><h3>배운 스킬</h3><table class="mv"><tr><th>스킬</th><th>습득 Lv.</th><th>소비 SP</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
+  <div class="sec"><h3>배운 스킬</h3><table class="mv"><tr><th>스킬</th><th>습득 Lv.</th><th>소비 SP</th><th>종류</th></tr>${[...m.sig.map(x=>[x,true,1]),...m.moves.map(x=>[x,false,x[1]||999])].sort((a,b)=>a[2]-b[2]).map(([x,sg])=>mvRow(x,sg)).join('')}</table></div>
   <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:13px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
   <div class="sec"><h3>퇴화될 디지몬</h3>${evo(m.prev,'prev')}</div>
   <div class="sec"><h3>진화될 디지몬</h3>${evo(m.next,'next')}</div>${MCP[i].length?`<div class="sec"><h3>모드 체인지</h3>${evo(MCP[i],'mc')}</div>`:''}
