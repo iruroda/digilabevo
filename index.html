@@ -614,12 +614,12 @@ const gridHtml=(items,rows,colW,perChar,minCols,rh=14)=>{const {cols,sp}=packCol
   return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},${rh}px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
 // 디지몬 박스에 쓰는 행동 (명사형, 총합): Lv · 스킬 · 특훈(HP→SPD) · 재능 · 우정
 function boxActs(p,k,got,steps){const m=D[p[k]],a=[],sk=[];let lv=0;
-  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>String(x[0])===String(id));if(mv&&mv[1]>lv)lv=mv[1];sk.push(`${esc(M[id].n)} 습득`)});
+  (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>String(x[0])===String(id));if(mv&&mv[1]>lv)lv=mv[1];sk.push([mv?mv[1]:0,`${esc(M[id].n)} 습득`])});sk.sort((x,y)=>x[0]-y[0]);
   let ev=false,c=null,f=null;
   if(k<p.length-1){const to=p[k+1];c=D[to].cond;f=steps&&steps[k];ev=!(isMC(p[k],to)||!m.next.includes(to))}
   if(ev){const need=f&&f.lv?f.lv:c.LVL;if(need>lv)lv=need}
   if(lv>1)a.push(`Lv. ${lv} 이상`);
-  a.push(...sk);
+  a.push(...sk.map(x=>x[1]));
   if(ev){
     if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`특훈 ${CL[SK[j]]} +${f.T?f.T[j]:d}`)});
     if(c.ABI)a.push(`${CL.ABI} ${c.ABI} 이상`);
