@@ -204,8 +204,8 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .sec h3{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;margin:0 0 8px}
 .sec h3::after{content:'';flex:1;height:1px;background:var(--border)}
 .drow{display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:8px;padding:6px 8px;margin-top:6px;cursor:pointer}
-.drow img{width:34px;height:34px;border-width:1.5px!important}.drow .nm{font-size:13px;font-weight:700}.drow .mt{font-size:11px;color:var(--sub);font-weight:600}
-.drow .rq{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.drow img{width:34px;height:34px;border-width:1.5px!important}.drow .nm{font-size:13px;font-weight:700;flex:0 0 auto;white-space:nowrap}.drow .mt{font-size:11px;color:var(--sub);font-weight:600}
+.drow .rq{margin-left:auto;flex:1 1 0;min-width:0;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
 .phd{display:flex;gap:12px;align-items:center;margin-bottom:12px}
 .phd img{width:68px;height:68px}
 .pg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px 8px}.pc{font-size:13px;font-weight:800;white-space:nowrap}.pc b{color:var(--accent);margin-right:6px}.pc span{color:var(--txt)}
@@ -255,7 +255,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .myh .ed{width:1.15em;height:1.15em;border-radius:0;background:none;padding:0;font-size:13px}.sum{align-items:center}.sum b{font-size:13px}.sum .ed{font-size:13px}
 .rnin{font:inherit;font-weight:800;color:var(--txt);border:0;border-bottom:2px solid var(--accent);outline:none;background:none;padding:0;min-width:0;width:100%;border-radius:0}
 .sum .rnin{font-size:13px;width:auto;flex:1}.myn .rnin{font-size:13px}
-.acctype{font-size:11px;font-weight:900;color:#8fe03a;paint-order:stroke fill;-webkit-text-stroke:2px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sig{color:var(--yellow)}
+.acctype{font-size:11px;font-weight:700;color:#88f890;paint-order:stroke fill;-webkit-text-stroke:3px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sig{color:#f8f050}
 .addsk:disabled{opacity:.4;cursor:default}
 .loadset{height:24px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
 #sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
@@ -564,7 +564,7 @@ function condArr(to,from){const c=D[to].cond,a=[];
   if(c.LVL)a.push(`Lv. ${c.LVL}`);
   ['HP','SP','ATK','DEF','INT','SPD'].forEach(k=>{if(c[k])a.push(`${CL[k]} ${c[k]}`)});
   if(c.ABI)a.push(`${CL.ABI} ${c.ABI}`);
-  if(c.Fus){const p=partner(from,to);a.push(`우정 ${c.CAM||100}% ${p!=null?esc(D[p].ko):'다른 디지몬'}`)}else if(c.CAM)a.push(`우정 ${c.CAM}%`);
+  if(c.Fus){const p=partner(from,to);a.push(`우정 ${c.CAM||100}%`);a.push(`우정 ${c.CAM||100}% ${p!=null?esc(D[p].ko):'다른 디지몬'}`)}else if(c.CAM)a.push(`우정 ${c.CAM}%`);
   if(c.Item)a.push(esc(c.Item));if(c.Clear)a.push('해커스 메모리 클리어');
   return a}
 function condPills(to,from){return condArr(to,from).map(t=>tp('',t)).join('')}
@@ -575,7 +575,7 @@ function routeNeeds(p,steps){const tr=[0,0,0,0,0,0],trT=[0,0,0,0,0,0];let abi=0,
   p.forEach((i,k)=>{if(!k)return;const c=D[i].cond,f=steps&&steps[k-1];if(isMC(p[k-1],i)||!D[p[k-1]].next.includes(i))return;
     if(f&&f.tr)f.tr.forEach((d,j)=>{tr[j]+=d||0;if(f.T)trT[j]=Math.max(trT[j],f.T[j])});
     if(c.ABI)abi=Math.max(abi,c.ABI);
-    if(c.Fus){const pt=partner(p[k-1],i);par.push(`우정 ${c.CAM||100}% ${pt!=null?D[pt].ko:'다른 디지몬'}`)}else if(f&&f.fr>0&&c.CAM)cam=Math.max(cam,c.CAM);
+    if(c.Fus){const pt=partner(p[k-1],i);par.push(`우정 ${c.CAM||100}% ${pt!=null?D[pt].ko:'다른 디지몬'}`)}if(f&&f.fr>0&&c.CAM)cam=Math.max(cam,c.CAM);
     if(c.Item&&!items.includes(c.Item))items.push(c.Item);if(c.Clear)clr=true});
   const a=[];tr.forEach((d,j)=>{if(d>0)a.push(tp('',`특훈 ${CL[SK[j]]} +${trT[j]||d}`))});
   if(abi)a.push(tp('',`재능 ${abi} 이상`));
@@ -601,7 +601,7 @@ function boxActs(p,k,got,steps){const m=D[p[k]],a=[],sk=[];let lv=0;
   if(ev){
     if(f&&f.tr)f.tr.forEach((d,j)=>{if(d>0)a.push(`특훈 ${CL[SK[j]]} +${f.T?f.T[j]:d}`)});
     if(c.ABI)a.push(`${CL.ABI} ${c.ABI} 이상`);
-    if(!c.Fus&&f&&f.fr>0)a.push(`우정 ${f.F!=null?f.F:f.fr}% 이상`)}
+    if(f&&f.fr>0)a.push(`우정 ${f.F!=null?f.F:f.fr}% 이상`)}
   return a}
 // 진화 박스에 쓰는 조건: 데이터베이스에 저장된 원래 진화 조건 (저장 순서 그대로)
 function evoConds(from,to){return condArr(to,from)}
