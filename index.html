@@ -172,7 +172,7 @@ th:first-child,td:first-child{text-align:left}
 .box table th:not(:first-child),.box table td:not(:first-child){white-space:nowrap}.box table td:first-child{width:100%}
 th{color:var(--sub);font-weight:700;font-size:11px}
 tr+tr td{border-top:1px solid var(--border)}
-.mv td,.mv th{text-align:center}.mv td:first-child{text-align:left}.mvc{display:inline-flex;align-items:center;justify-content:flex-start;gap:6px}
+.en th,.en td:not(:first-child){text-align:center}.mv td,.mv th{text-align:center}.mv td:first-child{text-align:left}.mvc{display:inline-flex;align-items:center;justify-content:flex-start;gap:6px}
 .md{color:var(--txt);font-size:11px;line-height:1.4;margin-top:2px;font-weight:500}
 tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .treebox{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:auto;height:calc(100vh - 250px);min-height:300px}
@@ -211,7 +211,7 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .phd img{width:68px;height:68px}
 .pg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px 8px}.pc{font-size:13px;font-weight:800;white-space:nowrap}.pc b{color:var(--accent);margin-right:6px}.pc span{color:var(--txt)}
 .tno{color:var(--accent)}.tnm{color:var(--txt)}.stgt{font-size:13px;font-weight:700;color:var(--sub);margin-left:4px}.modal h2 .ta{margin-right:6px;vertical-align:-5px}
-.mv td:not(:first-child),.mv th{white-space:nowrap}
+.mv td:not(:first-child),.mv th{white-space:nowrap}.mv td:not(:first-child),.mv th:not(:first-child){padding-left:3px;padding-right:3px}
 .lvbox{display:flex;gap:14px;align-items:center}.lvl{display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto}
 .tri{width:44px;height:22px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}.tri svg{width:100%;height:100%;fill:currentColor}
 .lvi{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--accent);font-size:13px}
@@ -258,7 +258,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sum .rnin{font-size:13px;width:auto;flex:1;font-weight:800}.myn .rnin{font-size:13px;font-weight:800}
 .acctype{font-size:11px;font-weight:700;color:#88f890;paint-order:stroke fill;-webkit-text-stroke:3px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sig{color:#f8f050}
 .addsk:disabled{opacity:.4;cursor:default}
-.grpchip{height:24px;padding:0 9px;border-width:0;background:var(--sky);color:var(--txt);opacity:.4}.grpchip.active{background:var(--sky);color:var(--txt);opacity:1}.loadset{height:24px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
+.grpchip{height:24px;padding:0 9px;border:2px solid var(--sky);background:transparent;color:var(--txt)}.grpchip.active{background:var(--sky);color:var(--txt)}.loadset{height:24px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
 #sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
 #sdrawer.open{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s}
 .sdh{display:inline-flex;align-items:center;background:#fff;border-radius:12px 12px 0 0;padding:9px 8px 6px 14px;margin:0;vertical-align:bottom}.sdbody{background:#fff;border-radius:0 14px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}.sdh b{font-size:13px;font-weight:800}.sdh .ed{font-size:13px}.sdh .rnin{font-size:13px;font-weight:800;flex:none;width:10em;min-width:0}
@@ -681,16 +681,16 @@ function drawDex(){const q=QS.dex;
 // ---------- 상세 팝업 ----------
 function openDetail(i){
   const m=D[i];const want=new Set(S.skills);
-  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td><div class="mvc">${skI(x,18)}<b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b></div>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv. ${sig?1:(lv||'-')}</td><td>${x.sp??'-'}</td><td><span class="acctype${sig?' sig':''}">${sig?'필살기':'계승기'}</span></td></tr>`};
+  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td><div class="mvc">${skI(x,18)}<b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b></div>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>${sig?1:(lv||'-')}</td><td>${x.sp??'-'}</td><td><span class="acctype${sig?' sig':''}">${sig?'필살기':'계승기'}</span></td></tr>`};
   const evo=(arr,dir)=>arr.filter(j=>dir==='mc'||!isMC(i,j)).map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div class="nm">${esc(D[j].ko)}</div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:13px">없음</div>';
-  const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:13px">없음</div>';
+  const enc=m.enc.length?`<table class="en"><tr><th>장소</th><th>Lv.</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:13px">없음</div>';
   const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['DEF','DEF'],['INT','INT'],['SPD','SPD']];
   const cells=LS.map(([k,l])=>`<div class="sc"><b>${l}</b><span class="cv" data-k="${k}">${statAt(i,k,1)}</span></div>`).join('');
   const title=`${taI(m,22)}<span class="tno">No.${String(m.no).padStart(3,'0')}</span> <span class="tnm">${esc(m.ko)}</span> <span class="stgt">${m.stage}</span>`;
   const b=openModal(title,`<div class="phd"><img src="${img(i)}"><div class="pg"><div class="pc"><b>종족</b><span>${TYPE[m.type]||''}</span></div><div class="pc"><b>속성</b><span>${ATTR[m.attr]||''}</span></div><div class="pc"><b>장비 슬롯</b><span>${m.slots}</span></div><div class="pc"><b>소비 메모리</b><span>${m.mem}</span></div></div></div>
   <div class="btnrow"><button class="btn act" id="as" type="button">${ICS}출발 디지몬으로</button><button class="btn act" id="ae" type="button">${ICE}도착 디지몬으로</button></div>
   <div class="sec"><h3>레벨별 능력치</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
-  <div class="sec"><h3>스킬</h3><table class="mv"><tr><th>배운 스킬</th><th>습득</th><th>SP</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
+  <div class="sec"><h3>스킬</h3><table class="mv"><tr><th>배운 스킬</th><th>습득 Lv.</th><th>소비 SP</th><th>종류</th></tr>${m.moves.map(x=>mvRow(x,false)).join('')}${m.sig.map(x=>mvRow(x,true)).join('')}</table></div>
   <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:13px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
   <div class="sec"><h3>퇴화</h3>${evo(m.prev,'prev')}</div>
   <div class="sec"><h3>진화</h3>${evo(m.next,'next')}</div>${MCP[i].length?`<div class="sec"><h3>모드 체인지</h3>${evo(MCP[i],'mc')}</div>`:''}
