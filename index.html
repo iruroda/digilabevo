@@ -565,7 +565,7 @@ function condArr(to,from){const c=D[to].cond,a=[];
   ['HP','SP','ATK','DEF','INT','SPD'].forEach(k=>{if(c[k])a.push(`${CL[k]} ${c[k]}`)});
   if(c.ABI)a.push(`${CL.ABI} ${c.ABI}`);
   if(c.Fus){const p=partner(from,to);a.push(`우정 ${c.CAM||100}% ${p!=null?esc(D[p].ko):'다른 디지몬'}`)}else if(c.CAM)a.push(`우정 ${c.CAM}%`);
-  if(c.Item)a.push(c.Item);if(c.Clear)a.push('해커스 메모리 클리어');
+  if(c.Item)a.push(esc(c.Item));if(c.Clear)a.push('해커스 메모리 클리어');
   return a}
 function condPills(to,from){return condArr(to,from).map(t=>tp('',t)).join('')}
 // 루트 흐름도: 디지몬(아이콘+이름) → 해야 할 일 → 다음 디지몬. dir 'h' 가로 / 'v' 세로
@@ -604,15 +604,7 @@ function boxActs(p,k,got,steps){const m=D[p[k]],a=[],sk=[];let lv=0;
     if(!c.Fus&&f&&f.fr>0)a.push(`우정 ${f.F!=null?f.F:f.fr}% 이상`)}
   return a}
 // 진화 박스에 쓰는 조건: 데이터베이스에 저장된 원래 진화 조건 (저장 순서 그대로)
-function evoConds(from,to){const c=D[to].cond,a=[];
-  for(const k of Object.keys(c)){
-    if(k==='Fus')continue;
-    if(k==='Item')a.push(esc(c.Item));
-    else if(k==='Clear')a.push('해커스 메모리 클리어');
-    else if(k==='CAM'){if(c.Fus){const pt=partner(from,to);a.push(`우정 ${c.CAM}% ${pt!=null?esc(D[pt].ko):'다른 디지몬'}`)}else a.push(`우정 ${c.CAM}%`)}
-    else a.push(`${CL[k]==='Lv'?'Lv.':CL[k]} ${c[k]}`)}
-  if(c.Fus&&c.CAM==null){const pt=partner(from,to);a.push(`우정 100% ${pt!=null?esc(D[pt].ko):'다른 디지몬'}`)}
-  return a}
+function evoConds(from,to){return condArr(to,from)}
 let _mc=null;const mtw=t=>{_mc=_mc||document.createElement('canvas').getContext('2d');_mc.font='800 11px '+getComputedStyle(document.body).fontFamily;return _mc.measureText(t).width};
 const FLAG=k=>'<svg class="fl" data-k="'+k+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22V3"/><path d="M5 4L19 9.5L5 15Z" fill="currentColor"/></svg>';
 function routeFlow(p,got,steps,dir){
