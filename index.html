@@ -380,6 +380,7 @@ const BATTLE_EXP=80000,VISIT=3,FUSION=200,CAP=10;
 // 가중치 합이 같을 때: 위에서 아래로(EXP → 디지뱅크 방문 → 특훈 → 우정) 큰 쪽을 먼저. 조그레스 진화는 실수 오차 때문에 동점 처리에서 뺀다
 const tie=(vf,n,tc,fr,fu)=>-(n*1e-4+(vf?1e-7:0)+tc*5e-11+fr*1e-13);
 const nBattles=(i,L)=>Math.ceil(EXPT[D[i].ec][Math.max(1,Math.min(99,L))-1]/BATTLE_EXP);
+function minLv(i,to,T,pi){const c=D[to].cond;for(let L=Math.max(1,c.LVL||1);L<99;L++){if(SK.every((k,j)=>{const q=c[k]||0;return !q||statAt(i,k,L)+T[j]>=(j===pi?Math.ceil(q*100/105):q)}))return L}return 99}
 function lvAfter(i,n){const t=EXPT[D[i].ec],e=n*BATTLE_EXP;let L=1;while(L<99&&t[L]<=e)L++;return L}
 const _ec=new Map();
 function edgeCurve(from,to,pi=-1){const key=from*1000+to+(pi+1)*1e6;let o=_ec.get(key);if(o)return o;
@@ -445,7 +446,7 @@ function solveHard(start,end,skills,ban,w,budget,av){
         if(pT&&pm===mask2&&T2.every((t,j)=>t===pT[j]))continue;pT=T2;pm=mask2;
         let tc=0;const tr=T2.map((t,j)=>{const d=t-s.T[j];if(d>0)tc+=j===0?Math.ceil(d/10):d;return d});
         const F2=Math.max(s.F,cam),fr=F2-s.F,vf=(s.b===0||o.n>0),v=vf?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n*wE+v+tc*WT+fr*WF+fu+tie(vf,o.n,tc,fr,fu),r:s.r+o.n+v+tc+fr+fu,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,T:T2,F:F2,g:mask2&~s.mask}})}}
+        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n*wE+v+tc*WT+fr*WF+fu+tie(vf,o.n,tc,fr,fu),r:s.r+o.n+v+tc+fr+fu,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,T:T2,F:F2,lv:minLv(x,nb,T2,PI),g:mask2&~s.mask}})}}
   }
   return {err:'조건을 만족하는 루트가 없습니다.'};
 }
@@ -612,7 +613,7 @@ function boxActs(p,k,got,steps){const m=D[p[k]],a=[],sk=[];let lv=0;
   (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);if(mv&&mv[1]>lv)lv=mv[1];sk.push(`${esc(M[id].n)} 습득`)});
   let ev=false,c=null,f=null;
   if(k<p.length-1){const to=p[k+1];c=D[to].cond;f=steps&&steps[k];ev=!(isMC(p[k],to)||!m.next.includes(to))}
-  if(ev&&c.LVL>lv)lv=c.LVL;
+  if(ev){const need=f&&f.lv?f.lv:c.LVL;if(need>lv)lv=need}
   if(lv>1)a.push(`Lv. ${lv} 이상`);
   a.push(...sk);
   if(ev){
