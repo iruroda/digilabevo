@@ -255,7 +255,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .myh .ed{width:1.15em;height:1.15em;border-radius:0;background:none;padding:0;font-size:13.5px}.sum{align-items:center}.sum b{font-size:13.5px}.sum .ed{font-size:13.5px}
 .rnin{font:inherit;font-weight:800;color:var(--txt);border:0;border-bottom:2px solid var(--accent);outline:none;background:none;padding:0;min-width:0;width:100%;border-radius:0}
 .sum .rnin{font-size:13.5px;width:auto;flex:1}.myn .rnin{font-size:13.5px}
-.acctype{font-size:12px;font-weight:900;color:#8fe03a;paint-order:stroke fill;-webkit-text-stroke:2px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sg{color:var(--yellow)}
+.acctype{font-size:12px;font-weight:900;color:#8fe03a;paint-order:stroke fill;-webkit-text-stroke:2px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sig{color:var(--yellow)}
 .addsk:disabled{opacity:.4;cursor:default}
 .loadset{height:22px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
 #sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
@@ -667,7 +667,7 @@ function drawDex(){const q=QS.dex;
 // ---------- 상세 팝업 ----------
 function openDetail(i){
   const m=D[i];const want=new Set(S.skills);
-  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td><div class="mvc">${skI(x,18)}<b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b></div>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${sig?1:(lv||'-')}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td><span class="acctype${sig?' sg':''}">${sig?'필살기':'계승기'}</span></td></tr>`};
+  const mvRow=([id,lv],sig)=>{const x=M[id];return `<tr class="${want.has(id)?'hit':''}"><td><div class="mvc">${skI(x,18)}<b class="mvl" data-id="${id}" style="cursor:pointer">${esc(x.n)}</b></div>${x.d?`<div class="md">${esc(x.d)}</div>`:''}</td><td>Lv.${sig?1:(lv||'-')}</td><td>${x.sp??'-'}</td><td>${x.p||'-'}${x.n2>1?`×${x.n1===x.n2?x.n2:x.n1+'~'+x.n2}`:''}</td><td><span class="acctype${sig?' sig':''}">${sig?'필살기':'계승기'}</span></td></tr>`};
   const evo=(arr,dir)=>arr.filter(j=>dir==='mc'||!isMC(i,j)).map(j=>`<div class="drow" data-j="${j}"><img src="${img(j)}"><div class="nm">${esc(D[j].ko)}</div><div class="rq">${dir==='next'?condPills(j,i):''}</div></div>`).join('')||'<div class="mt" style="color:var(--sub);font-size:12px">없음</div>';
   const enc=m.enc.length?`<table><tr><th>장소</th><th>레벨</th><th>확률</th></tr>${m.enc.map(e=>`<tr><td>${esc(e.a)}</td><td>${e.lo===e.hi?e.lo:e.lo+'~'+e.hi}</td><td>${e.rate}%</td></tr>`).join('')}</table>`:'<div style="color:var(--sub);font-size:12px">없음</div>';
   const LS=[['HP','HP'],['SP','SP'],['ATK','ATK'],['INT','INT'],['DEF','DEF'],['SPD','SPD']];
@@ -732,7 +732,7 @@ function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.qu
   a.classList.toggle('open',open)}
 function drawSkillView(){const host=$('#skview');const openId=SKSEL;SKSEL=null;
   const q=QS.skill;chipsSk();const list=allSkillIds.filter(id=>(SKF==='all'||(SKF==='sig')===!!sigH[id])&&match(M[id].n,q));
-  host.innerHTML=`<div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div></div><span class="acctype${sigH[id]?' sg':''}">${sigH[id]?'필살기':'계승기'}</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없습니다.</div>'}</div>`;
+  host.innerHTML=`<div class="rlist">${list.map(id=>`<div class="acc" data-id="${id}"><div class="rrow acch">${skI(M[id],22)}<div style="flex:1"><div class="nm">${esc(M[id].n)}</div></div><span class="acctype${sigH[id]?' sig':''}">${sigH[id]?'필살기':'계승기'}</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div><div class="accb"><div class="accin"></div></div></div>`).join('')||'<div class="empty">검색 결과가 없습니다.</div>'}</div>`;
   host.querySelectorAll('.acc').forEach(a=>a.querySelector('.acch').onclick=()=>{const o=!a.classList.contains('open');if(o)host.querySelectorAll('.acc.open').forEach(b=>toggleAcc(b,false));toggleAcc(a,o)});
   if(openId!=null){const a=host.querySelector(`.acc[data-id="${openId}"]`);if(a){toggleAcc(a,true);setTimeout(()=>a.scrollIntoView({block:'nearest',behavior:'smooth'}),50)}}}
 function chipsSk(){const h=$('#chips-sk');h.innerHTML=[['all','전체'],['sig','필살기'],['inh','계승기']].map(([v,l])=>`<button class="chip${SKF===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
