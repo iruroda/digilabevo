@@ -267,7 +267,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sdsk{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}.sdsk .chip{height:26px;padding:0 9px;gap:5px;font-weight:700}
 .sdbtn{display:flex;gap:8px}
 .sdrow{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;font-weight:800}.sdrow+.sdrow{border-top:1px solid var(--border);font-weight:800}
-.setlist{max-height:187px;overflow:auto;border:1px solid var(--border);border-radius:12px}.setlist div{padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer}.setlist div.on{background:var(--bg);color:var(--accent)}.setprev .sdsk{margin:12px 0 0}.sdd{position:relative}.sdd .drop{position:static;max-height:0;margin-top:0;border-width:0;box-shadow:none;transform:none;overflow:hidden;transition:max-height .28s,margin .28s,opacity .18s,visibility 0s .28s}.sdd .drop.open{max-height:170px;margin-top:4px;border-width:1px;overflow:auto;transition:max-height .28s,margin .28s,opacity .18s,visibility 0s}.ddb{width:100%;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:13px;color:rgba(var(--sub-rgb),.9);cursor:pointer}.ddb.set{color:var(--txt);font-weight:700}.ddb.open{border-color:var(--accent)}.ddb .chev{width:18px;height:18px;fill:none;stroke:var(--sub);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}.ddb.open .chev{transform:rotate(180deg)}.setprev{margin-top:8px}.setprev .accp{padding:2px 4px 0}
+.setlist{max-height:187px;overflow:auto;border:1px solid var(--border);border-radius:12px}.setlist div{padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer}.setlist div.on{background:var(--bg);color:var(--accent)}.setlist.mg div{display:flex;align-items:center;justify-content:space-between;gap:8px}.sx{flex:0 0 auto;width:20px;height:20px;border:0;background:none;color:var(--sub);padding:2px;cursor:pointer;display:flex}.sx svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}#smg{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:21;display:none;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:bottom .28s cubic-bezier(.33,0,.2,1)}#smg.show{display:flex}body.sdo #smg{bottom:calc(var(--sdb,0px) + 8.5px)}.setprev .sdsk{margin:12px 0 0}.sdd{position:relative}.sdd .drop{position:static;max-height:0;margin-top:0;border-width:0;box-shadow:none;transform:none;overflow:hidden;transition:max-height .28s,margin .28s,opacity .18s,visibility 0s .28s}.sdd .drop.open{max-height:170px;margin-top:4px;border-width:1px;overflow:auto;transition:max-height .28s,margin .28s,opacity .18s,visibility 0s}.ddb{width:100%;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:13px;color:rgba(var(--sub-rgb),.9);cursor:pointer}.ddb.set{color:var(--txt);font-weight:700}.ddb.open{border-color:var(--accent)}.ddb .chev{width:18px;height:18px;fill:none;stroke:var(--sub);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}.ddb.open .chev{transform:rotate(180deg)}.setprev{margin-top:8px}.setprev .accp{padding:2px 4px 0}
 body.sdo{padding-bottom:170px}
 .mys.grabbing{cursor:grabbing;user-select:none}.mys .bi{cursor:pointer}
 .bi{position:relative}.bi .fl{position:absolute;left:-2px;top:-2px;width:15px;height:15px;color:var(--accent);font-weight:700}
@@ -500,7 +500,7 @@ function slideViews(o,n,snap,H0){const so=$('#v-'+o),sn=$('#v-'+n),c=document.qu
   let done=false,t;const fin=()=>{if(done)return;done=true;clearTimeout(t);slideDone=null;so.hidden=true;so.style.cssText='';sn.style.transform='';sn.style.transition='';sh.style.transform='';sh.style.transition='';ft.style.transform='';ft.style.transition='';document.body.style.overflowX='';snap&&snap.remove();c.style.position='';c.style.overflowX='';hw.style.overflowX=''};
   slideDone=fin;sn.addEventListener('transitionend',e=>{if(e.target===sn&&e.propertyName==='transform')fin()},{once:true});t=setTimeout(fin,360)}
 function view(v){closeModal();if(slideDone)slideDone();const old=VIEWS.find(k=>!$('#v-'+k).hidden),mo=old&&old!==v&&!matchMedia('(prefers-reduced-motion:reduce)').matches,snap=mo?subSnap():null,H0=$('#hdwrap').offsetHeight;
-  CUR=v;document.body.dataset.view=v;try{const o=DRAFT.length>0&&v==='skill';$('#sdrawer').classList.toggle('open',o);document.body.classList.toggle('sdo',o)}catch(e){}
+  CUR=v;document.body.dataset.view=v;try{updMg()}catch(e){}try{const o=DRAFT.length>0&&v==='skill';$('#sdrawer').classList.toggle('open',o);document.body.classList.toggle('sdo',o)}catch(e){}
   VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
   const q=$('#q');q.value=QS[v]||'';window.scrollTo(0,0);
   if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree();if(v==='my')drawMy();
@@ -736,13 +736,28 @@ function addToDraft(id){if(DRAFT.length>=8||DRAFT.includes(id))return;if(!DRAFT.
 $('#sdedit').onclick=()=>{const t=document.querySelector('.sdh'),w0=t.offsetWidth;editName($('#sdn'),DRAFTNAME,v=>{DRAFTNAME=v},()=>animH(t,wE,t.offsetWidth,'width'));var wE=t.offsetWidth;animH(t,w0,wE,'width')};
 $('#sdclr').onclick=()=>{DRAFT=[];drawDrawer()};
 $('#sdsave').onclick=()=>{if(!DRAFT.length)return;SETS.push({id:Date.now().toString(36),name:DRAFTNAME||defSetName(),skills:DRAFT.slice(),t:Date.now()});saveSets();DRAFT=[];drawDrawer();drawLoadBtn()};
-function drawLoadBtn(){$('#loadset').style.display=SETS.length?'':'none'}
+function updMg(){const b=$('#smg');if(b)b.classList.toggle('show',CUR==='skill'&&SETS.length>0)}
+function drawLoadBtn(){$('#loadset').style.display=SETS.length?'':'none';updMg()}
 $('#loadset').onclick=()=>{
   const b=openModal('스킬 세트 불러오기',`<div class="setlist" id="setdrop">${SETS.map(s=>`<div data-id="${s.id}">${esc(s.name)}</div>`).join('')}</div><div class="setprev" id="setprev"></div><div style="margin-top:12px;display:flex"><button class="btn pri" id="setok" type="button" disabled>확인</button></div>`);
   const ok=b.querySelector('#setok'),dd=b.querySelector('#setdrop'),prev=b.querySelector('#setprev');let cur=null;
   dd.onclick=e=>{const t=e.target.closest('[data-id]');if(!t)return;cur=SETS.find(x=>x.id===t.dataset.id);dd.querySelectorAll('div').forEach(d=>d.classList.toggle('on',d===t));
     const had=!!prev.firstChild;prev.innerHTML=`<div class="sdsk">${cur.skills.filter(id=>M[id]).map(id=>`<span class="chip tag">${skI(M[id],18)}${esc(M[id].n)}</span>`).join('')}</div>`;if(!had)growIn(prev.firstChild);ok.disabled=false};
   ok.onclick=()=>{if(!cur)return;S.skills=cur.skills.filter(id=>M[id]).slice(0,8);drawSel();closeModal()}};
+
+document.body.insertAdjacentHTML('beforeend','<button class="btn act" id="smg" type="button">스킬 세트 관리</button>');
+try{new ResizeObserver(()=>document.documentElement.style.setProperty('--sdb',document.querySelector('.sdbody').offsetHeight+'px')).observe(document.querySelector('.sdbody'))}catch(e){}
+$('#smg').onclick=()=>{
+  let work=SETS.slice(),sel=null;
+  const b=openModal('스킬 세트 관리',`<div class="setlist mg" id="setdrop"></div><div class="setprev" id="setprev"></div><div class="btnrow" style="margin-top:12px"><button class="btn" id="mgno" type="button">취소</button><button class="btn pri" id="mgok" type="button">저장</button></div>`);
+  const dd=b.querySelector('#setdrop'),prev=b.querySelector('#setprev');
+  const drawList=()=>{dd.innerHTML=work.map(s=>`<div data-id="${s.id}" class="${sel===s.id?'on':''}"><span>${esc(s.name)}</span><button class="sx" type="button" aria-label="삭제">${XIC}</button></div>`).join('');
+    const c=work.find(x=>x.id===sel);prev.innerHTML=c?`<div class="sdsk">${c.skills.filter(id=>M[id]).map(id=>`<span class="chip tag">${skI(M[id],18)}${esc(M[id].n)}</span>`).join('')}</div>`:''};
+  drawList();
+  dd.onclick=e=>{const t=e.target.closest('[data-id]');if(!t)return;const id=t.dataset.id;
+    if(e.target.closest('.sx')){work=work.filter(x=>x.id!==id);if(sel===id)sel=null}else sel=id;drawList()};
+  b.querySelector('#mgno').onclick=()=>closeModal();
+  b.querySelector('#mgok').onclick=()=>{SETS=work;saveSets();drawLoadBtn();closeModal()}};
 drawLoadBtn();
 function toggleAcc(a,open){if(open&&!a.dataset.built){const id=a.dataset.id;a.querySelector('.accin').innerHTML=skBody(id);a.dataset.built=1;
     a.querySelectorAll('[data-i]').forEach(e=>e.onclick=()=>openDetail(+e.dataset.i));
