@@ -131,7 +131,7 @@ select.dn{-webkit-appearance:none;appearance:none;padding:0 14px 0 4px;text-alig
 .hintx{font-size:11px;color:var(--sub);margin-top:8px;line-height:1.5;font-weight:500}.skd .hintx{color:var(--txt);font-weight:500}
 .btn{display:flex;align-items:center;justify-content:center;height:36px;padding:0 10px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--txt);font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;flex:1}
 .btn.act,.btn.rsave{background:var(--sky);border-color:var(--sky);color:var(--txt)}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
-.btnrow{display:flex;gap:8px}
+.btnrow{display:flex;gap:8px}.gearb{flex:0 0 36px;width:36px;height:36px;border:0;background:none;color:var(--accent);padding:5px;cursor:pointer;display:flex}.gearb svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.wtx{font-size:13px;font-weight:500;line-height:1.5;margin-bottom:12px}.wr{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0;font-size:13px;font-weight:500}.wr .inp{width:64px;flex:0 0 64px;text-align:center;padding:0 6px}.wr+.wr{border-top:1px solid var(--border)}.wbt{margin-top:14px}.wbt .btn{white-space:nowrap}.wbt .act{flex:1.5}
 .tagp{display:inline-flex;align-items:center;gap:3px;background:var(--bg);border-radius:8px;padding:2px 7px;font-size:11px;font-weight:500;color:var(--txt)}
 .tagp.evo{background:var(--accent);color:#fff;font-weight:700}
 .tagp.dev{background:#fff;border:1px solid var(--border);color:var(--sub)}
@@ -240,7 +240,7 @@ input[type=range]{accent-color:var(--accent)}
 .bact{display:grid;grid-auto-flow:column;align-content:start}.bact div{overflow:hidden;white-space:nowrap}.bact div.w{white-space:normal;word-break:keep-all}
 .bt{font-size:11px;font-weight:800;line-height:14px;white-space:nowrap}
 .ar{position:relative;background:var(--txt);flex:0 0 auto;border-radius:1px}
-.bd .bact{background:#fff;border-radius:8px;padding:1px 4px;align-self:stretch}.be .bact{background:#fff3c9;border-radius:8px;padding:1px 4px}.ar::after{content:'';position:absolute}.ar.ln::after{display:none}.flow.v .ar.ln{margin-bottom:0}.flow.h .ar.ln{margin-right:0}
+.bd .bact{background:#fff;border-radius:8px;padding:1px 4px;align-self:stretch}.be .bact{background:#fff3c9;border-radius:8px;padding:1px 4px;margin-top:4px;flex:1}.be .bact div{line-height:13px}.ar::after{content:'';position:absolute}.ar.ln::after{display:none}.flow.v .ar.ln{margin-bottom:0}.flow.h .ar.ln{margin-right:0}
 .flow.v .ar{width:2px;height:20px;margin:0 0 6px 42px}.flow.v .ar::after{left:-4px;bottom:-6px;border-top:7px solid var(--txt);border-left:5px solid transparent;border-right:5px solid transparent}
 .flow.h .ar{height:2px;width:22px;margin:0 6px 0 0}.flow.h .ar::after{right:-6px;top:-4px;border-left:7px solid var(--txt);border-top:5px solid transparent;border-bottom:5px solid transparent}
 .sv:first-child{border-top:none}
@@ -316,7 +316,7 @@ body.sdo{padding-bottom:170px}
     <div class="dc"><button class="chip" id="tgT" type="button">특훈 회피</button><button class="chip" id="tgF" type="button">우정 회피</button></div>
    </div>
   </div>
-  <div class="btnrow" style="margin-bottom:12px"><button class="btn pri" id="go" type="button">루트 찾기</button></div>
+  <div class="btnrow" style="margin-bottom:12px"><button class="btn pri" id="go" type="button">루트 찾기</button><button class="gearb" id="wgear" type="button" aria-label="가중치 설정"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
   <div id="result"></div>
  </section>
  <section id="v-dex" hidden><div class="grid" id="cards"></div></section>
@@ -489,7 +489,8 @@ function slideViews(o,n,snap,H0){const so=$('#v-'+o),sn=$('#v-'+n),c=document.qu
   let done=false,t;const fin=()=>{if(done)return;done=true;clearTimeout(t);slideDone=null;so.hidden=true;so.style.cssText='';sn.style.transform='';sn.style.transition='';sh.style.transform='';sh.style.transition='';ft.style.transform='';ft.style.transition='';document.body.style.overflowX='';snap&&snap.remove();c.style.position='';c.style.overflowX='';hw.style.overflowX=''};
   slideDone=fin;sn.addEventListener('transitionend',e=>{if(e.target===sn&&e.propertyName==='transform')fin()},{once:true});t=setTimeout(fin,360)}
 function view(v){closeModal();if(slideDone)slideDone();const old=VIEWS.find(k=>!$('#v-'+k).hidden),mo=old&&old!==v&&!matchMedia('(prefers-reduced-motion:reduce)').matches,snap=mo?subSnap():null,H0=$('#hdwrap').offsetHeight;
-  CUR=v;document.body.dataset.view=v;VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
+  CUR=v;document.body.dataset.view=v;try{const o=DRAFT.length>0&&v==='skill';$('#sdrawer').classList.toggle('open',o);document.body.classList.toggle('sdo',o)}catch(e){}
+  VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
   const q=$('#q');q.value=QS[v]||'';window.scrollTo(0,0);
   if(v==='dex')drawDex();if(v==='skill')drawSkillView();if(v==='tree')buildTree();if(v==='my')drawMy();
   if(mo)slideViews(old,v,snap,H0)}
@@ -589,8 +590,8 @@ const BH=88,BIC=70,BCOL=88,BR=5,BRE=4;
 const twb=(t,hg,ot)=>[...String(t).replace(/<[^>]*>/g,'')].reduce((w,c)=>w+(c.charCodeAt(0)>255?hg:c===' '?3.4:/[()]/.test(c)?4.2:ot),0);
 let _WE=0;const boxWE=()=>_WE||(_WE=Math.max(8+BIC+8+BCOL+8+8,Math.ceil(Math.max(...D.map(m=>twb(ro(m.ko)+' 진화',11.3,6.6))))+16+4));
 function packCols(items,rows,colW,perChar){let col=1,used=0;const sp=items.map(t=>Math.min(rows,Math.max(1,Math.ceil((twb(t,perChar[0],perChar[1])+2)/colW))));sp.forEach(s=>{if(used+s>rows){col++;used=0}used+=s});return {cols:col,sp}}
-const gridHtml=(items,rows,colW,perChar,minCols)=>{const {cols,sp}=packCols(items,rows,colW,perChar);const c=Math.max(cols,minCols||1);
-  return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},14px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
+const gridHtml=(items,rows,colW,perChar,minCols,rh=14)=>{const {cols,sp}=packCols(items,rows,colW,perChar);const c=Math.max(cols,minCols||1);
+  return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},${rh}px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
 // 디지몬 박스에 쓰는 행동 (명사형, 총합): Lv · 스킬 · 특훈(HP→SPD) · 재능 · 우정
 function boxActs(p,k,got,steps){const m=D[p[k]],a=[],sk=[];let lv=0;
   (got&&got[k]?String(got[k]).split(',').filter(Boolean).map(Number):[]).forEach(id=>{const mv=m.moves.find(x=>x[0]===id);if(mv&&mv[1]>lv)lv=mv[1];sk.push(`${esc(M[id].n)} 습득`)});
@@ -616,7 +617,7 @@ function routeFlow(p,got,steps,dir){
     const to=p[k+1],evo=m.next.includes(to);h+='<div class="ar ln"></div>';
     if(isMC(i,to))h+=`<div class="bx bv" style="width:${WE}px;height:46px"><div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">모드 체인지</div></div>`;
     else if(!evo)h+=`<div class="bx bv" style="width:${WE}px;height:30px"><div class="bt">${esc(ro(D[to].ko))} 퇴화</div></div>`;
-    else{const fu=!!D[to].cond.Fus,one1=`${ro(D[to].ko)} 조그레스 진화`,cds0=evoConds(i,to),cds=cds0.length?cds0:['<span style="color:var(--sub)">없음</span>'],tw1=mtw(one1)+16,cw0=Math.floor((WE-24)/2),c2=Math.max(2,packCols(cds,BRE-1,cw0,[11,6.5]).cols),two=fu&&tw1-4>WE&&tw1>24+c2*cw0,wb=fu&&!two&&tw1-4>WE?Math.ceil(tw1):WE,cw=Math.floor((wb-24)/2),cg=gridHtml(cds,two?BRE-1:BRE,cw,[11,6.5],2);
+    else{const fu=!!D[to].cond.Fus,one1=`${ro(D[to].ko)} 조그레스 진화`,cds0=evoConds(i,to),cds=cds0.length?cds0:['<span style="color:var(--sub)">없음</span>'],tw1=mtw(one1)+16,cw0=Math.floor((WE-24)/2),c2=Math.max(2,packCols(cds,BRE-1,cw0,[11,6.5]).cols),two=fu&&tw1-4>WE&&tw1>24+c2*cw0,wb=fu&&!two&&tw1-4>WE?Math.ceil(tw1):WE,cw=Math.floor((wb-24)/2),cg=gridHtml(cds,two?BRE-1:BRE,cw,[11,6.5],2,13);
       h+=`<div class="bx be" style="width:${Math.max(wb,24+cg.cols*cw)}px;height:${BH}px">${two?`<div class="bt">${esc(ro(D[to].ko))}</div><div class="bt">조그레스 진화</div>`:`<div class="bt">${esc(fu?one1:ro(D[to].ko)+' 진화')}</div>`}${cg.html}</div>`}
     h+='<div class="ar"></div>'});
   return `<div class="flow ${dir}">${h}</div>`}
@@ -641,6 +642,14 @@ function runRoute(){
   $('#saveRoute').onclick=saveRoute;$('#rclose').onclick=()=>shrinkOut(r.querySelector('.rcard'),()=>{r.innerHTML='';LAST=null;SAVEDID=null});authGate();
 }
 $('#go').onclick=runRoute;
+// ---------- 가중치 설정 ----------
+const WDEF=[1,3,1,1,200],WLAB=['EXP 80,000 획득','디지뱅크 방문','특훈으로 스테이터스 1(HP 10) 상승','우정 1% 상승','조그레스 진화'];
+let WT=WDEF.slice();try{const a=JSON.parse(localStorage.getItem('digilab.w')||'null');if(Array.isArray(a)&&a.length===5&&a.every(v=>Number.isInteger(v)&&v>=0&&v<=999))WT=a}catch(e){}
+$('#wgear').onclick=()=>{openModal('가중치 설정',`<div class="wtx">진·퇴화, 스킬 습득에 필요한 아래 행동의 가중치 합이 최소(합이 같다면 EXP부터 큰 순서)인 루트를 찾습니다.</div>${WLAB.map((l,k)=>`<div class="wr"><span>${l}</span><input class="inp" inputmode="numeric" maxlength="3" value="${WT[k]}" data-k="${k}"></div>`).join('')}<div class="btnrow wbt"><button class="btn act" id="wreset" type="button">기본값으로 되돌리기</button><button class="btn pri" id="wok" type="button">확인</button></div>`);
+  const ins=[...document.querySelectorAll('#mbody .wr .inp')];
+  ins.forEach(i=>i.addEventListener('input',()=>{i.value=i.value.replace(/\D/g,'').slice(0,3)}));
+  $('#wreset').onclick=()=>ins.forEach((i,k)=>i.value=WDEF[k]);
+  $('#wok').onclick=()=>{WT=ins.map((i,k)=>i.value===''?WDEF[k]:Math.min(999,+i.value));try{localStorage.setItem('digilab.w',JSON.stringify(WT))}catch(e){}closeModal()}};
 // ---------- 도감 ----------
 const F={stage:new Set(),type:new Set(),attr:new Set()};
 const stages=[...new Set(D.map(m=>m.stage))];
@@ -705,7 +714,7 @@ let dShown=[];
 function animH(el,h0,h1,prop){if(RM||!el.animate||h0===h1)return;el.style.overflow='hidden';el.animate([{[prop]:h0+'px'},{[prop]:h1+'px'}],{duration:240,easing:EASE}).onfinish=()=>{el.style.overflow=''}}
 function drawDrawer(){const bd=document.querySelector('.sdbody'),wasOpen=$('#sdrawer').classList.contains('open'),h0=bd.offsetHeight;$('#sdn').textContent=DRAFTNAME;const sk=$('#sdsk');sk.innerHTML=DRAFT.map((id,k)=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}<span class="x" data-k="${k}">${XIC}</span></span>`).join('');
   sk.querySelectorAll('.chip').forEach((c,k)=>{if(!dShown.includes(DRAFT[k]))popIn(c);c.querySelector('.x').onclick=()=>popOut(c,()=>{DRAFT.splice(k,1);drawDrawer()})});dShown=DRAFT.slice();
-$('#sdrawer').classList.toggle('open',DRAFT.length>0);document.body.classList.toggle('sdo',DRAFT.length>0);refreshAdd();if(wasOpen&&DRAFT.length)animH(bd,h0,bd.offsetHeight,'height')}
+$('#sdrawer').classList.toggle('open',DRAFT.length>0&&CUR==='skill');document.body.classList.toggle('sdo',DRAFT.length>0&&CUR==='skill');refreshAdd();if(wasOpen&&DRAFT.length)animH(bd,h0,bd.offsetHeight,'height')}
 function addToDraft(id){if(DRAFT.length>=8||DRAFT.includes(id))return;if(!DRAFT.length)DRAFTNAME=defSetName();DRAFT.push(id);drawDrawer()}
 $('#sdedit').onclick=()=>{const t=document.querySelector('.sdh'),w0=t.offsetWidth;editName($('#sdn'),DRAFTNAME,v=>{DRAFTNAME=v},()=>animH(t,wE,t.offsetWidth,'width'));var wE=t.offsetWidth;animH(t,w0,wE,'width')};
 $('#sdclr').onclick=()=>{DRAFT=[];drawDrawer()};
