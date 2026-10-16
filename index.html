@@ -373,8 +373,8 @@ const SK=['HP','SP','ATK','DEF','INT','SPD'];
 function statAt(i,k,L){const [b,g]=D[i].bs[k];let v=Math.floor((b+g*(L-1))/100);return k==='HP'?v*10:v}
 // ---------- 곤란도: 디지뱅크 방문 3 · 전투(80000exp) 1회 1 · 팜 훈련 스탯 1당 1(HP 10당 1) · 우정 1당 1 · 조그레스 진화(재료 디지몬) 200 ----------
 const BATTLE_EXP=80000,VISIT=3,FUSION=200,CAP=10;
-// 가중치 합이 같을 때: EXP(전투)가 큰 쪽을 먼저, 그다음 팜 훈련·우정·조그레스 진화를 덜 쓰는 쪽
-const tie=(v,n,tc,fr,fu)=>(fu?1e-3:0)+fr*5e-6+tc*2e-9-n*5e-12+(v?1e-13:0);
+// 가중치 합이 같을 때: 위에서 아래로(EXP → 디지뱅크 방문 → 특훈 → 우정) 큰 쪽을 먼저. 조그레스 진화는 실수 오차 때문에 동점 처리에서 뺀다
+const tie=(vf,n,tc,fr,fu)=>-(n*1e-4+(vf?1e-7:0)+tc*5e-11+fr*1e-13);
 const nBattles=(i,L)=>Math.ceil(EXPT[D[i].ec][Math.max(1,Math.min(99,L))-1]/BATTLE_EXP);
 function lvAfter(i,n){const t=EXPT[D[i].ec],e=n*BATTLE_EXP;let L=1;while(L<99&&t[L]<=e)L++;return L}
 const _ec=new Map();
@@ -433,15 +433,15 @@ function solveHard(start,end,skills,ban,w,budget,av){
     for(const nb of MCP[x]){if(ban.has(nb))continue;
       add({node:nb,mask:s.mask,b:s.b,T:s.T,F:s.F,c:s.c+1e-9,r:s.r,par:s,info:{evo:false,mc:true,n:0,visit:0,tr:null,fr:0,fus:0,g:0}})}
     for(const nb of D[x].prev){if(ban.has(nb)||isMC(x,nb))continue;
-      for(const o of opts(x,nb,false)){const mask2=s.mask|o.g,v=(s.b===0||o.n>0)?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n*wE+v+tie(v,o.n,0,0,0),r:s.r+o.n+v,par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
+      for(const o of opts(x,nb,false)){const mask2=s.mask|o.g,vf=(s.b===0||o.n>0),v=vf?VISIT:0;
+        add({node:nb,mask:mask2,b:1,T:s.T,F:s.F,c:s.c+o.n*wE+v+tie(vf,o.n,0,0,0),r:s.r+o.n+v,par:s,info:{evo:false,n:o.n,visit:v,tr:null,fr:0,fus:0,g:mask2&~s.mask}})}}
     for(const nb of D[x].next){if(ban.has(nb)||isMC(x,nb))continue;const cd=D[nb].cond,cam=cd.CAM||0,fu=cd.Fus?FUSION:0;let pT=null,pm=-1;
       for(const o of opts(x,nb,true)){const mask2=s.mask|o.g;
         const T2=s.T.map((t,j)=>Math.max(t,o.tau[j]));
         if(pT&&pm===mask2&&T2.every((t,j)=>t===pT[j]))continue;pT=T2;pm=mask2;
         let tc=0;const tr=T2.map((t,j)=>{const d=t-s.T[j];if(d>0)tc+=j===0?Math.ceil(d/10):d;return d});
-        const F2=Math.max(s.F,cam),fr=F2-s.F,v=(s.b===0||o.n>0)?VISIT:0;
-        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n*wE+v+tc*WT+fr*WF+fu+tie(v,o.n,tc,fr,fu),r:s.r+o.n+v+tc+fr+fu,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,T:T2,F:F2,g:mask2&~s.mask}})}}
+        const F2=Math.max(s.F,cam),fr=F2-s.F,vf=(s.b===0||o.n>0),v=vf?VISIT:0;
+        add({node:nb,mask:mask2,b:1,T:T2,F:F2,c:s.c+o.n*wE+v+tc*WT+fr*WF+fu+tie(vf,o.n,tc,fr,fu),r:s.r+o.n+v+tc+fr+fu,par:s,info:{evo:true,n:o.n,visit:v,tr,tc,fr,fus:fu,T:T2,F:F2,g:mask2&~s.mask}})}}
   }
   return {err:'조건을 만족하는 루트가 없습니다.'};
 }
@@ -657,7 +657,7 @@ $('#go').onclick=runRoute;
 const GEARI=`<svg class="ic16" viewBox="0 0 24 24"><path d="M8.23 5.14Q9.53 4.39 9.75 2.99L9.75 2.99Q9.98 1.59 11.48 1.59L12.52 1.59Q14.02 1.59 14.25 2.99L14.25 2.99Q14.47 4.39 15.77 5.14L16.05 5.30Q17.35 6.05 18.68 5.55L18.68 5.55Q20.00 5.05 20.75 6.34L21.27 7.25Q22.02 8.55 20.92 9.44L20.92 9.44Q19.83 10.34 19.83 11.84L19.83 12.16Q19.83 13.66 20.92 14.56L20.92 14.56Q22.02 15.45 21.27 16.75L20.75 17.66Q20.00 18.95 18.68 18.45L18.68 18.45Q17.35 17.95 16.05 18.70L15.77 18.86Q14.47 19.61 14.25 21.01L14.25 21.01Q14.02 22.41 12.52 22.41L11.48 22.41Q9.98 22.41 9.75 21.01L9.75 21.01Q9.53 19.61 8.23 18.86L7.95 18.70Q6.65 17.95 5.32 18.45L5.32 18.45Q4.00 18.95 3.25 17.66L2.73 16.75Q1.98 15.45 3.08 14.56L3.08 14.56Q4.17 13.66 4.17 12.16L4.17 11.84Q4.17 10.34 3.08 9.44L3.08 9.44Q1.98 8.55 2.73 7.25L3.25 6.34Q4.00 5.05 5.32 5.55L5.32 5.55Q6.65 6.05 7.95 5.30Z"/><circle cx="12" cy="12" r="3.2"/></svg>`;
 const WDEF=[1,3,1,1,200],WLAB=['EXP 80,000 획득','디지뱅크 방문','특훈으로 능력치 1(HP 10) 상승','우정 1% 상승','조그레스 진화'];
 let WGT=WDEF.slice();try{const a=JSON.parse(localStorage.getItem('digilab.w')||'null');if(Array.isArray(a)&&a.length===5&&a.every(v=>Number.isInteger(v)&&v>=0&&v<=999))WGT=a}catch(e){}
-$('#wgear').onclick=()=>{openModal(`<span class="mti">${GEARI}</span>가중치 설정`,`<div class="wtx">진·퇴화, 스킬 습득에 필요한 아래 행동의 가중치 합이 최소(합이 같다면 EXP부터 큰 순서)인 루트를 찾습니다.</div>${WLAB.map((l,k)=>`<div class="wr"><span>${l}</span><input class="inp" inputmode="numeric" maxlength="3" value="${WGT[k]}" data-k="${k}"></div>`).join('')}<div class="btnrow wbt"><button class="btn act" id="wreset" type="button">기본값으로 되돌리기</button><button class="btn pri" id="wok" type="button">확인</button></div>`,{titleHtml:1});
+$('#wgear').onclick=()=>{openModal(`<span class="mti">${GEARI}</span>가중치 설정`,`<div class="wtx">진·퇴화, 스킬 습득에 필요한 아래 행동의 가중치 합이 최소(합이 같다면 위에서 아래로 큰 순서)인 루트를 찾습니다.</div>${WLAB.map((l,k)=>`<div class="wr"><span>${l}</span><input class="inp" inputmode="numeric" maxlength="3" value="${WGT[k]}" data-k="${k}"></div>`).join('')}<div class="btnrow wbt"><button class="btn act" id="wreset" type="button">기본값으로 되돌리기</button><button class="btn pri" id="wok" type="button">적용</button></div>`,{titleHtml:1});
   const ins=[...document.querySelectorAll('#mbody .wr .inp')];
   ins.forEach(i=>i.addEventListener('input',()=>{i.value=i.value.replace(/\D/g,'').slice(0,3)}));
   $('#wreset').onclick=()=>ins.forEach((i,k)=>i.value=WDEF[k]);
