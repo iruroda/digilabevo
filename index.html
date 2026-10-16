@@ -605,7 +605,11 @@ function routeNeeds(p,steps){const tr=[0,0,0,0,0,0],trT=[0,0,0,0,0,0];let abi=0,
 const BH=88,BIC=70,BCOL=88,BR=5,BRE=4;
 const twb=(t,hg,ot)=>[...String(t).replace(/<[^>]*>/g,'')].reduce((w,c)=>w+(c.charCodeAt(0)>255?hg:c===' '?3.4:/[()]/.test(c)?4.2:ot),0);
 let _WE=0;const boxWE=()=>_WE||(_WE=Math.max(8+BIC+8+BCOL+8+8,Math.ceil(Math.max(...D.map(m=>twb(ro(m.ko)+' 진화',11.3,6.6))))+16+4));
-function packCols(items,rows,colW,perChar){let col=1,used=0;const sp=items.map(t=>Math.min(rows,Math.max(1,Math.ceil((twb(t,perChar[0],perChar[1])+2)/colW))));sp.forEach(s=>{if(used+s>rows){col++;used=0}used+=s});return {cols:col,sp}}
+let _rm=null;const _rw=new Map();
+// 행동 텍스트 너비: 실제 글꼴로 직접 재서 (기기마다 글꼴이 달라도 줄 수가 맞게)
+const twr=(t,perChar)=>{try{if(!_rm){_rm=document.createElement('span');_rm.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font-size:11px;font-weight:500';document.body.appendChild(_rm)}
+  let w=_rw.get(t);if(w==null){_rm.innerHTML=t;w=_rm.getBoundingClientRect().width;if(!w)throw 0;_rw.set(t,w)}return w}catch(e){return twb(t,perChar[0],perChar[1])}};
+function packCols(items,rows,colW,perChar){let col=1,used=0;const sp=items.map(t=>Math.min(rows,Math.max(1,Math.ceil((twr(t,perChar)+2)/colW))));sp.forEach(s=>{if(used+s>rows){col++;used=0}used+=s});return {cols:col,sp}}
 const gridHtml=(items,rows,colW,perChar,minCols,rh=14)=>{const {cols,sp}=packCols(items,rows,colW,perChar);const c=Math.max(cols,minCols||1);
   return {cols:c,html:`<div class="bact" style="grid-template-columns:repeat(${c},${colW}px);grid-template-rows:repeat(${rows},${rh}px)">${items.map((t,k)=>`<div${sp[k]>1?` class="w" style="grid-row:span ${sp[k]}"`:''}>${t}</div>`).join('')}</div>`}};
 // 디지몬 박스에 쓰는 행동 (명사형, 총합): Lv · 스킬 · 특훈(HP→SPD) · 재능 · 우정
