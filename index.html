@@ -258,7 +258,7 @@ body:not(.authed) .tn .rb{display:none!important}
 .sum .rnin{font-size:13px;width:auto;flex:1;font-weight:800}.myn .rnin{font-size:13px;font-weight:800}
 .acctype{font-size:11px;font-weight:700;color:#88f890;paint-order:stroke fill;-webkit-text-stroke:3px var(--accent);margin-right:2px;flex:0 0 auto}.acctype.sig{color:#f8f050}
 .addsk:disabled{opacity:.4;cursor:default}
-.grpchip{height:24px;padding:0 9px;border-width:0;background:var(--sky);color:var(--txt)}.grpchip.active{background:var(--accent);color:#fff}.loadset{height:24px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
+.grpchip{height:24px;padding:0 9px;border-width:0;background:var(--sky);color:var(--txt);opacity:.4}.grpchip.active{background:var(--sky);color:var(--txt);opacity:1}.loadset{height:24px;padding:0 9px;font-size:11px;margin-left:8px;border-width:0;background:var(--sky);color:var(--txt);font-weight:700}
 #sdrawer{position:fixed;left:0;right:0;bottom:0;z-index:20;max-width:520px;margin:0 auto;filter:drop-shadow(0 -4px 10px rgba(0,0,0,.14));transform:translateY(105%);visibility:hidden;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s .28s}
 #sdrawer.open{transform:none;visibility:visible;transition:transform .28s cubic-bezier(.33,0,.2,1),visibility 0s}
 .sdh{display:inline-flex;align-items:center;background:#fff;border-radius:12px 12px 0 0;padding:9px 8px 6px 14px;margin:0;vertical-align:bottom}.sdbody{background:#fff;border-radius:0 14px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom))}.sdh b{font-size:13px;font-weight:800}.sdh .ed{font-size:13px}.sdh .rnin{font-size:13px;font-weight:800;flex:none;width:10em;min-width:0}
@@ -363,9 +363,9 @@ const sigH={};D.forEach((m,i)=>m.sig.forEach(([id])=>{(sigH[id]=sigH[id]||[]).pu
 const skillIds=Object.keys(holders).sort((a,b)=>M[a].n.localeCompare(M[b].n,'ko'));
 const allSkillIds=Object.keys(M).filter(id=>holders[id]||sigH[id]).sort((a,b)=>M[a].n.localeCompare(M[b].n,'ko'));
 let SKF='all';const FS={type:new Set(),el:new Set()};
-// 스킬 타입: dt 1·3 물리, 2·4 마법, 0 보조, 8·14 회복 (5 HP 감소·7 고정 대미지는 어느 타입에도 넣지 않음)
-const skType=m=>({1:'phy',3:'phy',2:'mag',4:'mag',0:'sup',8:'heal',14:'heal'})[m.dt]||'';
-const SKTYPE=[['phy','물리'],['mag','마법'],['sup','보조'],['heal','회복']],SKEL=[['0','무'],['1','불'],['2','물'],['3','풀'],['4','전기'],['6','바람'],['5','땅'],['7','빛'],['8','어둠']];
+// 스킬 타입: dt 1·3 물리, 2·4 마법, 5·7 고정 대미지(HP %감소 포함), 8·14 회복, 0 보조
+const skType=m=>({1:'phy',3:'phy',2:'mag',4:'mag',5:'fix',7:'fix',0:'sup',8:'heal',14:'heal'})[m.dt]||'';
+const SKTYPE=[['phy','물리'],['mag','마법'],['fix','고정 대미지'],['heal','회복'],['sup','보조']],SKEL=[['0','무'],['1','불'],['2','물'],['3','풀'],['4','전기'],['6','바람'],['5','땅'],['7','빛'],['8','어둠']];
 
 
 // ---------- 루트 탐색: (디지몬, 모은 스킬 비트마스크) 상태 다익스트라 ----------
