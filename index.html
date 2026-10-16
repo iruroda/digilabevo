@@ -212,13 +212,14 @@ tr.hit td{background:rgba(var(--accent-rgb),.12)}
 .pg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px 8px}.pc{font-size:13px;font-weight:800;white-space:nowrap}.pc b{color:var(--accent);margin-right:6px}.pc span{color:var(--txt)}
 .tno{color:var(--accent)}.tnm{color:var(--txt)}.stgt{font-size:13px;font-weight:700;color:var(--sub);margin-left:4px}.modal h2 .ta{margin-right:6px;vertical-align:-5px}
 .mv td:not(:first-child),.mv th{white-space:nowrap}.mv td:not(:first-child),.mv th:not(:first-child){padding-left:3px;padding-right:3px}
-.lvbox{display:flex;gap:14px;align-items:center}.lvl{display:flex;flex-direction:column;align-items:center;gap:2px;flex:0 0 auto}
+.lvbox{display:grid;grid-template-columns:1fr 1fr 1fr;column-gap:28px;align-items:center}.lvl{display:flex;flex-direction:column;align-items:center;gap:2px;grid-row:1/4;grid-column:1;justify-self:center}
 .tri{width:44px;height:22px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0}.tri svg{width:100%;height:100%;fill:currentColor}
 .lvi{display:flex;align-items:center;gap:5px;font-weight:800;color:var(--accent);font-size:13px}
 .lvi input{width:50px;text-align:center;font-size:17px;font-weight:800;border:1px solid var(--border);border-radius:8px;height:36px;color:var(--txt);background:#fff;outline:none;-moz-appearance:textfield;user-select:text}
 .lvi input:focus{border-color:var(--accent)}.lvi input::-webkit-inner-spin-button,.lvi input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.sg{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.sc{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:800}.sc b{color:var(--accent);font-weight:700}.sc span{color:var(--txt);font-variant-numeric:tabular-nums}
+.sg{display:contents}
+.sc{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;font-size:13px;font-weight:800}.sc b{color:var(--accent);font-weight:700}.sc span{color:var(--txt);font-variant-numeric:tabular-nums}
+.sc:nth-child(n+3){background:linear-gradient(var(--border),var(--border)) left top/100% 1px no-repeat}
 .inp{font-weight:500;width:100%;height:36px;border-radius:12px;border:1px solid var(--border);padding:0 12px;font-size:13px;outline:none}
 .inp:focus{border-color:var(--accent)}
 .nrow{display:flex;align-items:center;gap:6px;margin:5px 0;font-size:13px;font-weight:500}
