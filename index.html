@@ -896,7 +896,7 @@ function drawMy(){
     row.querySelector('[data-a=ren]').onclick=()=>editName(row.querySelector('.nm'),row.querySelector('.nm').textContent,v=>{const r=ROUTES.find(x=>x.id===id);if(r){r.name=v;persist()}});
     row.querySelector('[data-a=undo]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(r)undoAnim(row,r)};
     row.querySelector('[data-a=del]').onclick=()=>{const r=ROUTES.find(x=>x.id===id);if(!r)return;
-      const b=openModal('내 루트 삭제',`<div style="word-break:keep-all"><b>${esc(r.name)}</b> 루트를 삭제합니다.</div><div class="btnrow" style="margin-top:16px"><button class="btn pri" id="delok" type="button">확인</button><button class="btn" id="delno" type="button">취소</button></div>`);
+      const b=openModal('내 루트 삭제',`<div style="word-break:keep-all"><b>${esc(r.name)}</b> 루트를 삭제합니다.</div><div class="btnrow" style="margin-top:16px"><button class="btn" id="delno" type="button">취소</button><button class="btn pri" id="delok" type="button">확인</button></div>`);
       b.querySelector('#delno').onclick=closeModal;
       b.querySelector('#delok').onclick=()=>{closeModal();shrinkOut(row,()=>{ROUTES=ROUTES.filter(x=>x.id!==id);persist();if(ROUTES.length){row.remove()}else drawMy()})}}});
   const todo=[...host.querySelectorAll('.mycard')];
