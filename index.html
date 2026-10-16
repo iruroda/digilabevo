@@ -848,8 +848,8 @@ function buildTree(){
   const rt=N.get(r).getAttribute('transform').match(/translate\(([\d.]+),([\d.]+)\)/);box.scrollTo({left:Math.max(0,+rt[1]*TZ-40),top:Math.max(0,+rt[2]*TZ-box.clientHeight/2)})}
 let TZ=1,TW_=[0,0];
 function setZoom(z,cx,cy){const b=$('#treebox'),sv=b.querySelector('svg');z=Math.min(2,Math.max(.5,Math.round(z*1000)/1000));if(!sv||z===TZ){return}
-  if(cx==null){cx=b.clientWidth/2;cy=b.clientHeight/2}const ux=(b.scrollLeft+cx)/TZ,uy=(b.scrollTop+cy)/TZ;TZ=z;
-  sv.setAttribute('width',TW_[0]*z);sv.setAttribute('height',TW_[1]*z);b.scrollLeft=ux*z-cx;b.scrollTop=uy*z-cy;rbScale();zoomBtns()}
+  if(cx==null){cx=b.clientWidth/2;cy=b.clientHeight/2}const oy=sv.getBoundingClientRect().top-b.getBoundingClientRect().top-b.clientTop+b.scrollTop,ux=(b.scrollLeft+cx)/TZ,uy=(b.scrollTop+cy-oy)/TZ;TZ=z;
+  sv.setAttribute('width',TW_[0]*z);sv.setAttribute('height',TW_[1]*z);const ny=Math.max(0,(b.clientHeight-TW_[1]*z)/2);b.scrollLeft=ux*z-cx;b.scrollTop=uy*z+ny-cy;rbScale();zoomBtns()}
 function rbScale(){const s=1/TZ;document.querySelectorAll('#treebox .rb').forEach(e=>e.setAttribute('transform',`translate(${e.dataset.x},-1) scale(${s}) translate(0,-18)`))}
 function zoomBtns(){$('#zout').disabled=TZ<=.5;$('#zin').disabled=TZ>=2}
 (()=>{const b=$('#treebox');
