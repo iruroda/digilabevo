@@ -696,7 +696,7 @@ function openDetail(i){
   <div class="btnrow"><button class="btn act" id="as" type="button">${ICS}출발 디지몬</button><button class="btn act" id="ae" type="button">${ICE}도착 디지몬</button></div>
   <div class="sec"><h3>레벨별 스테이터스</h3><div class="lvbox"><div class="lvl"><button class="tri" id="lvu" type="button" aria-label="레벨 올리기"><svg viewBox="0 0 24 24"><path d="M4 18 L12 6 L20 18 Z"/></svg></button><div class="lvi"><span>Lv.</span><input id="lvn" type="number" inputmode="numeric" min="1" max="99" value="1" aria-label="레벨"></div><button class="tri" id="lvd" type="button" aria-label="레벨 내리기"><svg viewBox="0 0 24 24"><path d="M4 6 L12 18 L20 6 Z"/></svg></button></div><div class="sg">${cells}</div></div></div>
   <div class="sec"><h3>배운 스킬</h3><table class="mv"><tr><th>스킬</th><th>습득 Lv.</th><th>소비 SP</th><th>종류</th></tr>${[...m.sig.map(x=>[x,true,1]),...m.moves.map(x=>[x,false,x[1]||999])].sort((a,b)=>a[2]-b[2]).map(([x,sg])=>mvRow(x,sg)).join('')}</table></div>
-  <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:13px;line-height:1.65;white-space:pre-wrap">${esc(m.sup[1])}</div></div>
+  <div class="sec"><h3>SS: ${esc(m.sup[0])}</h3><div style="font-size:13px;line-height:1.65">${esc(m.sup[1].replace(/\s*[\r\n]+\s*/g," "))}</div></div>
   <div class="sec"><h3>퇴화될 디지몬</h3>${evo(m.prev,'prev')}</div>
   <div class="sec"><h3>진화될 디지몬</h3>${evo(m.next,'next')}</div>${MCP[i].length?`<div class="sec"><h3>모드 체인지</h3>${evo(MCP[i],'mc')}</div>`:''}
   <div class="sec"><h3>프로필</h3><div style="font-size:13px;line-height:1.65;white-space:pre-wrap">${esc(m.desc)}</div></div>
