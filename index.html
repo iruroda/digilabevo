@@ -90,8 +90,8 @@ body[data-view=route] #qwrap,body[data-view=my] #qwrap,body[data-view=route] #pk
 #ftogwrap,#stogwrap{display:none;justify-content:center;margin-top:8px}body[data-view=dex] #ftogwrap,body[data-view=skill] #stogwrap{display:flex}
 #ftog,#stog{position:relative;width:14.3px;height:10.1px;border:0;background:none;color:var(--accent);cursor:pointer;padding:0;display:block}
 #ftog::before,#stog::before{content:'';position:absolute;inset:-8px -26px}
-#ftog svg,#stog svg{width:100%;height:100%;fill:currentColor;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round;transition:transform .3s;display:block}
-#ftog.open svg,#stog.open svg{transform:rotate(180deg)}#ftog.has::after,#stog.has::after{content:'';position:absolute;top:-2px;right:-9px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
+#ftog svg,#stog svg{overflow:visible;width:100%;height:100%;fill:currentColor;stroke:currentColor;stroke-width:2.5;stroke-linejoin:round;display:block}
+#ftog.has::after,#stog.has::after{content:'';position:absolute;top:-2px;right:-9px;width:7px;height:7px;border-radius:50%;background:var(--yellow)}
 .fpanel{display:none}body[data-view=dex] #fpanel,body[data-view=skill] #spanel{display:grid}.fpanel{grid-template-rows:0fr;transition:grid-template-rows .3s ease}.fpanel.open{grid-template-rows:1fr}
 .fin{overflow:hidden;min-height:0}.fin>.fsec:first-child{margin-top:8px}.fpanel.open .fin{overflow-y:auto;max-height:calc(100vh - 290px);scrollbar-width:thin}
 .fsec{background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:6px}.fsec:last-child{margin-bottom:0}
@@ -290,8 +290,8 @@ body.sdo{padding-bottom:170px}
     <button id="qclear" class="qclear" type="button" aria-label="검색어 지우기"><svg viewBox="0 0 24 24"><path d="M6 6L18 18M18 6L6 18"/></svg></button>
   </div></div>
   <div class="searchwrap" id="pkwrap"><div id="pk-root"></div></div>
-  <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
-  <div id="stogwrap"><button id="stog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path d="M6.1 8.8 L12 16.4 L17.9 8.8 Z"/></svg></button></div>
+  <div id="ftogwrap"><button id="ftog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path class="mph" d="M6.1 8.8L17.9 8.8L12 16.4L12 16.4Z"/></svg></button></div>
+  <div id="stogwrap"><button id="stog" type="button" aria-label="필터 열기/닫기" aria-expanded="false"><svg viewBox="4.85 7.55 14.3 10.1"><path class="mph" d="M6.1 8.8L17.9 8.8L12 16.4L12 16.4Z"/></svg></button></div>
   <div class="fpanel" id="spanel"><div class="fin"><div class="fsec"><div class="fl">타입</div><div class="chips" id="chips-stype"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-sattr"></div></div></div></div>
   <div class="fpanel" id="fpanel"><div class="fin"><div class="fsec"><div class="fl fh">세대<button class="chip grpchip" id="grpchip" type="button">세대 구분</button></div><div class="chips" id="chips-stage"></div></div><div class="fsec"><div class="fl">종족</div><div class="chips" id="chips-type"></div></div><div class="fsec"><div class="fl">속성</div><div class="chips" id="chips-attr"></div></div></div></div>
 </div>
@@ -678,7 +678,17 @@ function chipset(id,pairs,key){const host=$(id),set=F[key];
   host.innerHTML=[['',`전체`],...pairs].map(([v,l])=>`<button class="chip${v===''?(set.size?'':' active'):(set.has(v)?' active':'')}" data-v="${v}" type="button">${l}</button>`).join('');
   host.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='')set.clear();else if(set.has(v))set.delete(v);else set.add(v);chipset(id,pairs,key);if(CUR!=='dex')view('dex');else drawDex();filterMark()})}
 function filterMark(){$('#ftog').classList.toggle('has',!!(F.stage.size||F.type.size||F.attr.size))}
-$('#ftog').onclick=()=>{const o=!$('#fpanel').classList.contains('open');document.body.classList.toggle('fopen',o);if(o)window.scrollTo(0,0);$('#fpanel').classList.toggle('open',o);$('#ftog').classList.toggle('open',o);$('#ftog').setAttribute('aria-expanded',o)};
+// 서랍 삼각형: 회전 대신 슬라임처럼 넓은 쪽이 좁아지고 뾰족한 쪽이 넓어지며 변신
+const MPH={dn:[[6.1,8.8],[17.9,8.8],[12,16.4],[12,16.4]],up:[[12,8.8],[12,8.8],[17.9,16.4],[6.1,16.4]]};
+function mphD(t){const k=t<=0?0:t>=1?1:t,sq=Math.sin(Math.PI*Math.min(1,Math.max(0,t))),cy=12.6;
+  return 'M'+MPH.dn.map((p,i)=>{const q=MPH.up[i];let x=p[0]+(q[0]-p[0])*k,y=p[1]+(q[1]-p[1])*k;x=12+(x-12)*(1+.14*sq);y=cy+(y-cy)*(1-.2*sq);return x.toFixed(2)+' '+y.toFixed(2)}).join('L')+'Z'}
+const _mphA=new WeakMap();
+function morphTog(btn,open){const p=btn.querySelector('.mph');if(!p)return;const prev=_mphA.get(btn);if(prev)cancelAnimationFrame(prev.id);
+  const from=prev?prev.t:(open?0:1),to=open?1:0;if(RM||from===to){p.setAttribute('d',mphD(to));_mphA.set(btn,{t:to,id:0});return}
+  const T0=performance.now(),D=520,st={t:from,id:0};_mphA.set(btn,st);
+  const e=u=>{const s=u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;return s+.025*Math.sin(Math.PI*u)*(1-u)};
+  const f=now=>{const u=Math.min(1,(now-T0)/D);st.t=from+(to-from)*e(u);p.setAttribute('d',mphD(st.t));if(u<1)st.id=requestAnimationFrame(f);else{st.t=to;p.setAttribute('d',mphD(to))}};st.id=requestAnimationFrame(f)}
+$('#ftog').onclick=()=>{const o=!$('#fpanel').classList.contains('open');document.body.classList.toggle('fopen',o);if(o)window.scrollTo(0,0);$('#fpanel').classList.toggle('open',o);$('#ftog').classList.toggle('open',o);morphTog($('#ftog'),o);$('#ftog').setAttribute('aria-expanded',o)};
 let GRP=false;
 function drawFilters(){const g=$('#grpchip');g.onclick=()=>{GRP=!GRP;g.classList.toggle('active',GRP);if(CUR!=='dex')view('dex');else drawDex()};chipset('#chips-stage',stages.map(s=>[s,s]),'stage');chipset('#chips-type',Object.entries(TYPE),'type');chipset('#chips-attr',Object.entries(ATTR),'attr')}
 function drawDex(){const q=QS.dex;
@@ -781,7 +791,7 @@ function chipsetS(id,pairs,key){const host=$(id),set=FS[key];
   host.innerHTML=[['','전체'],...pairs].map(([v,l])=>`<button class="chip${v===''?(set.size?'':' active'):(set.has(v)?' active':'')}" data-v="${v}" type="button">${l}</button>`).join('');
   host.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const v=b.dataset.v;if(v==='')set.clear();else if(set.has(v))set.delete(v);else set.add(v);drawSkillView()})}
 function chipsSkF(){chipsetS('#chips-stype',SKTYPE,'type');chipsetS('#chips-sattr',SKEL,'el');$('#stog').classList.toggle('has',!!(FS.type.size||FS.el.size))}
-$('#stog').onclick=()=>{const o=!$('#spanel').classList.contains('open');document.body.classList.toggle('fopen',o);if(o)window.scrollTo(0,0);$('#spanel').classList.toggle('open',o);$('#stog').classList.toggle('open',o);$('#stog').setAttribute('aria-expanded',o)};
+$('#stog').onclick=()=>{const o=!$('#spanel').classList.contains('open');document.body.classList.toggle('fopen',o);if(o)window.scrollTo(0,0);$('#spanel').classList.toggle('open',o);$('#stog').classList.toggle('open',o);morphTog($('#stog'),o);$('#stog').setAttribute('aria-expanded',o)};
 function chipsSk(){const h=$('#chips-sk');h.innerHTML=[['all','전체'],['sig','필살기'],['inh','계승기']].map(([v,l])=>`<button class="chip${SKF===v?' active':''}" data-v="${v}" type="button">${l}</button>`).join('');
   h.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{SKF=b.dataset.v;drawSkillView()})}
 function showSkill(id){SKSEL=id;SKF='all';FS.type.clear();FS.el.clear();QS.skill=M[id].n;if(CUR!=='skill')view('skill');else{$('#q').value=QS.skill;drawSkillView()}}
