@@ -685,8 +685,8 @@ function mphD(t){const k=t<=0?0:t>=1?1:t,sq=Math.sin(Math.PI*Math.min(1,Math.max
 const _mphA=new WeakMap();
 function morphTog(btn,open){const p=btn.querySelector('.mph');if(!p)return;const prev=_mphA.get(btn);if(prev)cancelAnimationFrame(prev.id);
   const from=prev?prev.t:(open?0:1),to=open?1:0;if(RM||from===to){p.setAttribute('d',mphD(to));_mphA.set(btn,{t:to,id:0});return}
-  const T0=performance.now(),D=520,st={t:from,id:0};_mphA.set(btn,st);
-  const e=u=>{const s=u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;return s+.025*Math.sin(Math.PI*u)*(1-u)};
+  const T0=performance.now(),D=300,st={t:from,id:0};_mphA.set(btn,st);
+  const e=u=>{const s=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;return s+.025*Math.sin(Math.PI*u)*(1-u)};
   const f=now=>{const u=Math.min(1,(now-T0)/D);st.t=from+(to-from)*e(u);p.setAttribute('d',mphD(st.t));if(u<1)st.id=requestAnimationFrame(f);else{st.t=to;p.setAttribute('d',mphD(to))}};st.id=requestAnimationFrame(f)}
 $('#ftog').onclick=()=>{const o=!$('#fpanel').classList.contains('open');document.body.classList.toggle('fopen',o);if(o)window.scrollTo(0,0);$('#fpanel').classList.toggle('open',o);$('#ftog').classList.toggle('open',o);morphTog($('#ftog'),o);$('#ftog').setAttribute('aria-expanded',o)};
 let GRP=false;
