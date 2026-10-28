@@ -743,25 +743,34 @@ let SETS=[];try{SETS=JSON.parse(localStorage.getItem('digilab.sets')||'[]')}catc
 const sortSk=a=>a.slice().sort((x,y)=>String(M[x]?.n||'').localeCompare(String(M[y]?.n||''),'ko'));
 SETS.forEach(t=>{if(t&&t.skills)t.skills=sortSk(t.skills)});
 const saveSets=()=>{try{localStorage.setItem('digilab.sets',JSON.stringify(SETS))}catch(e){}};
-let DRAFT=[],DRAFTNAME='';
+let DRAFT=[],DRAFTNAME='',EDITID=null;
 const defSetName=()=>{const ns=SETS.map(s=>(/^스킬 세트 (\d+)$/.exec(s.name)||[])[1]).filter(Boolean).map(Number);return ns.includes(1)?`스킬 세트 ${Math.max(...ns)+1}`:'스킬 세트 1'};
 document.body.insertAdjacentHTML('beforeend',`<div id="sdrawer"><div class="sdh"><b id="sdn"></b><button class="ed" id="sdedit" type="button" aria-label="이름 변경">${PEN}</button></div><div class="sdbody"><div class="sdsk" id="sdsk"></div><div class="sdbtn"><button class="btn act" id="sdclr" type="button">모두 지우기</button><button class="btn pri" id="sdsave" type="button">저장</button></div></div></div>`);
 function refreshAdd(){document.querySelectorAll('.addsk').forEach(b=>{const id=b.closest('.acc').dataset.id;b.disabled=DRAFT.length>=8||DRAFT.includes(id)})}
 let dShown=[];
 function animH(el,h0,h1,prop){if(RM||!el.animate||h0===h1)return;el.style.overflow='hidden';el.animate([{[prop]:h0+'px'},{[prop]:h1+'px'}],{duration:240,easing:EASE}).onfinish=()=>{el.style.overflow=''}}
-function drawDrawer(){const bd=document.querySelector('.sdbody'),wasOpen=$('#sdrawer').classList.contains('open'),h0=bd.offsetHeight;$('#sdn').textContent=DRAFTNAME;const sk=$('#sdsk');sk.innerHTML=DRAFT.map((id,k)=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}<span class="x" data-k="${k}">${XIC}</span></span>`).join('');
+function drawDrawer(){if(!DRAFT.length)EDITID=null;const bd=document.querySelector('.sdbody'),wasOpen=$('#sdrawer').classList.contains('open'),h0=bd.offsetHeight;$('#sdn').textContent=DRAFTNAME;const sk=$('#sdsk');sk.innerHTML=DRAFT.map((id,k)=>`<span class="chip tag">${skI(M[id],16)}${esc(M[id].n)}<span class="x" data-k="${k}">${XIC}</span></span>`).join('');
   sk.querySelectorAll('.chip').forEach((c,k)=>{if(!dShown.includes(DRAFT[k]))popIn(c);c.querySelector('.x').onclick=()=>popOut(c,()=>{DRAFT.splice(k,1);drawDrawer()})});dShown=DRAFT.slice();
 $('#sdrawer').classList.toggle('open',DRAFT.length>0&&CUR==='skill');document.body.classList.toggle('hasd',DRAFT.length>0);document.body.classList.toggle('sdo',DRAFT.length>0&&CUR==='skill');refreshAdd();if(wasOpen&&DRAFT.length)animH(bd,h0,bd.offsetHeight,'height')}
 function addToDraft(id){if(DRAFT.length>=8||DRAFT.includes(id))return;if(!DRAFT.length)DRAFTNAME=defSetName();DRAFT.push(id);drawDrawer()}
 $('#sdedit').onclick=()=>{const t=document.querySelector('.sdh'),w0=t.offsetWidth;editName($('#sdn'),DRAFTNAME,v=>{DRAFTNAME=v},()=>animH(t,wE,t.offsetWidth,'width'));var wE=t.offsetWidth;animH(t,w0,wE,'width')};
 $('#sdclr').onclick=()=>{DRAFT=[];drawDrawer()};
-$('#sdsave').onclick=()=>{if(!DRAFT.length)return;SETS.push({id:Date.now().toString(36),name:DRAFTNAME||defSetName(),skills:sortSk(DRAFT),t:Date.now()});saveSets();DRAFT=[];drawDrawer();drawLoadBtn()};
+$('#sdsave').onclick=()=>{if(!DRAFT.length)return;const ex=EDITID&&SETS.find(x=>x.id===EDITID);
+  if(ex){ex.name=DRAFTNAME||ex.name;ex.skills=sortSk(DRAFT)}else SETS.push({id:Date.now().toString(36),name:DRAFTNAME||defSetName(),skills:sortSk(DRAFT),t:Date.now()});
+  saveSets();EDITID=null;DRAFT=[];drawDrawer();drawLoadBtn()};
+// 스킬 세트 수정: 서랍(스킬 세트 만들기 창)에 불러와서 이름·스킬을 고친 뒤 저장
+function editSet(id){const it=SETS.find(x=>x.id===id);if(!it)return;
+  const go=()=>{EDITID=id;DRAFTNAME=it.name;DRAFT=it.skills.filter(k=>M[k]).slice(0,8);dShown=[];drawDrawer()};
+  if(DRAFT.length&&EDITID!==id){const b=openModal('스킬 세트 수정','<div style="word-break:keep-all">작성 중인 스킬 세트가 사라집니다.</div><div class="btnrow" style="margin-top:16px"><button class="btn" id="edno" type="button">취소</button><button class="btn pri" id="edok" type="button">수정</button></div>');
+    b.querySelector('#edno').onclick=()=>closeModal();b.querySelector('#edok').onclick=()=>{closeModal();go()}}else go()}
 function updMg(){const b=$('#smg');if(b)b.classList.toggle('show',CUR==='skill'&&SETS.length>0)}
 function drawLoadBtn(){$('#loadset').style.display=SETS.length?'':'none';updMg()}
 $('#loadset').onclick=()=>{
   const b=openModal('스킬 세트 불러오기',`<div class="setlist" id="setdrop">${SETS.map(s=>`<div data-id="${s.id}">${esc(s.name)}</div>`).join('')}</div><div class="setprev" id="setprev"></div><div style="margin-top:12px;display:flex"><button class="btn pri" id="setok" type="button" disabled>확인</button></div>`);
   const ok=b.querySelector('#setok'),dd=b.querySelector('#setdrop'),prev=b.querySelector('#setprev');let cur=null;
-  dd.onclick=e=>{const t=e.target.closest('[data-id]');if(!t)return;cur=SETS.find(x=>x.id===t.dataset.id);dd.querySelectorAll('div').forEach(d=>d.classList.toggle('on',d===t));
+  dd.onclick=e=>{const t=e.target.closest('[data-id]');if(!t)return;
+    if(cur&&cur.id===t.dataset.id){cur=null;dd.querySelectorAll('div').forEach(d=>d.classList.remove('on'));ok.disabled=true;const pc=prev.firstChild;if(pc)shrinkOut(pc,()=>{if(!cur)prev.innerHTML=''});return}
+    cur=SETS.find(x=>x.id===t.dataset.id);dd.querySelectorAll('div').forEach(d=>d.classList.toggle('on',d===t));
     const had=!!prev.firstChild;prev.innerHTML=`<div class="sdsk">${cur.skills.filter(id=>M[id]).map(id=>`<span class="chip tag">${skI(M[id],18)}${esc(M[id].n)}</span>`).join('')}</div>`;if(!had)growIn(prev.firstChild);ok.disabled=false};
   ok.onclick=()=>{if(!cur)return;S.skills=cur.skills.filter(id=>M[id]).slice(0,8);drawSel();closeModal()}};
 
@@ -772,11 +781,11 @@ $('#smg').onclick=()=>{
   let work=SETS.map(x=>({...x})),sel=null;
   const b=openModal('스킬 세트 관리',`<div class="setlist mg" id="setdrop"></div><div class="setprev" id="setprev"></div><div class="btnrow" style="margin-top:12px"><button class="btn" id="mgno" type="button">취소</button><button class="btn pri" id="mgok" type="button">저장</button></div>`);
   const dd=b.querySelector('#setdrop'),prev=b.querySelector('#setprev');
-  const drawList=()=>{dd.innerHTML=work.map(s=>`<div data-id="${s.id}" class="${sel===s.id?'on':''}"><span class="sn">${esc(s.name)}</span><button class="ed" type="button" aria-label="이름 변경">${PEN}</button><button class="sx" type="button" aria-label="삭제">${XIC}</button></div>`).join('');
+  const drawList=()=>{dd.innerHTML=work.map(s=>`<div data-id="${s.id}" class="${sel===s.id?'on':''}"><span class="sn">${esc(s.name)}</span><button class="ed" type="button" aria-label="수정">${PEN}</button><button class="sx" type="button" aria-label="삭제">${XIC}</button></div>`).join('');
     const c=work.find(x=>x.id===sel);prev.innerHTML=c?`<div class="sdsk">${c.skills.filter(id=>M[id]).map(id=>`<span class="chip tag">${skI(M[id],18)}${esc(M[id].n)}</span>`).join('')}</div>`:''};
   drawList();
   dd.onclick=e=>{const t=e.target.closest('[data-id]');if(!t||e.target.closest('.rnin'))return;const id=t.dataset.id;
-    if(e.target.closest('.ed')){const it=work.find(x=>x.id===id);editName(t.querySelector('.sn'),it.name,v=>{it.name=v});return}
+    if(e.target.closest('.ed')){closeModal();editSet(id);return}
     if(e.target.closest('.sx')){work=work.filter(x=>x.id!==id);if(sel===id)sel=null}else sel=id;drawList()};
   b.querySelector('#mgno').onclick=()=>closeModal();
   b.querySelector('#mgok').onclick=()=>{SETS=work;saveSets();drawLoadBtn();closeModal()}};
