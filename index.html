@@ -503,7 +503,7 @@ function slideViews(o,n,snap,H0){const so=$('#v-'+o),sn=$('#v-'+n),c=document.qu
   requestAnimationFrame(()=>{so.style.transform=`translateX(${-dir*W}px)`;sn.style.transform='translateX(0)';sh.style.transform='translateX(0)';ft.style.transform='translateX(0)';if(snap)snap.style.transform=`translateX(${-dir*W}px)`});
   let done=false,t;const fin=()=>{if(done)return;done=true;clearTimeout(t);slideDone=null;so.hidden=true;so.style.cssText='';sn.style.transform='';sn.style.transition='';sh.style.transform='';sh.style.transition='';ft.style.transform='';ft.style.transition='';document.body.style.overflowX='';snap&&snap.remove();c.style.position='';c.style.overflowX='';hw.style.overflowX=''};
   slideDone=fin;sn.addEventListener('transitionend',e=>{if(e.target===sn&&e.propertyName==='transform')fin()},{once:true});t=setTimeout(fin,360)}
-function view(v){closeModal();if(slideDone)slideDone();const old=VIEWS.find(k=>!$('#v-'+k).hidden),mo=old&&old!==v&&!matchMedia('(prefers-reduced-motion:reduce)').matches,snap=mo?subSnap():null,H0=$('#hdwrap').offsetHeight;
+function view(v){closeModal();if(slideDone)slideDone();const old=VIEWS.find(k=>!$('#v-'+k).hidden),mo=old&&old!==v,snap=mo?subSnap():null,H0=$('#hdwrap').offsetHeight;
   CUR=v;document.body.dataset.view=v;try{updMg()}catch(e){}try{const o=DRAFT.length>0&&v==='skill';$('#sdrawer').classList.toggle('open',o);document.body.classList.toggle('sdo',o)}catch(e){}
   VIEWS.forEach(k=>{$('#v-'+k).hidden=k!==v;$('#vt-'+k).classList.toggle('active',k===v)});
   const q=$('#q');q.value=QS[v]||'';window.scrollTo(0,0);
@@ -516,7 +516,7 @@ $('#tq').addEventListener('input',()=>{QS.tree=$('#tq').value;treeSearch()});
 $('#tqclear').onclick=()=>{$('#tq').value='';QS.tree='';treeSearch();$('#tq').focus()};
 $('#qclear').onclick=()=>{$('#q').value='';QS[CUR]='';$('#q').dispatchEvent(new Event('input'))};
 // ---------- 늘어남/줄어듦 애니메이션 ----------
-const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,EASE='cubic-bezier(.4,0,.2,1)';
+const RM=false,/* OS의 '동작 줄이기' 설정과 상관없이 사이트 설정 우선 */EASE='cubic-bezier(.4,0,.2,1)';
 function growIn(el){if(!el||RM||!el.animate)return;const cs=getComputedStyle(el),h=el.offsetHeight;
   const k=[{height:'0px',opacity:0,marginTop:'0px',marginBottom:'0px',paddingTop:'0px',paddingBottom:'0px'},{height:h+'px',opacity:1,marginTop:cs.marginTop,marginBottom:cs.marginBottom,paddingTop:cs.paddingTop,paddingBottom:cs.paddingBottom}];
   el.style.overflow='hidden';const a=el.animate(k,{duration:260,easing:EASE});a.onfinish=a.oncancel=()=>{el.style.overflow=''}}
