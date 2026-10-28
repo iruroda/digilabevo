@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="google-site-verification" content="7yBTZUeCCDnbQs1EWhZnMn5975IcNAGY-ifb-crTASc" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500;700;800&display=swap">
 <title>디지랩 EVO</title>
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='27.5' fill='none' stroke='%23ffc401' stroke-width='9'/%3E%3Ccircle cx='32' cy='32' r='10.8' fill='none' stroke='%23ffc401' stroke-width='7'/%3E%3C/svg%3E">
@@ -25,7 +28,7 @@ html.scrolling::-webkit-scrollbar-thumb:hover,.sb.scrolling::-webkit-scrollbar-t
 html,.sb{scrollbar-width:thin;scrollbar-color:rgba(0,0,0,0) transparent}
 html.scrolling,.sb.scrolling{scrollbar-color:rgba(0,0,0,.28) transparent}
 }
-html,body{margin:0;padding:0;font-weight:500;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
+html,body{margin:0;padding:0;font-weight:500;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;background:var(--bg);color:var(--txt);font-family:"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Malgun Gothic",sans-serif}
 input,textarea{-webkit-user-select:text;user-select:text;font-family:inherit}
 button{font-family:inherit}
 html.lock{overflow:hidden}
@@ -606,6 +609,7 @@ const BH=88,BIC=70,BCOL=88,BR=5,BRE=4;
 const twb=(t,hg,ot)=>[...String(t).replace(/<[^>]*>/g,'')].reduce((w,c)=>w+(c.charCodeAt(0)>255?hg:c===' '?3.4:/[()]/.test(c)?4.2:ot),0);
 let _WE=0;const boxWE=()=>_WE||(_WE=Math.max(8+BIC+8+BCOL+8+8,Math.ceil(Math.max(...D.map(m=>twb(ro(m.ko)+' 진화',11.3,6.6))))+16+4));
 let _rm=null;const _rw=new Map();
+try{document.fonts.ready.then(()=>{_rw.clear();_WE=0;if(typeof CUR!=='undefined'&&CUR==='my')try{drawMy()}catch(e){}})}catch(e){}
 // 행동 텍스트 너비: 실제 글꼴로 직접 재서 (기기마다 글꼴이 달라도 줄 수가 맞게)
 const twr=(t,perChar)=>{try{if(!_rm){_rm=document.createElement('span');_rm.style.cssText='position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font-size:11px;font-weight:500';document.body.appendChild(_rm)}
   let w=_rw.get(t);if(w==null){_rm.innerHTML=t;w=_rm.getBoundingClientRect().width;if(!w)throw 0;_rw.set(t,w)}return w}catch(e){return twb(t,perChar[0],perChar[1])}};
